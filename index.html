@@ -248,8 +248,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Right Column - Photo -->
-                    <div class="order-1 md:order-2">
+                    <!-- Right Column - Photo & Resume -->
+                    <div class="order-1 md:order-2 flex flex-col items-center gap-4">
                         <div class="relative rounded-2xl overflow-hidden shadow-xl" style="height: 320px;">
                             <img src="./photo.jpg" alt="职业形象照" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green via-morandi-gray-blue to-morandi-lavender flex-col items-center justify-center text-white">
@@ -257,10 +257,26 @@
                                 <span class="text-sm">职业形象照</span>
                             </div>
                         </div>
-                        <a href="./20260417柳诗颖.pdf" target="_blank" class="mt-4 w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-medium bg-gradient-to-r from-morandi-gray-blue to-morandi-gray-green hover:shadow-lg transition-all duration-300">
-                            <i class="fas fa-download"></i>
-                            📄 下载完整简历
-                        </a>
+                        <!-- Resume Preview Card -->
+                        <div class="w-full bg-white rounded-xl shadow-lg p-4 flex flex-col items-center border border-gray-100">
+                            <div class="w-full aspect-[3/4] max-w-[160px] bg-gradient-to-br from-morandi-cream to-white rounded-lg shadow-inner border border-gray-200 flex flex-col items-center justify-center relative overflow-hidden">
+                                <div class="absolute top-3 left-3 right-3 space-y-1">
+                                    <div class="h-1.5 bg-gray-300 rounded w-3/4"></div>
+                                    <div class="h-1 bg-gray-200 rounded w-1/2"></div>
+                                    <div class="h-1 bg-gray-200 rounded w-2/3"></div>
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i class="fas fa-file-pdf text-5xl text-morandi-pink/60"></i>
+                                </div>
+                                <div class="absolute bottom-2 text-center">
+                                    <span class="text-[10px] text-gray-400 font-medium">A4 纵向</span>
+                                </div>
+                            </div>
+                            <a href="./20260417柳诗颖.pdf" target="_blank" class="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-morandi-gray-blue to-morandi-gray-green hover:shadow-lg transition-all duration-300">
+                                <i class="fas fa-download"></i>
+                                下载完整简历
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
