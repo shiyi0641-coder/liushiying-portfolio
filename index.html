@@ -787,17 +787,54 @@
         });
     </script>
     <!-- AI 聊天悬浮按钮 -->
-    <a href="https://www.coze.cn/s/VupATMTeQis/" target="_blank" style="position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; align-items: center; justify-content: center; text-decoration: none; display: flex; animation: pulse 2s infinite;">
+    <button id="chatToggle" onclick="toggleChat()" style="position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; align-items: center; justify-content: center; animation: breathe 3s ease-in-out infinite;">
         <i class="fas fa-comment-dots" style="color: white; font-size: 24px;"></i>
-    </a>
+    </button>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 聊天抽屉 -->
+    <div id="chatDrawer" class="hidden fixed inset-0 z-[60]">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeChat()"></div>
+        <div id="chatPanel" class="absolute right-0 top-0 bottom-0 w-full md:w-[400px] md:h-[80vh] md:top-[10vh] md:bottom-auto md:rounded-2xl overflow-hidden shadow-2xl transform translate-x-full transition-transform duration-300 bg-white flex flex-col">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100" style="background: linear-gradient(135deg, #8B9A8E, #7B8B9E);">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <span class="font-semibold text-white">和我的 AI 分身聊聊</span>
+                </div>
+                <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="flex-1 w-full overflow-hidden">
+                <iframe id="chatIframe" src="https://www.coze.cn/s/VupATMTeQis/" frameborder="0" width="100%" height="100%" class="w-full h-full"></iframe>
+            </div>
+        </div>
+    </div>
 
     <style>
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-            50% { transform: scale(1.05); box-shadow: 0 4px 30px rgba(139,154,142,0.4); }
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 154, 142, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(139, 154, 142, 0.2); }
         }
     </style>
+
+    <script>
+        function toggleChat() {
+            const drawer = document.getElementById('chatDrawer');
+            const panel = document.getElementById('chatPanel');
+            drawer.classList.remove('hidden');
+            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+        }
+        function closeChat() {
+            const drawer = document.getElementById('chatDrawer');
+            const panel = document.getElementById('chatPanel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => drawer.classList.add('hidden'), 300);
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeChat();
+        });
+    </script>
 </body>
 </html>
