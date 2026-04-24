@@ -786,48 +786,16 @@
             }
         });
     </script>
-    <!-- Coze Web SDK -->
-    <script src="https://lf6.coze.cn/obj/flow-platform/chat-app-sdk/1.2.0-beta.21/libs/cn/index.js"></script>
-    <script>
-        window.addEventListener('load', function() {
-            try {
-                new CozeWebSDK.WebChatClient({
-                    config: {
-                        type: 'bot',
-                        bot_id: '7632159218883575823',
-                        isIframe: false
-                    },
-                    auth: {
-                        type: 'token',
-                        token: 'cztei_q8AuCsmi0jxs2ep8a82Y3Q7dmHq43svlMttzUbCPyA2dTrAOn3vffmNnX6DtXQI1O',
-                        onRefreshToken: async () => 'cztei_q8AuCsmi0jxs2ep8a82Y3Q7dmHq43svlMttzUbCPyA2dTrAOn3vffmNnX6DtXQI1O'
-                    },
-                    ui: {
-                        base: {
-                            icon: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/chatsdk-logo.png',
-                            layout: 'pc',
-                            lang: 'zh-CN',
-                            zIndex: 1000
-                        },
-                        asstBtn: { isNeed: true },
-                        chatBot: {
-                            title: '柳诗颖的 AI 分身',
-                            uploadable: true,
-                            width: 390
-                        }
-                    }
-                });
-            } catch (e) {
-                console.error('Coze SDK 加载失败:', e);
-                // 备用方案：显示浮动按钮链接到Coze
-                document.getElementById('fallbackBtn').style.display = 'flex';
-            }
-        });
-    </script>
-
-    <!-- 备用浮动按钮 -->
-    <a href="https://www.coze.cn/s/VupATMTeQis/" target="_blank" id="fallbackBtn" style="display: none; position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; align-items: center; justify-content: center; text-decoration: none;">
+    <!-- AI 聊天悬浮按钮 -->
+    <a href="https://www.coze.cn/s/VupATMTeQis/" target="_blank" id="chatBtn" style="position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; align-items: center; justify-content: center; text-decoration: none; display: flex; animation: pulse 2s infinite;">
         <i class="fas fa-comment-dots" style="color: white; font-size: 24px;"></i>
     </a>
+
+    <style>
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 30px rgba(139,154,142,0.4); }
+        }
+    </style>
 </body>
 </html>
