@@ -159,10 +159,10 @@
                 <span class="text-lg font-semibold text-gray-700">柳诗颖</span>
                 <div class="hidden md:flex items-center gap-8 text-sm text-gray-500">
                     <a href="#about" class="hover:text-gray-700 transition-colors">关于我</a>
-                    <a href="#education" class="hover:text-gray-700 transition-colors">教育背景</a>
-                    <a href="#projects" class="hover:text-gray-700 transition-colors">项目经历</a>
+                    <a href="#internships" class="hover:text-gray-700 transition-colors">实习经历</a>
+                    <a href="#projects" class="hover:text-gray-700 transition-colors">核心项目</a>
                     <a href="#skills" class="hover:text-gray-700 transition-colors">技能图谱</a>
-                    <a href="#awards" class="hover:text-gray-700 transition-colors">荣誉奖项</a>
+                    <a href="#life" class="hover:text-gray-700 transition-colors">生活剪影</a>
                 </div>
                 <button class="md:hidden text-gray-500" onclick="toggleMobileMenu()">
                     <i class="fas fa-bars text-xl"></i>
@@ -172,10 +172,10 @@
             <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-100 pt-4">
                 <div class="flex flex-col gap-4 text-sm text-gray-500">
                     <a href="#about" class="hover:text-gray-700 transition-colors">关于我</a>
-                    <a href="#education" class="hover:text-gray-700 transition-colors">教育背景</a>
-                    <a href="#projects" class="hover:text-gray-700 transition-colors">项目经历</a>
+                    <a href="#internships" class="hover:text-gray-700 transition-colors">实习经历</a>
+                    <a href="#projects" class="hover:text-gray-700 transition-colors">核心项目</a>
                     <a href="#skills" class="hover:text-gray-700 transition-colors">技能图谱</a>
-                    <a href="#awards" class="hover:text-gray-700 transition-colors">荣誉奖项</a>
+                    <a href="#life" class="hover:text-gray-700 transition-colors">生活剪影</a>
                 </div>
             </div>
         </div>
@@ -185,14 +185,11 @@
     <section id="about" class="pt-32 pb-20 px-4 bg-gradient-to-br from-white via-morandi-cream to-white">
         <div class="max-w-6xl mx-auto">
             <div class="fade-in-up">
-                <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-                    <!-- Avatar Placeholder -->
-                    <div class="w-40 h-40 rounded-full bg-gradient-to-br from-morandi-gray-green via-morandi-gray-blue to-morandi-lavender flex items-center justify-center shadow-xl">
-                        <span class="text-5xl text-white font-light">柳</span>
-                    </div>
-                    <div class="text-center md:text-left">
+                <div class="grid md:grid-cols-2 gap-12 items-start">
+                    <!-- Left Column -->
+                    <div class="order-2 md:order-1">
                         <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">柳诗颖</h1>
-                        <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
+                        <div class="flex flex-wrap gap-3 mb-6">
                             <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-gray-green/20 to-morandi-gray-blue/20 text-gray-700 border border-morandi-gray-green/30">
                                 AI 产品经理
                             </span>
@@ -200,59 +197,69 @@
                                 心理学硕士
                             </span>
                         </div>
-                        <a href="./20260417柳诗颖.pdf" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-medium bg-gradient-to-r from-morandi-gray-blue to-morandi-gray-green hover:shadow-lg hover:shadow-morandi-gray-blue/30 transition-all duration-300">
-                            📄 下载完整简历
-                        </a>
-                        <div class="space-y-2 text-gray-600">
-                            <p class="flex items-center justify-center md:justify-start gap-2">
-                                <i class="fas fa-birthday-cake text-morandi-gray-green"></i>
+                        <!-- Motto -->
+                        <div class="mb-6 pl-4 border-l-4 border-morandi-gray-green">
+                            <p class="text-morandi-gray-green text-sm italic font-light">"做自己喜欢且坚持做的事情"</p>
+                        </div>
+                        <!-- Personal Info -->
+                        <div class="space-y-3 text-gray-600 mb-6">
+                            <p class="flex items-center gap-3">
+                                <i class="fas fa-birthday-cake text-morandi-gray-green w-5"></i>
                                 <span>出生日期：2002.04.30</span>
                             </p>
-                            <p class="flex items-center justify-center md:justify-start gap-2">
-                                <i class="fas fa-venus text-morandi-pink"></i>
+                            <p class="flex items-center gap-3">
+                                <i class="fas fa-venus text-morandi-pink w-5"></i>
                                 <span>性别：女</span>
                             </p>
-                            <p class="flex items-center justify-center md:justify-start gap-2">
-                                <i class="fas fa-map-marker-alt text-morandi-gray-blue"></i>
+                            <p class="flex items-center gap-3">
+                                <i class="fas fa-map-marker-alt text-morandi-gray-blue w-5"></i>
                                 <span>籍贯：浙江台州</span>
                             </p>
                         </div>
+                        <!-- Contact & Hobbies -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white rounded-xl p-4 shadow">
+                                <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                    <i class="fas fa-address-card text-morandi-gray-green"></i>
+                                    联系方式
+                                </h3>
+                                <div class="space-y-2 text-xs text-gray-600">
+                                    <a href="tel:13456847578" target="_blank" class="flex items-center gap-2 hover:text-morandi-gray-green">
+                                        <i class="fas fa-phone"></i> 13456847578
+                                    </a>
+                                    <a href="mailto:1830074786@qq.com" target="_blank" class="flex items-center gap-2 hover:text-morandi-gray-green">
+                                        <i class="fas fa-envelope"></i> 1830074786@qq.com
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl p-4 shadow">
+                                <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                    <i class="fas fa-heart text-morandi-pink"></i>
+                                    个人爱好
+                                </h3>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="tag px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                                        <i class="fas fa-camera text-morandi-gray-green"></i> 摄影
+                                    </span>
+                                    <span class="tag px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                                        <i class="fas fa-running text-morandi-gray-blue"></i> 运动
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Contact & Hobbies -->
-            <div class="grid md:grid-cols-2 gap-6 mt-12">
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-address-card text-morandi-gray-green"></i>
-                        联系方式
-                    </h3>
-                    <div class="space-y-3">
-                        <a href="tel:13456847578" target="_blank" class="flex items-center gap-3 text-gray-600 hover:text-morandi-gray-green transition-colors">
-                            <i class="fas fa-phone text-morandi-gray-blue"></i>
-                            <span>13456847578</span>
+                    <!-- Right Column - Photo & Resume -->
+                    <div class="order-1 md:order-2 flex flex-col items-center gap-4">
+                        <div class="relative rounded-2xl overflow-hidden shadow-xl" style="height: 320px;">
+                            <img src="./photo.jpg" alt="职业形象照" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green via-morandi-gray-blue to-morandi-lavender flex-col items-center justify-center text-white">
+                                <i class="fas fa-user-tie text-5xl mb-4"></i>
+                                <span class="text-sm">职业形象照</span>
+                            </div>
+                        </div>
+                        <a href="./20260417柳诗颖.pdf" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-morandi-gray-blue to-morandi-gray-green hover:shadow-lg transition-all duration-300">
+                            下载完整简历
                         </a>
-                        <a href="mailto:1830074786@qq.com" target="_blank" class="flex items-center gap-3 text-gray-600 hover:text-morandi-gray-green transition-colors">
-                            <i class="fas fa-envelope text-morandi-pink"></i>
-                            <span>1830074786@qq.com</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.1s;">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-heart text-morandi-pink"></i>
-                        个人爱好
-                    </h3>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fas fa-camera text-morandi-gray-green"></i>
-                            摄影
-                        </span>
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fas fa-running text-morandi-gray-blue"></i>
-                            运动
-                        </span>
                     </div>
                 </div>
             </div>
@@ -302,11 +309,105 @@
         </div>
     </section>
 
+    <!-- Internships Section -->
+    <section id="internships" class="py-20 px-4 bg-morandi-cream/30">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">实习经历</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-blue to-morandi-pink rounded-full mx-auto"></div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Internship 1 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-green">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center">
+                                <i class="fas fa-cloud text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">中国电子云计算技术有限公司</h3>
+                                <p class="text-sm text-morandi-gray-green">AI产品经理</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700 md:ml-auto">2025.11 - 2026.02</span>
+                    </div>
+                    <div class="space-y-3 text-gray-600 text-sm">
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>合同AI智能体开发：</strong>深度参与"招投标合同生成"与"智能评估"需求定义，通过拆解复杂业务流完成原型与PRD撰写，有效降低了个性化定制成本。</span></p>
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>全流程需求管理：</strong>主导多次技术评审，输出精准 To-do List 并跨部门协调研发测试，保障功能准确落地。</span></p>
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>数据集赋能课程：</strong>针对供应链高质量数据集进行深度调研与需求洞察，构建结构化课程体系。</span></p>
+                    </div>
+                </div>
+
+                <!-- Internship 2 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-blue" style="transition-delay: 0.1s;">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-gray-blue to-morandi-lavender flex items-center justify-center">
+                                <i class="fas fa-chart-bar text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">北京起航未来科技有限公司</h3>
+                                <p class="text-sm text-morandi-gray-blue">行业研究员</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700 md:ml-auto">2025.09 - 2025.11</span>
+                    </div>
+                    <div class="space-y-3 text-gray-600 text-sm">
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>数据挖掘与建库：</strong>多渠道检索并梳理全国高校招生及就业数据，从0到1构建结构化信息库。</span></p>
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>竞品追踪与洞察：</strong>监测泛教育赛道核心竞品，产出结构化行业周报，辅助优化业务导向。</span></p>
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>内容打磨输出：</strong>将调研转化为高转化内容，累计输出直播脚本及产品解读文稿超120篇。</span></p>
+                    </div>
+                </div>
+
+                <!-- Internship 3 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-pink" style="transition-delay: 0.2s;">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center">
+                                <i class="fas fa-heart text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">温岭中学</h3>
+                                <p class="text-sm text-morandi-pink">心理实习教师</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700 md:ml-auto">2023.09 - 2023.12</span>
+                    </div>
+                    <div class="space-y-3 text-gray-600 text-sm">
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>独立授课与团辅，针对情绪管理痛点开展专题辅导</span></p>
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>负责1对1咨询与危机排查，协助完善全校心理档案</span></p>
+                    </div>
+                </div>
+
+                <!-- Internship 4 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-sage" style="transition-delay: 0.3s;">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">温岭第四中学</h3>
+                                <p class="text-sm text-morandi-sage">心理实习教师</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-sage/20 text-gray-700 md:ml-auto">2023.06 - 2023.07</span>
+                    </div>
+                    <div class="space-y-3 text-gray-600 text-sm">
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>承担初中心理课教学，结合身心发展特点设计互动环节</span></p>
+                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>培养学生抗压与受挫恢复能力</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Projects Section -->
     <section id="projects" class="py-20 px-4 bg-gradient-to-br from-morandi-cream via-white to-morandi-cream/50">
         <div class="max-w-6xl mx-auto">
             <div class="fade-in-up text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">核心项目与实习</h2>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">核心项目</h2>
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-pink to-morandi-lavender rounded-full mx-auto"></div>
             </div>
 
@@ -408,8 +509,8 @@
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-green to-morandi-sage rounded-full mx-auto"></div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Core Skills -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- 核心技能 -->
                 <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg">
                     <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
                         <i class="fas fa-star text-morandi-gray-green"></i>
@@ -455,81 +556,126 @@
                     </div>
                 </div>
 
-                <!-- Tools -->
+                <!-- 办公技能 -->
                 <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg" style="transition-delay: 0.1s;">
                     <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                        <i class="fas fa-tools text-morandi-gray-blue"></i>
-                        数据与工具
+                        <i class="fas fa-laptop text-morandi-gray-blue"></i>
+                        办公技能
                     </h3>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fas fa-chart-bar text-morandi-gray-green"></i>
-                            SPSS
-                        </span>
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fas fa-calculator text-morandi-gray-blue"></i>
-                            MATLAB
-                        </span>
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fas fa-robot text-morandi-pink"></i>
-                            扣子 (Coze)
-                        </span>
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fas fa-pencil-ruler text-morandi-lavender"></i>
-                            Axure
-                        </span>
-                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
-                            <i class="fab fa-figma text-morandi-sage"></i>
-                            Figma
-                        </span>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Matlab</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">SPSS</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Excel</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Word</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">PPT</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Python</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">E-prime</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">SQL</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Coze</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Claude Code</span>
                     </div>
-                    <div class="mt-6 p-4 bg-gray-50 rounded-xl">
-                        <p class="text-sm text-gray-500 leading-relaxed">
-                            <i class="fas fa-info-circle text-morandi-gray-blue mr-2"></i>
-                            数据分析能力：SPSS 熟练进行统计分析，MATLAB 进行数据清洗与相关性分析
-                        </p>
+                </div>
+
+                <!-- 产品技能 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg" style="transition-delay: 0.2s;">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="fas fa-pencil-ruler text-morandi-pink"></i>
+                        产品技能
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">X-mind</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">秀米</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">稿定</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Axure</span>
+                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Figma</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 mt-6 flex items-center gap-2">
+                        <i class="fas fa-certificate text-morandi-lavender"></i>
+                        获得证书
+                    </h3>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">英语六级</span>
+                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">计算机二级</span>
+                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">普通话二甲</span>
+                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">心理健康教资</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Awards Section -->
-    <section id="awards" class="py-20 px-4 bg-gradient-to-br from-morandi-cream/50 via-white to-morandi-cream">
+    <!-- Life & Photography Section -->
+    <section id="life" class="py-20 px-4 bg-gradient-to-br from-morandi-cream via-white to-morandi-lavender/20">
         <div class="max-w-6xl mx-auto">
             <div class="fade-in-up text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">荣誉奖项</h2>
-                <div class="w-20 h-1 bg-gradient-to-r from-morandi-lavender to-morandi-pink rounded-full mx-auto"></div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">生活剪影 | Life & Photography</h2>
+                <p class="text-gray-500">捕捉生活中的色彩与力量</p>
+                <div class="w-20 h-1 bg-gradient-to-r from-morandi-pink to-morandi-lavender rounded-full mx-auto mt-4"></div>
             </div>
 
-            <div class="fade-in-up bg-white rounded-2xl p-8 shadow-lg">
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-trophy text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-800">荣誉奖项 1</h4>
-                            <p class="text-sm text-gray-500">预留荣誉奖项展示位置</p>
-                        </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Life Photo 1 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.05s;">
+                    <img src="./life1.jpg" alt="生活照片1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life1.jpg</span>
                     </div>
-                    <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-medal text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-800">荣誉奖项 2</h4>
-                            <p class="text-sm text-gray-500">预留荣誉奖项展示位置</p>
-                        </div>
+                </div>
+                <!-- Life Photo 2 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.1s;">
+                    <img src="./life2.jpg" alt="生活照片2" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-pink to-morandi-lavender flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life2.jpg</span>
                     </div>
-                    <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-award text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-800">荣誉奖项 3</h4>
-                            <p class="text-sm text-gray-500">预留荣誉奖项展示位置</p>
-                        </div>
+                </div>
+                <!-- Life Photo 3 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.15s;">
+                    <img src="./life3.jpg" alt="生活照片3" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life3.jpg</span>
+                    </div>
+                </div>
+                <!-- Life Photo 4 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.2s;">
+                    <img src="./life4.jpg" alt="生活照片4" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-blue to-morandi-gray-green flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life4.jpg</span>
+                    </div>
+                </div>
+                <!-- Life Photo 5 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.25s;">
+                    <img src="./life5.jpg" alt="生活照片5" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-lavender to-morandi-pink flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life5.jpg</span>
+                    </div>
+                </div>
+                <!-- Life Photo 6 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.3s;">
+                    <img src="./life6.jpg" alt="生活照片6" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green to-morandi-sage flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life6.jpg</span>
+                    </div>
+                </div>
+                <!-- Life Photo 7 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.35s;">
+                    <img src="./life7.jpg" alt="生活照片7" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-pink to-morandi-gray-blue flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life7.jpg</span>
+                    </div>
+                </div>
+                <!-- Life Photo 8 -->
+                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.4s;">
+                    <img src="./life8.jpg" alt="生活照片8" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-sage to-morandi-lavender flex-col items-center justify-center text-white">
+                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
+                        <span class="text-xs opacity-50">life8.jpg</span>
                     </div>
                 </div>
             </div>
@@ -786,34 +932,54 @@
             }
         });
     </script>
-    <!-- Coze Web SDK -->
-    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
+    <!-- AI 聊天悬浮按钮 -->
+    <button id="chatToggle" onclick="toggleChat()" style="position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; align-items: center; justify-content: center; animation: breathe 3s ease-in-out infinite;">
+        <i class="fas fa-comment-dots" style="color: white; font-size: 24px;"></i>
+    </button>
+
+    <!-- 聊天抽屉 -->
+    <div id="chatDrawer" class="hidden fixed inset-0 z-[60]">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeChat()"></div>
+        <div id="chatPanel" class="absolute right-0 top-0 bottom-0 w-full md:w-[400px] md:h-[80vh] md:top-[10vh] md:bottom-auto md:rounded-2xl overflow-hidden shadow-2xl transform translate-x-full transition-transform duration-300 bg-white flex flex-col">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100" style="background: linear-gradient(135deg, #8B9A8E, #7B8B9E);">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <span class="font-semibold text-white">和我的 AI 分身聊聊</span>
+                </div>
+                <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="flex-1 w-full overflow-hidden">
+                <iframe id="chatIframe" src="https://www.doubao.com/chat/38423219680043266" frameborder="0" width="100%" height="100%" class="w-full h-full"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 154, 142, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(139, 154, 142, 0.2); }
+        }
+    </style>
+
     <script>
-        const cozeWebSDK = new CozeWebSDK.WebChatClient({
-            config: {
-                botId: '7632159218883575823',
-                isIframe: false,
-            },
-            auth: {
-                type: 'token',
-                token: 'pat_GldwuACrbpPwwphQjRB6IJkspynGuuTnpzNgbhQq2fkLEvbgsVG1vwc37coCsWdP',
-                onRefreshToken: async () => 'pat_GldwuACrbpPwwphQjRB6IJkspynGuuTnpzNgbhQq2fkLEvbgsVG1vwc37coCsWdP',
-            },
-            userInfo: {
-                id: 'user_001',
-                url: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/chatsdk-logo.png',
-                nickname: '访客',
-            },
-            ui: {
-                base: {
-                    icon: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/chatsdk-logo.png',
-                    layout: 'pc',
-                    zIndex: 1000,
-                },
-                asstBtn: {
-                    isNeed: true,
-                },
-            },
+        function toggleChat() {
+            const drawer = document.getElementById('chatDrawer');
+            const panel = document.getElementById('chatPanel');
+            drawer.classList.remove('hidden');
+            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
+        }
+        function closeChat() {
+            const drawer = document.getElementById('chatDrawer');
+            const panel = document.getElementById('chatPanel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => drawer.classList.add('hidden'), 300);
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeChat();
         });
     </script>
 </body>
