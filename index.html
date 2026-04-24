@@ -789,20 +789,31 @@
     <!-- Coze Web SDK -->
     <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
     <script>
-        new CozeWebSDK.WebChatClient({
+        const cozeWebSDK = new CozeWebSDK.WebChatClient({
             config: {
-                bot_id: '7632159218883575823',
-            },
-            componentProps: {
-                title: '诗颖的 AI 分身',
+                botId: '7632159218883575823',
+                isIframe: false,
             },
             auth: {
                 type: 'token',
                 token: 'pat_GldwuACrbpPwwphQjRB6IJkspynGuuTnpzNgbhQq2fkLEvbgsVG1vwc37coCsWdP',
-                onRefreshToken: function () {
-                    return 'pat_GldwuACrbpPwwphQjRB6IJkspynGuuTnpzNgbhQq2fkLEvbgsVG1vwc37coCsWdP'
-                }
-            }
+                onRefreshToken: async () => 'pat_GldwuACrbpPwwphQjRB6IJkspynGuuTnpzNgbhQq2fkLEvbgsVG1vwc37coCsWdP',
+            },
+            userInfo: {
+                id: 'user_001',
+                url: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/chatsdk-logo.png',
+                nickname: '访客',
+            },
+            ui: {
+                base: {
+                    icon: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/chatsdk-logo.png',
+                    layout: 'pc',
+                    zIndex: 1000,
+                },
+                asstBtn: {
+                    isNeed: true,
+                },
+            },
         });
     </script>
 </body>
