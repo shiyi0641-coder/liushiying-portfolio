@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>柳诗颖 - AI产品经理 | 心理学硕士</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        morandi: {
+                            'gray-green': '#8B9A8E',
+                            'gray-blue': '#7B8B9E',
+                            'pink': '#C9A5A5',
+                            'cream': '#F5F3F0',
+                            'sage': '#A8B5A0',
+                            'lavender': '#B5A8C9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #8B9A8E 0%, #7B8B9E 50%, #B5A8C9 100%);
+            transition: all 0.3s ease;
+        }
+
+        .gradient-btn:hover {
+            background: linear-gradient(135deg, #7B8B9E 0%, #8B9A8E 50%, #C9A5A5 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(123, 139, 158, 0.3);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #8B9A8E, #7B8B9E);
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8B9A8E, #7B8B9E);
+            position: absolute;
+            left: 15px;
+            top: 8px;
+        }
+
+        .skill-bar {
+            background: linear-gradient(90deg, #8B9A8E, #7B8B9E);
+            border-radius: 4px;
+            height: 8px;
+            transition: width 1s ease-out;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, rgba(139, 154, 142, 0.1), rgba(123, 139, 158, 0.1));
+            border: 1px solid rgba(139, 154, 142, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: linear-gradient(135deg, rgba(139, 154, 142, 0.2), rgba(123, 139, 158, 0.2));
+            transform: translateY(-2px);
+        }
+
+        .chat-bubble {
+            background: linear-gradient(135deg, #8B9A8E, #7B8B9E);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            animation: modalIn 0.3s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .chat-window {
+            background: linear-gradient(180deg, #F5F3F0 0%, #FFFFFF 100%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F5F3F0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8B9A8E;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-gray-700">柳诗颖</span>
+                <div class="hidden md:flex items-center gap-8 text-sm text-gray-500">
+                    <a href="#about" class="hover:text-gray-700 transition-colors">关于我</a>
+                    <a href="#education" class="hover:text-gray-700 transition-colors">教育背景</a>
+                    <a href="#projects" class="hover:text-gray-700 transition-colors">项目经历</a>
+                    <a href="#skills" class="hover:text-gray-700 transition-colors">技能图谱</a>
+                    <a href="#awards" class="hover:text-gray-700 transition-colors">荣誉奖项</a>
+                </div>
+                <button class="md:hidden text-gray-500" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-100 pt-4">
+                <div class="flex flex-col gap-4 text-sm text-gray-500">
+                    <a href="#about" class="hover:text-gray-700 transition-colors">关于我</a>
+                    <a href="#education" class="hover:text-gray-700 transition-colors">教育背景</a>
+                    <a href="#projects" class="hover:text-gray-700 transition-colors">项目经历</a>
+                    <a href="#skills" class="hover:text-gray-700 transition-colors">技能图谱</a>
+                    <a href="#awards" class="hover:text-gray-700 transition-colors">荣誉奖项</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="about" class="pt-32 pb-20 px-4 bg-gradient-to-br from-white via-morandi-cream to-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up">
+                <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                    <!-- Avatar Placeholder -->
+                    <div class="w-40 h-40 rounded-full bg-gradient-to-br from-morandi-gray-green via-morandi-gray-blue to-morandi-lavender flex items-center justify-center shadow-xl">
+                        <span class="text-5xl text-white font-light">柳</span>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">柳诗颖</h1>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
+                            <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-gray-green/20 to-morandi-gray-blue/20 text-gray-700 border border-morandi-gray-green/30">
+                                AI 产品经理
+                            </span>
+                            <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-pink/20 to-morandi-lavender/20 text-gray-700 border border-morandi-pink/30">
+                                心理学硕士
+                            </span>
+                        </div>
+                        <div class="space-y-2 text-gray-600">
+                            <p class="flex items-center justify-center md:justify-start gap-2">
+                                <i class="fas fa-birthday-cake text-morandi-gray-green"></i>
+                                <span>出生日期：2002.04.30</span>
+                            </p>
+                            <p class="flex items-center justify-center md:justify-start gap-2">
+                                <i class="fas fa-venus text-morandi-pink"></i>
+                                <span>性别：女</span>
+                            </p>
+                            <p class="flex items-center justify-center md:justify-start gap-2">
+                                <i class="fas fa-map-marker-alt text-morandi-gray-blue"></i>
+                                <span>籍贯：浙江台州</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact & Hobbies -->
+            <div class="grid md:grid-cols-2 gap-6 mt-12">
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-address-card text-morandi-gray-green"></i>
+                        联系方式
+                    </h3>
+                    <div class="space-y-3">
+                        <a href="tel:13456847578" class="flex items-center gap-3 text-gray-600 hover:text-morandi-gray-green transition-colors">
+                            <i class="fas fa-phone text-morandi-gray-blue"></i>
+                            <span>13456847578</span>
+                        </a>
+                        <a href="mailto:1830074786@qq.com" class="flex items-center gap-3 text-gray-600 hover:text-morandi-gray-green transition-colors">
+                            <i class="fas fa-envelope text-morandi-pink"></i>
+                            <span>1830074786@qq.com</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.1s;">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-heart text-morandi-pink"></i>
+                        个人爱好
+                    </h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-camera text-morandi-gray-green"></i>
+                            摄影
+                        </span>
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-running text-morandi-gray-blue"></i>
+                            运动
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="py-20 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">教育背景</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-green to-morandi-gray-blue rounded-full mx-auto"></div>
+            </div>
+            <div class="relative pl-10">
+                <div class="timeline-line"></div>
+
+                <!-- Master's Degree -->
+                <div class="fade-in-up relative mb-12">
+                    <div class="timeline-dot"></div>
+                    <div class="bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-green">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">硕士</span>
+                            <span class="text-sm text-gray-500">北京师范大学</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">心理学</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            研究方向：儿童认知能力与珠心算训练的迁移效应研究
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Bachelor's Degree -->
+                <div class="fade-in-up relative" style="transition-delay: 0.2s;">
+                    <div class="timeline-dot"></div>
+                    <div class="bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-blue">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700">本科</span>
+                            <span class="text-sm text-gray-500">浙江师范大学</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">心理学</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            扎实的心理学基础理论学习，为后续研究打下坚实基础
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 px-4 bg-gradient-to-br from-morandi-cream via-white to-morandi-cream/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">核心项目与实习</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-morandi-pink to-morandi-lavender rounded-full mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Project 1: 心理学文献精读助教 AI 智能体 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center mb-4">
+                        <i class="fas fa-brain text-white text-xl"></i>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">AI 产品经理</span>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">心理学文献精读助教 AI 智能体</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                        作为 AI 产品经理，负责专注提取行为学指标和生成格式化报告的智能体规划与需求定义。
+                    </p>
+                    <div class="flex gap-3">
+                        <button onclick="openModal('project1')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
+                            查看详情
+                        </button>
+                        <a href="./作品1_心理学文献精读助教prd.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2">
+                            📄 查看 PRD 文档
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 2: 社团招新智能匹配平台 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.1s;">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700">产品设计</span>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">社团招新智能匹配平台</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                        主导设计的智能匹配平台，涵盖核心业务流的梳理与 B 端后台产品架构规划。
+                    </p>
+                    <div class="flex gap-3">
+                        <button onclick="openModal('project2')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
+                            查看详情
+                        </button>
+                        <a href="./作品2_社团招新智能匹配平台prd.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-pink text-morandi-pink hover:bg-morandi-pink/10 transition-all duration-300 flex items-center gap-2">
+                            📄 查看 PRD 文档
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 3: 心理健康教育服务新模式调研 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.2s;">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center mb-4">
+                        <i class="fas fa-heartbeat text-white text-xl"></i>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-sage/20 text-gray-700">调研项目</span>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">心理健康教育服务新模式调研</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                        关注数"智"赋能下的心理健康教育，基于浙江百县千校进行深度调研与业务洞察。
+                    </p>
+                    <div class="flex gap-3">
+                        <button onclick="openModal('project3')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
+                            查看详情
+                        </button>
+                        <a href="./【文本】数“智”赋能下的心理健康教育服务新模式-基于浙江百县千校的调研.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-sage text-morandi-sage hover:bg-morandi-sage/10 transition-all duration-300 flex items-center gap-2">
+                            📄 查看调研报告
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Project 4: 珠算对儿童认知影响的数据分析 -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.3s;">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-lavender to-morandi-gray-blue flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-lavender/20 text-gray-700">学术研究</span>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">珠算对儿童认知影响的数据分析</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                        探究珠心算训练对儿童认知能力的迁移效应及其边界条件，使用相关软件进行数据清洗与分析。
+                    </p>
+                    <div class="flex gap-3">
+                        <button onclick="openModal('project4')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
+                            查看详情
+                        </button>
+                        <a href="./珠算对于儿童数学认知的影响数据分析报告.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-lavender text-morandi-lavender hover:bg-morandi-lavender/10 transition-all duration-300 flex items-center gap-2">
+                            📊 查看数据分析报告
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">技能图谱</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-green to-morandi-sage rounded-full mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Core Skills -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="fas fa-star text-morandi-gray-green"></i>
+                        核心技能
+                    </h3>
+                    <div class="space-y-5">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600">B端产品设计</span>
+                                <span class="text-sm text-morandi-gray-green">95%</span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="skill-bar" data-width="95"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600">AI 智能体规划</span>
+                                <span class="text-sm text-morandi-gray-green">90%</span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="skill-bar" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600">需求分析</span>
+                                <span class="text-sm text-morandi-gray-green">92%</span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="skill-bar" data-width="92"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-gray-600">招投标自动化设计</span>
+                                <span class="text-sm text-morandi-gray-green">88%</span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="skill-bar" data-width="88"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tools -->
+                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg" style="transition-delay: 0.1s;">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                        <i class="fas fa-tools text-morandi-gray-blue"></i>
+                        数据与工具
+                    </h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-chart-bar text-morandi-gray-green"></i>
+                            SPSS
+                        </span>
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-calculator text-morandi-gray-blue"></i>
+                            MATLAB
+                        </span>
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-robot text-morandi-pink"></i>
+                            扣子 (Coze)
+                        </span>
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fas fa-pencil-ruler text-morandi-lavender"></i>
+                            Axure
+                        </span>
+                        <span class="tag px-4 py-2 rounded-full text-sm text-gray-600 flex items-center gap-2">
+                            <i class="fab fa-figma text-morandi-sage"></i>
+                            Figma
+                        </span>
+                    </div>
+                    <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                        <p class="text-sm text-gray-500 leading-relaxed">
+                            <i class="fas fa-info-circle text-morandi-gray-blue mr-2"></i>
+                            数据分析能力：SPSS 熟练进行统计分析，MATLAB 进行数据清洗与相关性分析
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Awards Section -->
+    <section id="awards" class="py-20 px-4 bg-gradient-to-br from-morandi-cream/50 via-white to-morandi-cream">
+        <div class="max-w-6xl mx-auto">
+            <div class="fade-in-up text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">荣誉奖项</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-morandi-lavender to-morandi-pink rounded-full mx-auto"></div>
+            </div>
+
+            <div class="fade-in-up bg-white rounded-2xl p-8 shadow-lg">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-trophy text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800">荣誉奖项 1</h4>
+                            <p class="text-sm text-gray-500">预留荣誉奖项展示位置</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-medal text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800">荣誉奖项 2</h4>
+                            <p class="text-sm text-gray-500">预留荣誉奖项展示位置</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-award text-white"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800">荣誉奖项 3</h4>
+                            <p class="text-sm text-gray-500">预留荣誉奖项展示位置</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 px-4 bg-gray-800 text-white">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-gray-400 text-sm">© 2024 柳诗颖. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- AI Chat Floating Button (iframe) -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <!-- Chat FAB -->
+        <button id="chatToggle" onclick="toggleChat()" class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110" style="background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); animation: breathe 3s ease-in-out infinite;">
+            <i class="fas fa-comment-dots text-white text-2xl"></i>
+        </button>
+
+        <!-- Chat Drawer/Modal -->
+        <div id="chatDrawer" class="fixed inset-0 z-[60] hidden">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeChat()"></div>
+            <!-- Drawer Panel -->
+            <div id="chatPanel" class="absolute right-0 top-0 bottom-0 w-full md:w-[400px] md:h-[80vh] md:top-[10vh] md:bottom-auto md:rounded-2xl overflow-hidden shadow-2xl transform translate-x-full transition-transform duration-300 bg-white flex flex-col" style="height: 100vh;">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100" style="background: linear-gradient(135deg, #8B9A8E, #7B8B9E);">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <span class="font-semibold text-white">和我的 AI 分身聊聊</span>
+                    </div>
+                    <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+                        <i class="fas fa-times text-white"></i>
+                    </button>
+                </div>
+                <!-- iframe Container -->
+                <div class="flex-1 w-full overflow-hidden">
+                    <iframe
+                        id="chatIframe"
+                        src="https://www.coze.cn/store/bot/7632159218883575823"
+                        frameborder="0"
+                        width="100%"
+                        height="100%"
+                        class="w-full h-full"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes breathe {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 154, 142, 0.4); }
+            50% { box-shadow: 0 0 20px 10px rgba(139, 154, 142, 0.2); }
+        }
+    </style>
+
+    <script>
+        function toggleChat() {
+            const drawer = document.getElementById('chatDrawer');
+            const panel = document.getElementById('chatPanel');
+            drawer.classList.remove('hidden');
+            // Trigger animation
+            setTimeout(() => {
+                panel.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeChat() {
+            const drawer = document.getElementById('chatDrawer');
+            const panel = document.getElementById('chatPanel');
+            panel.classList.add('translate-x-full');
+            setTimeout(() => {
+                drawer.classList.add('hidden');
+            }, 300);
+        }
+    </script>
+
+    <!-- Modal -->
+    <div id="modal" class="hidden fixed inset-0 z-[60] modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div id="modalHeader" class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">项目详情</h3>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-gray-500"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="p-6 overflow-y-auto max-h-[60vh]">
+                <!-- Dynamic Content -->
+            </div>
+            <div class="p-6 border-t border-gray-100 flex gap-3 justify-end">
+                <a href="#" id="modalLink" target="_blank" class="px-6 py-3 rounded-xl text-white text-sm font-medium gradient-btn flex items-center gap-2">
+                    <i class="fas fa-external-link-alt"></i>
+                    访问链接
+                </a>
+                <button onclick="closeModal()" class="px-6 py-3 rounded-xl text-gray-600 text-sm font-medium hover:bg-gray-100 transition-colors">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Animate skill bars when visible
+                    if (entry.target.querySelector('.skill-bar')) {
+                        entry.target.querySelectorAll('.skill-bar').forEach(bar => {
+                            const width = bar.dataset.width;
+                            bar.style.width = width + '%';
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Project data
+        const projectData = {
+            project1: {
+                title: '心理学文献精读助教 AI 智能体',
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">项目背景</h4>
+                            <p class="text-gray-600 text-sm">结合心理学专业背景，设计 AI 辅助文献阅读工具，帮助研究者更高效地处理学术文献。</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">核心职责</h4>
+                            <ul class="text-gray-600 text-sm space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-gray-green mt-1"></i>
+                                    <span>作为 AI 产品经理主导产品规划</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-gray-green mt-1"></i>
+                                    <span>专注提取行为学指标</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-gray-green mt-1"></i>
+                                    <span>生成格式化报告的智能体规划与需求定义</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">产品特点</h4>
+                            <p class="text-gray-600 text-sm">基于心理学文献特点定制化训练，能够理解专业术语、提取研究方法、总结核心结论。</p>
+                        </div>
+                    </div>
+                `,
+                link: './作品1_心理学文献精读助教prd.pdf'
+            },
+            project2: {
+                title: '社团招新智能匹配平台',
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">项目背景</h4>
+                            <p class="text-gray-600 text-sm">针对社团招新场景设计的智能匹配平台，提升招新效率与学生体验。</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">核心职责</h4>
+                            <ul class="text-gray-600 text-sm space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-pink mt-1"></i>
+                                    <span>主导核心业务流的梳理</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-pink mt-1"></i>
+                                    <span>B 端后台产品架构规划</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-pink mt-1"></i>
+                                    <span>智能匹配算法需求定义</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">项目成果</h4>
+                            <p class="text-gray-600 text-sm">完成从 0 到 1 的产品设计，涵盖用户端与管理后台完整业务流程。</p>
+                        </div>
+                    </div>
+                `,
+                link: './作品2_社团招新智能匹配平台prd.pdf'
+            },
+            project3: {
+                title: '心理健康教育服务新模式调研',
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">调研背景</h4>
+                            <p class="text-gray-600 text-sm">关注数"智"赋能下的心理健康教育，基于浙江百县千校进行深度调研与业务洞察。</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">调研方法</h4>
+                            <ul class="text-gray-600 text-sm space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-sage mt-1"></i>
+                                    <span>百县千校实地走访</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-sage mt-1"></i>
+                                    <span>深度访谈与问卷调研</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-sage mt-1"></i>
+                                    <span>业务模式与需求分析</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">调研成果</h4>
+                            <p class="text-gray-600 text-sm">形成完整的心理健康教育服务新模式调研报告，为后续产品设计提供依据。</p>
+                        </div>
+                    </div>
+                `,
+                link: './【文本】数“智”赋能下的心理健康教育服务新模式-基于浙江百县千校的调研.pdf'
+            },
+            project4: {
+                title: '珠算对儿童认知影响的数据分析',
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">研究背景</h4>
+                            <p class="text-gray-600 text-sm">探究珠心算训练对儿童认知能力的迁移效应及其边界条件，是硕士研究的核心课题。</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">数据分析</h4>
+                            <ul class="text-gray-600 text-sm space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-lavender mt-1"></i>
+                                    <span>使用 SPSS、MATLAB 进行数据清洗</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-lavender mt-1"></i>
+                                    <span>相关性分析与回归分析</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fas fa-check text-morandi-lavender mt-1"></i>
+                                    <span>认知迁移效应量化评估</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h4 class="font-medium text-gray-800 mb-2">研究结论</h4>
+                            <p class="text-gray-600 text-sm">揭示珠心算训练对儿童认知能力的积极影响及其适用边界条件。</p>
+                        </div>
+                    </div>
+                `,
+                link: './珠算对于儿童数学认知的影响数据分析报告.pdf'
+            }
+        };
+
+        // Open modal
+        function openModal(projectId) {
+            const modal = document.getElementById('modal');
+            const header = document.getElementById('modalHeader');
+            const body = document.getElementById('modalBody');
+            const link = document.getElementById('modalLink');
+
+            const data = projectData[projectId];
+            if (!data) return;
+
+            header.querySelector('h3').textContent = data.title;
+            body.innerHTML = data.content;
+            link.href = data.link;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // Chat ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const chatDrawer = document.getElementById('chatDrawer');
+                if (!chatDrawer.classList.contains('hidden')) {
+                    closeChat();
+                }
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
