@@ -26,240 +26,192 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        html { scroll-behavior: smooth; }
 
-        * {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+        #scrollProgress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #8B9A8E, #7B8B9E, #B5A8C9, #C9A5A5); z-index: 9999; width: 0%; transition: width 0.1s linear; }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        .cursor-dot { width: 8px; height: 8px; background: #8B9A8E; border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; transition: transform 0.15s ease, background 0.3s ease; mix-blend-mode: difference; }
+        .cursor-ring { width: 40px; height: 40px; border: 2px solid rgba(139, 154, 142, 0.5); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99998; transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, transform 0.15s ease; }
+        .cursor-ring.hovering { width: 60px; height: 60px; border-color: rgba(181, 168, 201, 0.8); background: rgba(181, 168, 201, 0.08); }
+        @media (pointer: coarse) { .cursor-dot, .cursor-ring { display: none; } }
 
-        .gradient-btn {
-            background: linear-gradient(135deg, #8B9A8E 0%, #7B8B9E 50%, #B5A8C9 100%);
-            transition: all 0.3s ease;
-        }
+        .particle { position: fixed; pointer-events: none; z-index: 0; border-radius: 50%; opacity: 0; animation: floatParticle 8s ease-in-out infinite; }
+        @keyframes floatParticle { 0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); } 25% { opacity: 0.6; } 50% { opacity: 0.4; transform: translateY(-120px) scale(1); } 75% { opacity: 0.2; } }
 
-        .gradient-btn:hover {
-            background: linear-gradient(135deg, #7B8B9E 0%, #8B9A8E 50%, #C9A5A5 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(123, 139, 158, 0.3);
-        }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 2px; background: linear-gradient(90deg, #8B9A8E, #7B8B9E); transition: width 0.3s ease, left 0.3s ease; border-radius: 1px; }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; left: 0; }
+        .nav-link.active { color: #4B5563; font-weight: 500; }
 
-        .card-hover {
-            transition: all 0.3s ease;
-        }
+        .hero-gradient { background: linear-gradient(-45deg, #F5F3F0, #e8ece6, #ede9e3, #e6e0ec, #F5F3F0); background-size: 400% 400%; animation: gradientShift 15s ease infinite; }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 25% { background-position: 50% 0%; } 50% { background-position: 100% 50%; } 75% { background-position: 50% 100%; } 100% { background-position: 0% 50%; } }
 
-        .card-hover:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
+        .card-3d { transform-style: preserve-3d; perspective: 1000px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-3d:hover { box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12); }
+        .card-3d .card-shine { position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.3s ease; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.3), transparent 60%); pointer-events: none; }
+        .card-3d:hover .card-shine { opacity: 1; }
 
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease-out;
-        }
+        .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .stagger-children .reveal:nth-child(1) { transition-delay: 0ms; }
+        .stagger-children .reveal:nth-child(2) { transition-delay: 80ms; }
+        .stagger-children .reveal:nth-child(3) { transition-delay: 160ms; }
+        .stagger-children .reveal:nth-child(4) { transition-delay: 240ms; }
+        .stagger-children .reveal:nth-child(5) { transition-delay: 320ms; }
 
-        .fade-in-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .parallax-layer { will-change: transform; transition: transform 0.1s linear; }
 
-        .timeline-line {
-            position: absolute;
-            left: 20px;
-            top: 40px;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, #8B9A8E, #7B8B9E);
-        }
+        .skill-bar-container { position: relative; cursor: pointer; }
+        .skill-bar-container:hover .skill-bar-tooltip { opacity: 1; transform: translateY(0); }
+        .skill-bar-tooltip { opacity: 0; transform: translateY(8px); transition: all 0.3s ease; pointer-events: none; }
+        .skill-bar-fill { width: 0; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        .timeline-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8B9A8E, #7B8B9E);
-            position: absolute;
-            left: 15px;
-            top: 8px;
-        }
+        .timeline-item { position: relative; padding-left: 40px; }
+        .timeline-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #8B9A8E, #7B8B9E, #B5A8C9); }
+        .timeline-item::after { content: ''; position: absolute; left: -6px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: #8B9A8E; border: 3px solid #fff; box-shadow: 0 0 0 2px #8B9A8E; transition: all 0.3s ease; }
+        .timeline-item:hover::after { transform: scale(1.3); background: #7B8B9E; box-shadow: 0 0 0 4px rgba(123, 139, 158, 0.3), 0 0 20px rgba(123, 139, 158, 0.2); }
+        .timeline-item:last-child::before { display: none; }
 
-        .skill-bar {
-            background: linear-gradient(90deg, #8B9A8E, #7B8B9E);
-            border-radius: 4px;
-            height: 8px;
-            transition: width 1s ease-out;
-        }
+        .internship-card { overflow: hidden; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .internship-card .expand-content { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
+        .internship-card.expanded .expand-content { max-height: 800px; opacity: 1; }
+        .internship-card .expand-icon { transition: transform 0.3s ease; }
+        .internship-card.expanded .expand-icon { transform: rotate(180deg); }
 
-        .tag {
-            background: linear-gradient(135deg, rgba(139, 154, 142, 0.1), rgba(123, 139, 158, 0.1));
-            border: 1px solid rgba(139, 154, 142, 0.3);
-            transition: all 0.3s ease;
-        }
+        .photo-item { cursor: pointer; overflow: hidden; border-radius: 1rem; }
+        .photo-item img { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease; }
+        .photo-item:hover img { transform: scale(1.1); }
+        .photo-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent 50%); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .photo-item:hover::after { opacity: 1; }
+        .photo-item .photo-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 1rem; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); color: white; }
+        .photo-item:hover .photo-overlay { transform: translateY(0); }
 
-        .tag:hover {
-            background: linear-gradient(135deg, rgba(139, 154, 142, 0.2), rgba(123, 139, 158, 0.2));
-            transform: translateY(-2px);
-        }
+        .lightbox { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+        .lightbox.active { opacity: 1; pointer-events: all; }
+        .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 1rem; transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .lightbox.active img { transform: scale(1); }
 
-        .chat-bubble {
-            background: linear-gradient(135deg, #8B9A8E, #7B8B9E);
-            animation: pulse 2s infinite;
-        }
+        .modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px); }
+        .modal-content { animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalSlideUp { from { opacity: 0; transform: scale(0.9) translateY(40px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
+        .tag-interactive { background: linear-gradient(135deg, rgba(139, 154, 142, 0.1), rgba(123, 139, 158, 0.1)); border: 1px solid rgba(139, 154, 142, 0.3); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: default; }
+        .tag-interactive:hover { background: linear-gradient(135deg, rgba(139, 154, 142, 0.25), rgba(123, 139, 158, 0.25)); transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 20px rgba(139, 154, 142, 0.2); }
 
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-        }
+        .gradient-btn { background: linear-gradient(135deg, #8B9A8E 0%, #7B8B9E 50%, #B5A8C9 100%); transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
+        .gradient-btn:hover { background: linear-gradient(135deg, #7B8B9E 0%, #8B9A8E 50%, #C9A5A5 100%); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(123, 139, 158, 0.3); }
+        .gradient-btn .ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.4); transform: scale(0); animation: rippleEffect 0.6s ease-out; pointer-events: none; }
+        @keyframes rippleEffect { to { transform: scale(4); opacity: 0; } }
 
-        .modal-content {
-            animation: modalIn 0.3s ease-out;
-        }
+        .section-wave { position: relative; }
+        .section-wave::before { content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 60px; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60V30C240 5 480 55 720 30C960 5 1200 55 1440 30V60H0Z' fill='%23FFFFFF'/%3E%3C/svg%3E") no-repeat center; background-size: cover; }
 
-        @keyframes modalIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
+        .magnetic-btn { transition: transform 0.2s ease; }
 
-        .chat-window {
-            background: linear-gradient(180deg, #F5F3F0 0%, #FFFFFF 100%);
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #F5F3F0; }
+        ::-webkit-scrollbar-thumb { background: #8B9A8E; border-radius: 3px; }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+        #backToTop { position: fixed; bottom: 100px; right: 28px; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transform: translateY(20px); transition: all 0.3s ease; z-index: 1000; box-shadow: 0 4px 15px rgba(139, 154, 142, 0.3); border: none; }
+        #backToTop.visible { opacity: 1; transform: translateY(0); }
+        #backToTop:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139, 154, 142, 0.4); }
 
-        ::-webkit-scrollbar-track {
-            background: #F5F3F0;
-        }
+        /* ===== Add Internship Form ===== */
+        .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none; }
+        .form-input:focus { border-color: #8B9A8E; box-shadow: 0 0 0 3px rgba(139, 154, 142, 0.15); }
+        .form-label { display: block; font-size: 13px; font-weight: 500; color: #374151; margin-bottom: 4px; }
 
-        ::-webkit-scrollbar-thumb {
-            background: #8B9A8E;
-            border-radius: 3px;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+            .reveal { opacity: 1; transform: none; }
+            .particle { display: none; }
         }
     </style>
 </head>
 <body class="bg-white">
+    <div id="scrollProgress"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div id="particles" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md z-50 border-b border-gray-100">
+    <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 transition-all duration-300" id="navbar">
         <div class="max-w-6xl mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
-                <span class="text-lg font-semibold text-gray-700">柳诗颖</span>
+                <span class="text-lg font-semibold text-gray-700 tracking-tight">柳诗颖</span>
                 <div class="hidden md:flex items-center gap-8 text-sm text-gray-500">
-                    <a href="#about" class="hover:text-gray-700 transition-colors">关于我</a>
-                    <a href="#internships" class="hover:text-gray-700 transition-colors">实习经历</a>
-                    <a href="#projects" class="hover:text-gray-700 transition-colors">核心项目</a>
-                    <a href="#skills" class="hover:text-gray-700 transition-colors">技能图谱</a>
-                    <a href="#life" class="hover:text-gray-700 transition-colors">生活剪影</a>
+                    <a href="#about" class="nav-link hover:text-gray-700 transition-colors">关于我</a>
+                    <a href="#education" class="nav-link hover:text-gray-700 transition-colors">教育背景</a>
+                    <a href="#internships" class="nav-link hover:text-gray-700 transition-colors">实习经历</a>
+                    <a href="#projects" class="nav-link hover:text-gray-700 transition-colors">核心项目</a>
+                    <a href="#skills" class="nav-link hover:text-gray-700 transition-colors">技能图谱</a>
+                    <a href="#life" class="nav-link hover:text-gray-700 transition-colors">生活剪影</a>
                 </div>
-                <button class="md:hidden text-gray-500" onclick="toggleMobileMenu()">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
+                <button class="md:hidden text-gray-500 cursor-pointer" onclick="toggleMobileMenu()"><i class="fas fa-bars text-xl"></i></button>
             </div>
-            <!-- Mobile Menu -->
             <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-100 pt-4">
                 <div class="flex flex-col gap-4 text-sm text-gray-500">
-                    <a href="#about" class="hover:text-gray-700 transition-colors">关于我</a>
-                    <a href="#internships" class="hover:text-gray-700 transition-colors">实习经历</a>
-                    <a href="#projects" class="hover:text-gray-700 transition-colors">核心项目</a>
-                    <a href="#skills" class="hover:text-gray-700 transition-colors">技能图谱</a>
-                    <a href="#life" class="hover:text-gray-700 transition-colors">生活剪影</a>
+                    <a href="#about" class="hover:text-gray-700" onclick="toggleMobileMenu()">关于我</a>
+                    <a href="#education" class="hover:text-gray-700" onclick="toggleMobileMenu()">教育背景</a>
+                    <a href="#internships" class="hover:text-gray-700" onclick="toggleMobileMenu()">实习经历</a>
+                    <a href="#projects" class="hover:text-gray-700" onclick="toggleMobileMenu()">核心项目</a>
+                    <a href="#skills" class="hover:text-gray-700" onclick="toggleMobileMenu()">技能图谱</a>
+                    <a href="#life" class="hover:text-gray-700" onclick="toggleMobileMenu()">生活剪影</a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="about" class="pt-32 pb-20 px-4 bg-gradient-to-br from-white via-morandi-cream to-white">
-        <div class="max-w-6xl mx-auto">
-            <div class="fade-in-up">
+    <section id="about" class="pt-32 pb-20 px-4 hero-gradient relative overflow-hidden">
+        <div class="absolute top-20 right-10 w-64 h-64 bg-morandi-gray-green/5 rounded-full blur-3xl parallax-layer" data-speed="0.02"></div>
+        <div class="absolute bottom-10 left-10 w-80 h-80 bg-morandi-lavender/5 rounded-full blur-3xl parallax-layer" data-speed="0.03"></div>
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="reveal">
                 <div class="grid md:grid-cols-2 gap-12 items-start">
-                    <!-- Left Column -->
                     <div class="order-2 md:order-1">
-                        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">柳诗颖</h1>
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4"><span id="heroName">柳诗颖</span></h1>
                         <div class="flex flex-wrap gap-3 mb-6">
-                            <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-gray-green/20 to-morandi-gray-blue/20 text-gray-700 border border-morandi-gray-green/30">
-                                AI 产品经理
-                            </span>
-                            <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-pink/20 to-morandi-lavender/20 text-gray-700 border border-morandi-pink/30">
-                                心理学硕士
-                            </span>
+                            <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-gray-green/20 to-morandi-gray-blue/20 text-gray-700 border border-morandi-gray-green/30 tag-interactive">AI 产品经理</span>
+                            <span class="px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-morandi-pink/20 to-morandi-lavender/20 text-gray-700 border border-morandi-pink/30 tag-interactive">心理学硕士</span>
                         </div>
-                        <!-- Motto -->
                         <div class="mb-6 pl-4 border-l-4 border-morandi-gray-green">
                             <p class="text-morandi-gray-green text-sm italic font-light">"做自己喜欢且坚持做的事情"</p>
                         </div>
-                        <!-- Personal Info -->
                         <div class="space-y-3 text-gray-600 mb-6">
-                            <p class="flex items-center gap-3">
-                                <i class="fas fa-birthday-cake text-morandi-gray-green w-5"></i>
-                                <span>出生日期：2002.04.30</span>
-                            </p>
-                            <p class="flex items-center gap-3">
-                                <i class="fas fa-venus text-morandi-pink w-5"></i>
-                                <span>性别：女</span>
-                            </p>
-                            <p class="flex items-center gap-3">
-                                <i class="fas fa-map-marker-alt text-morandi-gray-blue w-5"></i>
-                                <span>籍贯：浙江台州</span>
-                            </p>
+                            <p class="flex items-center gap-3"><i class="fas fa-birthday-cake text-morandi-gray-green w-5"></i><span>出生日期：2002年4月30日</span></p>
+                            <p class="flex items-center gap-3"><i class="fas fa-venus text-morandi-pink w-5"></i><span>性别：女</span></p>
+                            <p class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-morandi-gray-blue w-5"></i><span>籍贯：浙江台州</span></p>
                         </div>
-                        <!-- Contact & Hobbies -->
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-white rounded-xl p-4 shadow">
-                                <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                    <i class="fas fa-address-card text-morandi-gray-green"></i>
-                                    联系方式
-                                </h3>
+                            <div class="bg-white rounded-xl p-4 shadow card-3d cursor-default">
+                                <div class="card-shine rounded-xl"></div>
+                                <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2"><i class="fas fa-address-card text-morandi-gray-green"></i> 联系方式</h3>
                                 <div class="space-y-2 text-xs text-gray-600">
-                                    <a href="tel:13456847578" target="_blank" class="flex items-center gap-2 hover:text-morandi-gray-green">
-                                        <i class="fas fa-phone"></i> 13456847578
-                                    </a>
-                                    <a href="mailto:1830074786@qq.com" target="_blank" class="flex items-center gap-2 hover:text-morandi-gray-green">
-                                        <i class="fas fa-envelope"></i> 1830074786@qq.com
-                                    </a>
+                                    <a href="tel:13456847578" target="_blank" class="flex items-center gap-2 hover:text-morandi-gray-green transition-colors cursor-pointer"><i class="fas fa-phone"></i> 13456847578</a>
+                                    <a href="mailto:1830074786@qq.com" target="_blank" class="flex items-center gap-2 hover:text-morandi-gray-green transition-colors cursor-pointer"><i class="fas fa-envelope"></i> 1830074786@qq.com</a>
                                 </div>
                             </div>
-                            <div class="bg-white rounded-xl p-4 shadow">
-                                <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                    <i class="fas fa-heart text-morandi-pink"></i>
-                                    个人爱好
-                                </h3>
+                            <div class="bg-white rounded-xl p-4 shadow card-3d cursor-default">
+                                <div class="card-shine rounded-xl"></div>
+                                <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2"><i class="fas fa-heart text-morandi-pink"></i> 个人爱好</h3>
                                 <div class="flex flex-wrap gap-2">
-                                    <span class="tag px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                                        <i class="fas fa-camera text-morandi-gray-green"></i> 摄影
-                                    </span>
-                                    <span class="tag px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                                        <i class="fas fa-running text-morandi-gray-blue"></i> 运动
-                                    </span>
+                                    <span class="tag-interactive px-2 py-1 rounded-full text-xs flex items-center gap-1"><i class="fas fa-camera text-morandi-gray-green"></i> 摄影</span>
+                                    <span class="tag-interactive px-2 py-1 rounded-full text-xs flex items-center gap-1"><i class="fas fa-running text-morandi-gray-blue"></i> 运动</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Right Column - Photo & Resume -->
                     <div class="order-1 md:order-2 flex flex-col items-center gap-4">
-                        <div class="relative rounded-2xl overflow-hidden shadow-xl" style="height: 320px;">
+                        <div class="relative rounded-2xl overflow-hidden shadow-xl card-3d cursor-default" style="height: 320px;">
+                            <div class="card-shine"></div>
                             <img src="./photo.jpg" alt="职业形象照" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green via-morandi-gray-blue to-morandi-lavender flex-col items-center justify-center text-white">
-                                <i class="fas fa-user-tie text-5xl mb-4"></i>
-                                <span class="text-sm">职业形象照</span>
+                                <i class="fas fa-user-tie text-5xl mb-4"></i><span class="text-sm">职业形象照</span>
                             </div>
                         </div>
-                        <a href="./20260417柳诗颖.pdf" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-morandi-gray-blue to-morandi-gray-green hover:shadow-lg transition-all duration-300">
-                            下载完整简历
-                        </a>
+                        <a href="./20260417柳诗颖.pdf" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-white text-sm font-medium bg-gradient-to-r from-morandi-gray-blue to-morandi-gray-green hover:shadow-lg transition-all duration-300 magnetic-btn cursor-pointer">下载完整简历</a>
                     </div>
                 </div>
             </div>
@@ -267,42 +219,52 @@
     </section>
 
     <!-- Education Section -->
-    <section id="education" class="py-20 px-4 bg-white">
+    <section id="education" class="py-20 px-4 bg-white section-wave">
         <div class="max-w-6xl mx-auto">
-            <div class="fade-in-up text-center mb-12">
+            <div class="reveal text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">教育背景</h2>
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-green to-morandi-gray-blue rounded-full mx-auto"></div>
             </div>
-            <div class="relative pl-10">
-                <div class="timeline-line"></div>
-
-                <!-- Master's Degree -->
-                <div class="fade-in-up relative mb-12">
-                    <div class="timeline-dot"></div>
-                    <div class="bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-green">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">硕士</span>
-                            <span class="text-sm text-gray-500">北京师范大学</span>
+            <div class="space-y-8 pl-2">
+                <div class="reveal timeline-item">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default border-l-4 border-morandi-gray-green ml-4">
+                        <div class="card-shine rounded-2xl"></div>
+                        <div class="card-inner">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">硕士</span>
+                                <span class="text-sm text-gray-500">2024.09 - 2027.06</span>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">北京师范大学 · 心理学</h3>
+                            <div class="flex items-center gap-2 mb-3 flex-wrap">
+                                <span class="px-2 py-1 rounded text-xs bg-morandi-gray-green/10 text-morandi-gray-green font-medium">GPA: 86.4/100</span>
+                                <span class="px-2 py-1 rounded text-xs bg-yellow-50 text-yellow-700 border border-yellow-200">二等奖学金</span>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <p><strong class="text-gray-700">主修课程：</strong>编程（Python）、社会认知发展、ERP原理与技术</p>
+                                <p class="text-gray-500 italic">研究方向：儿童认知能力与珠心算训练的迁移效应研究</p>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">心理学</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            研究方向：儿童认知能力与珠心算训练的迁移效应研究
-                        </p>
                     </div>
                 </div>
-
-                <!-- Bachelor's Degree -->
-                <div class="fade-in-up relative" style="transition-delay: 0.2s;">
-                    <div class="timeline-dot"></div>
-                    <div class="bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-blue">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700">本科</span>
-                            <span class="text-sm text-gray-500">浙江师范大学</span>
+                <div class="reveal timeline-item" style="transition-delay: 0.15s;">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default border-l-4 border-morandi-gray-blue ml-4">
+                        <div class="card-shine rounded-2xl"></div>
+                        <div class="card-inner">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700">本科</span>
+                                <span class="text-sm text-gray-500">2020.09 - 2024.06</span>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">浙江师范大学 · 应用心理学</h3>
+                            <div class="flex items-center gap-2 mb-3 flex-wrap">
+                                <span class="px-2 py-1 rounded text-xs bg-morandi-gray-blue/10 text-morandi-gray-blue font-medium">GPA: 3.95/5.0 (3/88)</span>
+                                <span class="px-2 py-1 rounded text-xs bg-yellow-50 text-yellow-700 border border-yellow-200">省优秀毕业生</span>
+                            </div>
+                            <div class="space-y-2 text-sm text-gray-600">
+                                <p><strong class="text-gray-700">主修课程：</strong>编程、心理统计(SPSS)、现代测量(编写问卷)、高等数学、多元统计、社会心理学、fMRI、微格</p>
+                                <p><strong class="text-gray-700">学生工作：</strong>团支书、心理学院执行主席、青年志愿者大队负责人</p>
+                                <p><strong class="text-gray-700">学术荣誉：</strong>省政府奖学金(2年)、校三好学生(连续3年)、校级奖学金(连续3年)、校志愿者先进个人(连续3年)</p>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">心理学</h3>
-                        <p class="text-gray-600 leading-relaxed">
-                            扎实的心理学基础理论学习，为后续研究打下坚实基础
-                        </p>
                     </div>
                 </div>
             </div>
@@ -310,95 +272,166 @@
     </section>
 
     <!-- Internships Section -->
-    <section id="internships" class="py-20 px-4 bg-morandi-cream/30">
+    <section id="internships" class="py-20 px-4 bg-morandi-cream/30 section-wave">
         <div class="max-w-6xl mx-auto">
-            <div class="fade-in-up text-center mb-12">
+            <div class="reveal text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">实习经历</h2>
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-blue to-morandi-pink rounded-full mx-auto"></div>
             </div>
 
-            <div class="space-y-6">
-                <!-- Internship 1 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-green">
-                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center">
-                                <i class="fas fa-cloud text-white"></i>
+            <div id="internshipList" class="space-y-6 stagger-children">
+
+                <!-- Internship: 快手 -->
+                <div class="reveal internship-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-pointer border-l-4 border-morandi-lavender" onclick="toggleExpand(this)">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-lavender to-morandi-pink flex items-center justify-center">
+                                    <i class="fas fa-play text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">快手</h3>
+                                    <p class="text-sm text-morandi-lavender">用户研究员</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">中国电子云计算技术有限公司</h3>
-                                <p class="text-sm text-morandi-gray-green">AI产品经理</p>
+                            <div class="flex items-center gap-3 md:ml-auto">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-lavender/20 text-gray-700">2026.04 - 至今</span>
+                                <i class="fas fa-chevron-down text-gray-400 expand-icon text-sm"></i>
                             </div>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700 md:ml-auto">2025.11 - 2026.02</span>
-                    </div>
-                    <div class="space-y-3 text-gray-600 text-sm">
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>合同AI智能体开发：</strong>深度参与"招投标合同生成"与"智能评估"需求定义，通过拆解复杂业务流完成原型与PRD撰写，有效降低了个性化定制成本。</span></p>
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>全流程需求管理：</strong>主导多次技术评审，输出精准 To-do List 并跨部门协调研发测试，保障功能准确落地。</span></p>
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>数据集赋能课程：</strong>针对供应链高质量数据集进行深度调研与需求洞察，构建结构化课程体系。</span></p>
+                        <div class="space-y-3 text-gray-600 text-sm">
+                            <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span><strong>创作者生态与运营策略研究：</strong>针对23-高浓度创作者开展分层研究，识别生存层、发展层、荣誉层三类核心差异与诉求</span></p>
+                        </div>
+                        <div class="expand-content">
+                            <div class="space-y-3 text-gray-600 text-sm pt-3 border-t border-gray-100 mt-3">
+                                <div class="mb-3">
+                                    <p class="font-medium text-gray-700 mb-2">项目一：用户研究调研</p>
+                                    <p class="flex items-start gap-2 mb-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span><strong>创作者生态与运营策略研究：</strong>针对23-高浓度创作者（粉丝中23-人群占比>50%）开展分层研究，识别出生存层、发展层、荣誉层三类创作者的核心差异与诉求；评估经营意愿风险，输出节假日分层激励+内容引导+互动工具化的运营策略建议。</span></p>
+                                    <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span><strong>漫剧用户行为与竞争破局研究：</strong>通过3255份定量问卷+深度访谈，测算站内漫剧用户基本盘（51.8%感兴趣、22.8%转化空间）；提出"用剧情+社交长板留住用户"的破局思路，输出三层差异化内容布局策略，并为新漫剧APP孵化提供机会评估与留存建议。</span></p>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="font-medium text-gray-700 mb-2">项目二：用户研究AI赋能工具矩阵建设</p>
+                                    <p class="flex items-start gap-2 mb-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span><strong>问卷模板智能生成工具开发：</strong>开发问卷模板生成Skill，通过结构化输入自动输出标准化问卷框架，将问卷设计耗时从小时级压缩至分钟级，降低学习门槛并保障专业性。</span></p>
+                                    <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span><strong>数据清洗工具HTML化：</strong>开发浏览器端数据清洗HTML工具，内置去重、格式标准化、异常值识别等规则，实现轻量高效的原始数据预处理。</span></p>
+                                    <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span><strong>懒蛋工具集成平台搭建：</strong>将词云工具、交叉表生成等高频工具集成至统一HTML界面，一站式沉淀团队通用能力，推动研究流程标准化。</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-morandi-lavender mt-3 expand-hint">点击展开详情</div>
                     </div>
                 </div>
 
-                <!-- Internship 2 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-gray-blue" style="transition-delay: 0.1s;">
-                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-gray-blue to-morandi-lavender flex items-center justify-center">
-                                <i class="fas fa-chart-bar text-white"></i>
+                <!-- Internship: 中国电子云 -->
+                <div class="reveal internship-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-pointer border-l-4 border-morandi-gray-green" onclick="toggleExpand(this)">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center"><i class="fas fa-cloud text-white"></i></div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">中国电子云计算技术有限公司</h3>
+                                    <p class="text-sm text-morandi-gray-green">AI产品经理</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">北京起航未来科技有限公司</h3>
-                                <p class="text-sm text-morandi-gray-blue">行业研究员</p>
+                            <div class="flex items-center gap-3 md:ml-auto">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">2025.11 - 2026.02</span>
+                                <i class="fas fa-chevron-down text-gray-400 expand-icon text-sm"></i>
                             </div>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700 md:ml-auto">2025.09 - 2025.11</span>
-                    </div>
-                    <div class="space-y-3 text-gray-600 text-sm">
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>数据挖掘与建库：</strong>多渠道检索并梳理全国高校招生及就业数据，从0到1构建结构化信息库。</span></p>
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>竞品追踪与洞察：</strong>监测泛教育赛道核心竞品，产出结构化行业周报，辅助优化业务导向。</span></p>
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>内容打磨输出：</strong>将调研转化为高转化内容，累计输出直播脚本及产品解读文稿超120篇。</span></p>
+                        <div class="space-y-3 text-gray-600 text-sm">
+                            <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>合同AI智能体产品开发：</strong>深度参与"招投标合同生成"与"合同AI智能评估"两大核心功能模块的需求定义</span></p>
+                        </div>
+                        <div class="expand-content">
+                            <div class="space-y-3 text-gray-600 text-sm pt-3 border-t border-gray-100 mt-3">
+                                <div class="mb-3">
+                                    <p class="font-medium text-gray-700 mb-2">项目一：合同AI智能体产品开发（企业级自研产品）</p>
+                                    <p class="flex items-start gap-2 mb-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>核心模块功能定义与设计：</strong>参与"招投标合同生成"与"合同AI智能评估"两大核心功能模块的需求定义；参与竞品分析；通过拆解复杂业务流，完成原型设计与PRD撰写，同时有效降低了客户的个性化定制成本。</span></p>
+                                    <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>全流程需求管理与闭环落地：</strong>深度参与多次技术需求评审，精准输出To-do List并协调研发、测试等多部门沟通；通过持续迭代方案，保障了产品功能从场景化设想到技术实现的准确落地。</span></p>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="font-medium text-gray-700 mb-2">项目二：供应链高质量数据集赋能课程设计</p>
+                                    <p class="flex items-start gap-2 mb-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>数据集深度调研与需求洞察：</strong>针对"供应链高质量数据集"开展系统性桌面研究，深度挖掘行业能力模型与数据治理的核心痛点。</span></p>
+                                    <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>结构化课程体系构建：</strong>完成赋能课程的逻辑框架设计与配套PPT制作，涵盖从数据集基础理论到供应链实际场景应用的全过程。</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-morandi-gray-green mt-3 expand-hint">点击展开详情</div>
                     </div>
                 </div>
 
-                <!-- Internship 3 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-pink" style="transition-delay: 0.2s;">
-                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center">
-                                <i class="fas fa-heart text-white"></i>
+                <!-- Internship: 北京起航未来 -->
+                <div class="reveal internship-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-pointer border-l-4 border-morandi-gray-blue" onclick="toggleExpand(this)">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-gray-blue to-morandi-lavender flex items-center justify-center"><i class="fas fa-chart-bar text-white"></i></div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">北京起航未来科技有限公司</h3>
+                                    <p class="text-sm text-morandi-gray-blue">行业研究员</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">温岭中学</h3>
-                                <p class="text-sm text-morandi-pink">心理实习教师</p>
+                            <div class="flex items-center gap-3 md:ml-auto">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700">2025.09 - 2025.11</span>
+                                <i class="fas fa-chevron-down text-gray-400 expand-icon text-sm"></i>
                             </div>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700 md:ml-auto">2023.09 - 2023.12</span>
-                    </div>
-                    <div class="space-y-3 text-gray-600 text-sm">
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>独立授课与团辅，针对情绪管理痛点开展专题辅导</span></p>
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>负责1对1咨询与危机排查，协助完善全校心理档案</span></p>
+                        <div class="space-y-3 text-gray-600 text-sm">
+                            <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>升学数据挖掘与建库：</strong>运用桌面研究方法，多渠道检索并深度梳理全国高校的高考/保研/考研招生简章等关键情报</span></p>
+                        </div>
+                        <div class="expand-content">
+                            <div class="space-y-3 text-gray-600 text-sm pt-3 border-t border-gray-100 mt-3">
+                                <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>升学数据挖掘与建库：</strong>运用桌面研究方法，多渠道检索并深度梳理全国高校的高考/保研/考研招生简章、拟录取门槛、专业壁垒及历年就业去向等关键情报；从0到1构建结构化的升学信息储备库，为咨询服务与产品设计提供坚实的数据支撑。</span></p>
+                                <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>竞品追踪与行业洞察：</strong>密切监测泛教育咨询赛道的核心竞品动态与前沿观点，深度剖析竞品的产品策略与市场导向；独立策划并持续产出结构化行业周报/分析报告，辅助团队优化业务走向。</span></p>
+                                <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-blue mt-1"></i><span><strong>高转化内容打磨与输出：</strong>将生涩枯燥的升学数据与行业调研成果，转化为切中家长/学生痛点的传播内容；累计高效输出优质文稿超120篇。</span></p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-morandi-gray-blue mt-3 expand-hint">点击展开详情</div>
                     </div>
                 </div>
 
-                <!-- Internship 4 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover border-l-4 border-morandi-sage" style="transition-delay: 0.3s;">
-                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center">
-                                <i class="fas fa-user-graduate text-white"></i>
+                <!-- Internship: 温岭中学 -->
+                <div class="reveal internship-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-pointer border-l-4 border-morandi-pink" onclick="toggleExpand(this)">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center"><i class="fas fa-heart text-white"></i></div>
+                                <div><h3 class="font-semibold text-gray-800">温岭中学</h3><p class="text-sm text-morandi-pink">心理实习教师</p></div>
                             </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">温岭第四中学</h3>
-                                <p class="text-sm text-morandi-sage">心理实习教师</p>
-                            </div>
+                            <div class="flex items-center gap-3 md:ml-auto"><span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700">2023.09 - 2023.12</span><i class="fas fa-chevron-down text-gray-400 expand-icon text-sm"></i></div>
                         </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-sage/20 text-gray-700 md:ml-auto">2023.06 - 2023.07</span>
-                    </div>
-                    <div class="space-y-3 text-gray-600 text-sm">
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>承担初中心理课教学，结合身心发展特点设计互动环节</span></p>
-                        <p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>培养学生抗压与受挫恢复能力</span></p>
+                        <div class="space-y-3 text-gray-600 text-sm"><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>独立授课与团辅，针对情绪管理痛点开展专题辅导</span></p></div>
+                        <div class="expand-content"><div class="space-y-3 text-gray-600 text-sm pt-3 border-t border-gray-100 mt-3"><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>独立授课与团辅，针对情绪管理痛点开展专题辅导</span></p><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span>负责1对1咨询与危机排查，协助完善全校心理档案</span></p></div></div>
+                        <div class="text-xs text-morandi-pink mt-3 expand-hint">点击展开详情</div>
                     </div>
                 </div>
+
+                <!-- Internship: 温岭第四中学 -->
+                <div class="reveal internship-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-pointer border-l-4 border-morandi-sage" onclick="toggleExpand(this)">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center"><i class="fas fa-user-graduate text-white"></i></div>
+                                <div><h3 class="font-semibold text-gray-800">温岭第四中学</h3><p class="text-sm text-morandi-sage">心理实习教师</p></div>
+                            </div>
+                            <div class="flex items-center gap-3 md:ml-auto"><span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-sage/20 text-gray-700">2023.06 - 2023.07</span><i class="fas fa-chevron-down text-gray-400 expand-icon text-sm"></i></div>
+                        </div>
+                        <div class="space-y-3 text-gray-600 text-sm"><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>承担初中心理课教学，结合身心发展特点设计互动环节</span></p></div>
+                        <div class="expand-content"><div class="space-y-3 text-gray-600 text-sm pt-3 border-t border-gray-100 mt-3"><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>承担初中心理课教学，结合身心发展特点设计互动环节</span></p><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span>培养学生抗压与受挫恢复能力</span></p></div></div>
+                        <div class="text-xs text-morandi-sage mt-3 expand-hint">点击展开详情</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Add Internship Button -->
+            <div class="reveal mt-8 text-center">
+                <button onclick="openAddInternship()" class="px-6 py-3 rounded-xl text-sm font-medium border-2 border-dashed border-morandi-gray-green/50 text-morandi-gray-green hover:bg-morandi-gray-green/5 hover:border-morandi-gray-green transition-all duration-300 cursor-pointer flex items-center gap-2 mx-auto">
+                    <i class="fas fa-plus"></i> 新增实习经历
+                </button>
             </div>
         </div>
     </section>
@@ -406,581 +439,519 @@
     <!-- Projects Section -->
     <section id="projects" class="py-20 px-4 bg-gradient-to-br from-morandi-cream via-white to-morandi-cream/50">
         <div class="max-w-6xl mx-auto">
-            <div class="fade-in-up text-center mb-12">
+            <div class="reveal text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">核心项目</h2>
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-pink to-morandi-lavender rounded-full mx-auto"></div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Project 1: 心理学文献精读助教 AI 智能体 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center mb-4">
-                        <i class="fas fa-brain text-white text-xl"></i>
-                    </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">AI 产品经理</span>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">心理学文献精读助教 AI 智能体</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                        作为 AI 产品经理，负责专注提取行为学指标和生成格式化报告的智能体规划与需求定义。
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="openModal('project1')" class="px-4 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
-                            查看详情
-                        </button>
-                        <a href="https://www.coze.cn/store/agent/7621552947746816038?bot_id=true" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2">
-                            🌐 立即在线使用
-                        </a>
-                        <a href="./作品1_心理学文献精读助教prd.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-pink text-morandi-pink hover:bg-morandi-pink/10 transition-all duration-300 flex items-center gap-2">
-                            📄 查看 PRD 文档
-                        </a>
+            <div class="grid md:grid-cols-2 gap-6 stagger-children">
+                <!-- Project 1 -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center mb-4"><i class="fas fa-brain text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">AI 产品经理</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">心理学文献精读助教 AI 智能体</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">针对科研场景下英文文献"实验范式提取慢、生理指标噪音多"的痛点，主导AI智能体的需求分析与PRD撰写，跑通从链接解析到Word结构化报告导出的全链路闭环。</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openModal('project1')" class="px-4 py-3 rounded-xl text-white text-sm font-medium gradient-btn cursor-pointer">查看详情</button>
+                            <a href="https://www.coze.cn/store/agent/7621552947746816038?bot_id=true" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-external-link-alt"></i> 立即在线使用</a>
+                            <a href="./作品1_心理学文献精读助教prd.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-pink text-morandi-pink hover:bg-morandi-pink/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-file-pdf"></i> 查看 PRD 文档</a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Project 2: 社团招新智能匹配平台 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.1s;">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center mb-4">
-                        <i class="fas fa-users text-white text-xl"></i>
-                    </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700">产品设计</span>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">社团招新智能匹配平台</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                        主导设计的智能匹配平台，涵盖核心业务流的梳理与 B 端后台产品架构规划。
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="openModal('project2')" class="px-4 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
-                            查看详情
-                        </button>
-                        <a href="https://easy-club-signup.nocode.host" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-pink text-morandi-pink hover:bg-morandi-pink/10 transition-all duration-300 flex items-center gap-2">
-                            🌐 访问 Demo 平台
-                        </a>
-                        <a href="./作品2_社团招新智能匹配平台prd.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-blue text-morandi-gray-blue hover:bg-morandi-gray-blue/10 transition-all duration-300 flex items-center gap-2">
-                            📄 查看 PRD 文档
-                        </a>
+                <!-- Project 2: 心理健康教育服务新模式调研 (合并走心驿站) -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center mb-4"><i class="fas fa-hands-helping text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700">产品经理</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">心理健康教育服务新模式调研（走心驿站）</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">面向中小学心理健康教育场景，执行并剖析超30,000份定量问卷，辅以10余所学校一线教师的定性深度访谈，提炼并规划核心业务模块。基于浙江百县千校进行深度调研与业务洞察。</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openModal('project2')" class="px-4 py-3 rounded-xl text-white text-sm font-medium gradient-btn cursor-pointer">查看详情</button>
+                            <a href="./【文本】数"智"赋能下的心理健康教育服务新模式-基于浙江百县千校的调研.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-sage text-morandi-sage hover:bg-morandi-sage/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-file-pdf"></i> 查看调研报告</a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Project 3: 心理健康教育服务新模式调研 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.2s;">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center mb-4">
-                        <i class="fas fa-heartbeat text-white text-xl"></i>
-                    </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-sage/20 text-gray-700">调研项目</span>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">心理健康教育服务新模式调研</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                        关注数"智"赋能下的心理健康教育，基于浙江百县千校进行深度调研与业务洞察。
-                    </p>
-                    <div class="flex gap-3">
-                        <button onclick="openModal('project3')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
-                            查看详情
-                        </button>
-                        <a href="./【文本】数“智”赋能下的心理健康教育服务新模式-基于浙江百县千校的调研.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-sage text-morandi-sage hover:bg-morandi-sage/10 transition-all duration-300 flex items-center gap-2">
-                            📄 查看调研报告
-                        </a>
+                <!-- Project 3 -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center mb-4"><i class="fas fa-users text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-sage/20 text-gray-700">产品负责人</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">社团招新智能匹配平台（双边市场应用）</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">基于低代码平台完成双边匹配系统从0到1的落地，设计基于兴趣标签的向量推荐引擎，将新生寻找社团的时间从数天大幅缩短至数分钟。</p>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openModal('project3')" class="px-4 py-3 rounded-xl text-white text-sm font-medium gradient-btn cursor-pointer">查看详情</button>
+                            <a href="https://easy-club-signup.nocode.host" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-sage text-morandi-sage hover:bg-morandi-sage/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-external-link-alt"></i> 访问 Demo 平台</a>
+                            <a href="./作品2_社团招新智能匹配平台prd.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-blue text-morandi-gray-blue hover:bg-morandi-gray-blue/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-file-pdf"></i> 查看 PRD 文档</a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Project 4: 珠算对儿童认知影响的数据分析 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg card-hover" style="transition-delay: 0.3s;">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-lavender to-morandi-gray-blue flex items-center justify-center mb-4">
-                        <i class="fas fa-chart-line text-white text-xl"></i>
-                    </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-lavender/20 text-gray-700">学术研究</span>
-                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">珠算对儿童认知影响的数据分析</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                        探究珠心算训练对儿童认知能力的迁移效应及其边界条件，使用相关软件进行数据清洗与分析。
-                    </p>
-                    <div class="flex gap-3">
-                        <button onclick="openModal('project4')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn">
-                            查看详情
-                        </button>
-                        <a href="./珠算对于儿童数学认知的影响数据分析报告.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-lavender text-morandi-lavender hover:bg-morandi-lavender/10 transition-all duration-300 flex items-center gap-2">
-                            📊 查看数据分析报告
-                        </a>
+                <!-- Project 4 -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-lavender to-morandi-gray-blue flex items-center justify-center mb-4"><i class="fas fa-chart-line text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-lavender/20 text-gray-700">学术研究</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">珠算对儿童认知影响的数据分析</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">探究珠心算训练对儿童认知能力的迁移效应及其边界条件，使用相关软件进行数据清洗与分析。</p>
+                        <div class="flex gap-3">
+                            <button onclick="openModal('project4')" class="flex-1 py-3 rounded-xl text-white text-sm font-medium gradient-btn cursor-pointer">查看详情</button>
+                            <a href="./珠算对于儿童数学认知的影响数据分析报告.pdf" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-lavender text-morandi-lavender hover:bg-morandi-lavender/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-chart-bar"></i> 查看数据分析报告</a>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Project 5: 懒蛋工具集成平台 -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-sage flex items-center justify-center mb-4"><i class="fas fa-toolbox text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-green/20 text-gray-700">工具产品</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">懒蛋工具集成平台</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">将词云工具、交叉表生成等高频工具集成至统一HTML界面，一站式沉淀团队通用能力，推动研究流程标准化。</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="./project-files/懒蛋_主页集成.zip" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载项目文件</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 6: 数据清洗工具 -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-blue to-morandi-lavender flex items-center justify-center mb-4"><i class="fas fa-broom text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-gray-blue/20 text-gray-700">工具产品</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">数据清洗工具</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">开发浏览器端数据清洗HTML工具，内置去重、格式标准化、异常值识别等规则，实现轻量高效的原始数据预处理。</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="./project-files/数据清洗.zip" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-blue text-morandi-gray-blue hover:bg-morandi-gray-blue/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载项目文件</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 7: 问卷模板智能生成工具 -->
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <div class="card-inner">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center mb-4"><i class="fas fa-file-alt text-white text-xl"></i></div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-pink/20 text-gray-700">AI 工具</span>
+                        <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">问卷模板智能生成工具</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-4">开发问卷模板生成Skill，通过结构化输入自动输出标准化问卷框架，将问卷设计耗时从小时级压缩至分钟级，降低学习门槛并保障专业性。</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="./project-files/questionnaire-import.gz" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-pink text-morandi-pink hover:bg-morandi-pink/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载项目文件</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Add Project Button -->
+            <div class="reveal mt-8 text-center">
+                <button onclick="openAddProject()" class="px-6 py-3 rounded-xl text-sm font-medium border-2 border-dashed border-morandi-pink/50 text-morandi-pink hover:bg-morandi-pink/5 hover:border-morandi-pink transition-all duration-300 cursor-pointer flex items-center gap-2 mx-auto">
+                    <i class="fas fa-plus"></i> 新增项目
+                </button>
             </div>
         </div>
     </section>
 
     <!-- Skills Section -->
-    <section id="skills" class="py-20 px-4 bg-white">
+    <section id="skills" class="py-20 px-4 bg-white section-wave">
         <div class="max-w-6xl mx-auto">
-            <div class="fade-in-up text-center mb-12">
+            <div class="reveal text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">技能图谱</h2>
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-green to-morandi-sage rounded-full mx-auto"></div>
             </div>
-
-            <div class="grid md:grid-cols-3 gap-6">
-                <!-- 核心技能 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                        <i class="fas fa-star text-morandi-gray-green"></i>
-                        核心技能
-                    </h3>
+            <div class="grid md:grid-cols-3 gap-6 stagger-children">
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-star text-morandi-gray-green"></i> 核心技能</h3>
                     <div class="space-y-5">
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600">B端产品设计</span>
-                                <span class="text-sm text-morandi-gray-green">95%</span>
-                            </div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="skill-bar" data-width="95"></div>
-                            </div>
+                        <div class="skill-bar-container" onmouseenter="animateSkillBar(this)">
+                            <div class="flex justify-between mb-2"><span class="text-sm text-gray-600">B端产品设计</span><span class="text-sm text-morandi-gray-green font-medium">95%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-morandi-gray-green to-morandi-gray-blue" data-width="95"></div></div>
+                            <div class="skill-bar-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap">精通 — 可独立完成完整B端产品设计</div>
                         </div>
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600">AI 智能体规划</span>
-                                <span class="text-sm text-morandi-gray-green">90%</span>
-                            </div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="skill-bar" data-width="90"></div>
-                            </div>
+                        <div class="skill-bar-container" onmouseenter="animateSkillBar(this)">
+                            <div class="flex justify-between mb-2"><span class="text-sm text-gray-600">AI 智能体规划</span><span class="text-sm text-morandi-gray-green font-medium">90%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-morandi-gray-green to-morandi-gray-blue" data-width="90"></div></div>
+                            <div class="skill-bar-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap">熟练 — 独立完成AI智能体需求定义</div>
                         </div>
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600">需求分析</span>
-                                <span class="text-sm text-morandi-gray-green">92%</span>
-                            </div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="skill-bar" data-width="92"></div>
-                            </div>
+                        <div class="skill-bar-container" onmouseenter="animateSkillBar(this)">
+                            <div class="flex justify-between mb-2"><span class="text-sm text-gray-600">需求分析</span><span class="text-sm text-morandi-gray-green font-medium">92%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-morandi-gray-green to-morandi-gray-blue" data-width="92"></div></div>
+                            <div class="skill-bar-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap">精通 — 深度需求拆解与优先级管理</div>
                         </div>
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-sm text-gray-600">招投标自动化设计</span>
-                                <span class="text-sm text-morandi-gray-green">88%</span>
-                            </div>
-                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                <div class="skill-bar" data-width="88"></div>
-                            </div>
+                        <div class="skill-bar-container" onmouseenter="animateSkillBar(this)">
+                            <div class="flex justify-between mb-2"><span class="text-sm text-gray-600">招投标自动化设计</span><span class="text-sm text-morandi-gray-green font-medium">88%</span></div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="skill-bar-fill h-full rounded-full bg-gradient-to-r from-morandi-gray-green to-morandi-gray-blue" data-width="88"></div></div>
+                            <div class="skill-bar-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap">熟练 — 合同AI智能体核心开发者</div>
                         </div>
                     </div>
                 </div>
-
-                <!-- 办公技能 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg" style="transition-delay: 0.1s;">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                        <i class="fas fa-laptop text-morandi-gray-blue"></i>
-                        办公技能
-                    </h3>
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-laptop text-morandi-gray-blue"></i> 办公技能</h3>
                     <div class="flex flex-wrap gap-2">
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Matlab</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">SPSS</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Excel</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Word</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">PPT</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Python</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">E-prime</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">SQL</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Coze</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Claude Code</span>
+                        <span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Matlab</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">SPSS</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Excel</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Word</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">PPT</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Python</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">E-prime</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">SQL</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Coze</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Claude Code</span>
                     </div>
                 </div>
-
-                <!-- 产品技能 -->
-                <div class="fade-in-up bg-white rounded-2xl p-6 shadow-lg" style="transition-delay: 0.2s;">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-                        <i class="fas fa-pencil-ruler text-morandi-pink"></i>
-                        产品技能
-                    </h3>
+                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                    <div class="card-shine rounded-2xl"></div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-pencil-ruler text-morandi-pink"></i> 产品技能</h3>
                     <div class="flex flex-wrap gap-2">
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">X-mind</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">秀米</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">稿定</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Axure</span>
-                        <span class="tag px-3 py-2 rounded-full text-sm text-gray-600">Figma</span>
+                        <span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">X-mind</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">秀米</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">稿定</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Axure</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Figma</span>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4 mt-6 flex items-center gap-2">
-                        <i class="fas fa-certificate text-morandi-lavender"></i>
-                        获得证书
-                    </h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 mt-6 flex items-center gap-2"><i class="fas fa-certificate text-morandi-lavender"></i> 获得证书</h3>
                     <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">英语六级</span>
-                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-blue-100 text-blue-700 border border-blue-200">计算机二级</span>
-                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">普通话二甲</span>
-                        <span class="px-3 py-2 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">心理健康教资</span>
+                        <span class="tag-interactive px-3 py-2 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">英语六级</span>
+                        <span class="tag-interactive px-3 py-2 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">计算机二级</span>
+                        <span class="tag-interactive px-3 py-2 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">普通话二甲</span>
+                        <span class="tag-interactive px-3 py-2 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">心理健康教资</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Life & Photography Section -->
+    <!-- Life Section -->
     <section id="life" class="py-20 px-4 bg-gradient-to-br from-morandi-cream via-white to-morandi-lavender/20">
         <div class="max-w-6xl mx-auto">
-            <div class="fade-in-up text-center mb-12">
+            <div class="reveal text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">生活剪影 | Life & Photography</h2>
                 <p class="text-gray-500">捕捉生活中的色彩与力量</p>
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-pink to-morandi-lavender rounded-full mx-auto mt-4"></div>
             </div>
-
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Life Photo 1 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.05s;">
-                    <img src="./life1.jpg" alt="生活照片1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life1.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 2 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.1s;">
-                    <img src="./life2.jpg" alt="生活照片2" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-pink to-morandi-lavender flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life2.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 3 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.15s;">
-                    <img src="./life3.jpg" alt="生活照片3" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life3.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 4 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.2s;">
-                    <img src="./life4.jpg" alt="生活照片4" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-blue to-morandi-gray-green flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life4.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 5 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.25s;">
-                    <img src="./life5.jpg" alt="生活照片5" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-lavender to-morandi-pink flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life5.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 6 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.3s;">
-                    <img src="./life6.jpg" alt="生活照片6" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green to-morandi-sage flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life6.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 7 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.35s;">
-                    <img src="./life7.jpg" alt="生活照片7" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-pink to-morandi-gray-blue flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life7.jpg</span>
-                    </div>
-                </div>
-                <!-- Life Photo 8 -->
-                <div class="fade-in-up relative rounded-2xl overflow-hidden aspect-square group cursor-pointer" style="transition-delay: 0.4s;">
-                    <img src="./life8.jpg" alt="生活照片8" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-sage to-morandi-lavender flex-col items-center justify-center text-white">
-                        <i class="fas fa-image text-3xl mb-2 opacity-50"></i>
-                        <span class="text-xs opacity-50">life8.jpg</span>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life1.jpg" alt="生活照片1" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life1.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life2.jpg" alt="生活照片2" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-pink to-morandi-lavender flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life2.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life3.jpg" alt="生活照片3" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life3.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life4.jpg" alt="生活照片4" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-blue to-morandi-gray-green flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life4.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life5.jpg" alt="生活照片5" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-lavender to-morandi-pink flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life5.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life6.jpg" alt="生活照片6" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-gray-green to-morandi-sage flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life6.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life7.jpg" alt="生活照片7" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-pink to-morandi-gray-blue flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life7.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
+                <div class="reveal photo-item relative aspect-square group" onclick="openLightbox(this)"><img src="./life8.jpg" alt="生活照片8" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden absolute inset-0 bg-gradient-to-br from-morandi-sage to-morandi-lavender flex-col items-center justify-center text-white"><i class="fas fa-image text-3xl mb-2 opacity-50"></i><span class="text-xs opacity-50">life8.jpg</span></div><div class="photo-overlay"><i class="fas fa-expand text-lg"></i></div></div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="py-8 px-4 bg-gray-800 text-white">
-        <div class="max-w-6xl mx-auto text-center">
-            <p class="text-gray-400 text-sm">© 2024 柳诗颖. All rights reserved.</p>
-        </div>
+        <div class="max-w-6xl mx-auto text-center"><p class="text-gray-400 text-sm">© 2024 柳诗颖. All rights reserved.</p></div>
     </footer>
 
-    <!-- Modal -->
+    <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="absolute top-6 right-6 text-white text-2xl hover:opacity-70 transition-opacity cursor-pointer" aria-label="关闭"><i class="fas fa-times"></i></button>
+        <img id="lightboxImg" src="" alt="大图预览">
+    </div>
+
+    <!-- Project Modal -->
     <div id="modal" class="hidden fixed inset-0 z-[60] modal-overlay flex items-center justify-center p-4">
         <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
             <div id="modalHeader" class="p-6 border-b border-gray-100 flex items-center justify-between">
                 <h3 class="text-xl font-semibold text-gray-800">项目详情</h3>
-                <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
-                    <i class="fas fa-times text-gray-500"></i>
-                </button>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer" aria-label="关闭"><i class="fas fa-times text-gray-500"></i></button>
             </div>
-            <div id="modalBody" class="p-6 overflow-y-auto max-h-[60vh]">
-                <!-- Dynamic Content -->
-            </div>
+            <div id="modalBody" class="p-6 overflow-y-auto max-h-[60vh]"></div>
             <div class="p-6 border-t border-gray-100 flex gap-3 justify-end">
-                <a href="#" id="modalLink" target="_blank" class="px-6 py-3 rounded-xl text-white text-sm font-medium gradient-btn flex items-center gap-2">
-                    <i class="fas fa-external-link-alt"></i>
-                    访问链接
-                </a>
-                <button onclick="closeModal()" class="px-6 py-3 rounded-xl text-gray-600 text-sm font-medium hover:bg-gray-100 transition-colors">
-                    关闭
-                </button>
+                <a href="#" id="modalLink" target="_blank" class="px-6 py-3 rounded-xl text-white text-sm font-medium gradient-btn flex items-center gap-2 cursor-pointer"><i class="fas fa-external-link-alt"></i> 访问链接</a>
+                <button onclick="closeModal()" class="px-6 py-3 rounded-xl text-gray-600 text-sm font-medium hover:bg-gray-100 transition-colors cursor-pointer">关闭</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-
-                    // Animate skill bars when visible
-                    if (entry.target.querySelector('.skill-bar')) {
-                        entry.target.querySelectorAll('.skill-bar').forEach(bar => {
-                            const width = bar.dataset.width;
-                            bar.style.width = width + '%';
-                        });
-                    }
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.fade-in-up').forEach(el => {
-            observer.observe(el);
-        });
-
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Project data
-        const projectData = {
-            project1: {
-                title: '心理学文献精读助教 AI 智能体',
-                content: `
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">项目背景</h4>
-                            <p class="text-gray-600 text-sm">结合心理学专业背景，设计 AI 辅助文献阅读工具，帮助研究者更高效地处理学术文献。</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">核心职责</h4>
-                            <ul class="text-gray-600 text-sm space-y-2">
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-gray-green mt-1"></i>
-                                    <span>作为 AI 产品经理主导产品规划</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-gray-green mt-1"></i>
-                                    <span>专注提取行为学指标</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-gray-green mt-1"></i>
-                                    <span>生成格式化报告的智能体规划与需求定义</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">产品特点</h4>
-                            <p class="text-gray-600 text-sm">基于心理学文献特点定制化训练，能够理解专业术语、提取研究方法、总结核心结论。</p>
-                        </div>
+    <!-- Add Internship Modal -->
+    <div id="addInternshipModal" class="hidden fixed inset-0 z-[60] modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">新增实习经历</h3>
+                <button onclick="closeAddInternship()" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer" aria-label="关闭"><i class="fas fa-times text-gray-500"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[65vh] space-y-4">
+                <div><label class="form-label">公司名称 *</label><input type="text" id="add_company" class="form-input" placeholder="如：快手"></div>
+                <div><label class="form-label">职位 *</label><input type="text" id="add_position" class="form-input" placeholder="如：用户研究员"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="form-label">开始时间 *</label><input type="text" id="add_start" class="form-input" placeholder="如：2026.04"></div>
+                    <div><label class="form-label">结束时间</label><input type="text" id="add_end" class="form-input" placeholder="如：至今"></div>
+                </div>
+                <div><label class="form-label">边框颜色</label>
+                    <div class="flex gap-3" id="add_colorPicker">
+                        <button type="button" data-color="morandi-lavender" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-lavender ring-2 ring-morandi-lavender" onclick="pickColor(this)"></button>
+                        <button type="button" data-color="morandi-gray-green" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-gray-green" onclick="pickColor(this)"></button>
+                        <button type="button" data-color="morandi-gray-blue" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-gray-blue" onclick="pickColor(this)"></button>
+                        <button type="button" data-color="morandi-pink" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-pink" onclick="pickColor(this)"></button>
+                        <button type="button" data-color="morandi-sage" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-sage" onclick="pickColor(this)"></button>
                     </div>
-                `,
-                link: './作品1_心理学文献精读助教prd.pdf'
-            },
-            project2: {
-                title: '社团招新智能匹配平台',
-                content: `
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">项目背景</h4>
-                            <p class="text-gray-600 text-sm">针对社团招新场景设计的智能匹配平台，提升招新效率与学生体验。</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">核心职责</h4>
-                            <ul class="text-gray-600 text-sm space-y-2">
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-pink mt-1"></i>
-                                    <span>主导核心业务流的梳理</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-pink mt-1"></i>
-                                    <span>B 端后台产品架构规划</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-pink mt-1"></i>
-                                    <span>智能匹配算法需求定义</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">项目成果</h4>
-                            <p class="text-gray-600 text-sm">完成从 0 到 1 的产品设计，涵盖用户端与管理后台完整业务流程。</p>
-                        </div>
+                </div>
+                <div><label class="form-label">图标 (Font Awesome class)</label><input type="text" id="add_icon" class="form-input" placeholder="如：fa-play" value="fa-briefcase"></div>
+                <div><label class="form-label">预览摘要 *</label><textarea id="add_preview" class="form-input" rows="2" placeholder="一条简短描述，始终显示在卡片上"></textarea></div>
+                <div><label class="form-label">详细内容（可分项目写，用空行分隔项目）</label><textarea id="add_details" class="form-input" rows="6" placeholder="项目一：XXX&#10;- 要点1&#10;- 要点2&#10;&#10;项目二：XXX&#10;- 要点1"></textarea></div>
+            </div>
+            <div class="p-6 border-t border-gray-100 flex gap-3 justify-end">
+                <button onclick="closeAddInternship()" class="px-6 py-3 rounded-xl text-gray-600 text-sm font-medium hover:bg-gray-100 transition-colors cursor-pointer">取消</button>
+                <button onclick="submitInternship()" class="px-6 py-3 rounded-xl text-white text-sm font-medium gradient-btn cursor-pointer">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Project Modal -->
+    <div id="addProjectModal" class="hidden fixed inset-0 z-[60] modal-overlay flex items-center justify-center p-4">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="text-xl font-semibold text-gray-800">新增项目</h3>
+                <button onclick="closeAddProject()" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors cursor-pointer" aria-label="关闭"><i class="fas fa-times text-gray-500"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[65vh] space-y-4">
+                <div><label class="form-label">项目名称 *</label><input type="text" id="proj_name" class="form-input" placeholder="如：懒蛋工具集成平台"></div>
+                <div><label class="form-label">标签</label><input type="text" id="proj_tag" class="form-input" placeholder="如：工具产品" value="项目作品"></div>
+                <div><label class="form-label">简短描述 *</label><textarea id="proj_desc" class="form-input" rows="2" placeholder="一段话介绍项目核心内容"></textarea></div>
+                <div><label class="form-label">图标 (Font Awesome class)</label><input type="text" id="proj_icon" class="form-input" placeholder="如：fa-toolbox" value="fa-project-diagram"></div>
+                <div><label class="form-label">边框颜色</label>
+                    <div class="flex gap-3" id="proj_colorPicker">
+                        <button type="button" data-color="morandi-gray-green" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-gray-green ring-2 ring-morandi-gray-green" onclick="pickProjColor(this)"></button>
+                        <button type="button" data-color="morandi-gray-blue" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-gray-blue" onclick="pickProjColor(this)"></button>
+                        <button type="button" data-color="morandi-pink" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-pink" onclick="pickProjColor(this)"></button>
+                        <button type="button" data-color="morandi-lavender" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-lavender" onclick="pickProjColor(this)"></button>
+                        <button type="button" data-color="morandi-sage" class="w-8 h-8 rounded-full border-2 border-transparent hover:border-gray-400 transition-colors cursor-pointer bg-morandi-sage" onclick="pickProjColor(this)"></button>
                     </div>
-                `,
-                link: './作品2_社团招新智能匹配平台prd.pdf'
-            },
-            project3: {
-                title: '心理健康教育服务新模式调研',
-                content: `
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">调研背景</h4>
-                            <p class="text-gray-600 text-sm">关注数"智"赋能下的心理健康教育，基于浙江百县千校进行深度调研与业务洞察。</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">调研方法</h4>
-                            <ul class="text-gray-600 text-sm space-y-2">
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-sage mt-1"></i>
-                                    <span>百县千校实地走访</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-sage mt-1"></i>
-                                    <span>深度访谈与问卷调研</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-sage mt-1"></i>
-                                    <span>业务模式与需求分析</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">调研成果</h4>
-                            <p class="text-gray-600 text-sm">形成完整的心理健康教育服务新模式调研报告，为后续产品设计提供依据。</p>
-                        </div>
-                    </div>
-                `,
-                link: './【文本】数“智”赋能下的心理健康教育服务新模式-基于浙江百县千校的调研.pdf'
-            },
-            project4: {
-                title: '珠算对儿童认知影响的数据分析',
-                content: `
-                    <div class="space-y-4">
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">研究背景</h4>
-                            <p class="text-gray-600 text-sm">探究珠心算训练对儿童认知能力的迁移效应及其边界条件，是硕士研究的核心课题。</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">数据分析</h4>
-                            <ul class="text-gray-600 text-sm space-y-2">
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-lavender mt-1"></i>
-                                    <span>使用 SPSS、MATLAB 进行数据清洗</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-lavender mt-1"></i>
-                                    <span>相关性分析与回归分析</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fas fa-check text-morandi-lavender mt-1"></i>
-                                    <span>认知迁移效应量化评估</span>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <h4 class="font-medium text-gray-800 mb-2">研究结论</h4>
-                            <p class="text-gray-600 text-sm">揭示珠心算训练对儿童认知能力的积极影响及其适用边界条件。</p>
-                        </div>
-                    </div>
-                `,
-                link: './珠算对于儿童数学认知的影响数据分析报告.pdf'
-            }
-        };
+                </div>
+                <div><label class="form-label">项目文件路径（部署后的相对路径）</label><input type="text" id="proj_file" class="form-input" placeholder="如：./project-files/项目名.zip"></div>
+                <div><label class="form-label">文件按钮文字</label><input type="text" id="proj_file_label" class="form-input" placeholder="如：下载项目文件" value="下载项目文件"></div>
+                <div><label class="form-label">在线链接（可选）</label><input type="text" id="proj_link" class="form-input" placeholder="如：https://example.com"></div>
+                <div><label class="form-label">在线链接按钮文字</label><input type="text" id="proj_link_label" class="form-input" placeholder="如：在线体验" value="在线体验"></div>
+            </div>
+            <div class="p-6 border-t border-gray-100 flex gap-3 justify-end">
+                <button onclick="closeAddProject()" class="px-6 py-3 rounded-xl text-gray-600 text-sm font-medium hover:bg-gray-100 transition-colors cursor-pointer">取消</button>
+                <button onclick="submitProject()" class="px-6 py-3 rounded-xl text-white text-sm font-medium gradient-btn cursor-pointer">添加</button>
+            </div>
+        </div>
+    </div>
 
-        // Open modal
-        function openModal(projectId) {
-            const modal = document.getElementById('modal');
-            const header = document.getElementById('modalHeader');
-            const body = document.getElementById('modalBody');
-            const link = document.getElementById('modalLink');
-
-            const data = projectData[projectId];
-            if (!data) return;
-
-            header.querySelector('h3').textContent = data.title;
-            body.innerHTML = data.content;
-            link.href = data.link;
-
-            modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Close modal
-        function closeModal() {
-            const modal = document.getElementById('modal');
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-
-        // Chat ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const chatDrawer = document.getElementById('chatDrawer');
-                if (!chatDrawer.classList.contains('hidden')) {
-                    closeChat();
-                }
-            }
-        });
-
-        // Close modal on overlay click
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-
-        // Close modal on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-    </script>
-    <!-- AI 聊天悬浮按钮 -->
-    <button id="chatToggle" onclick="toggleChat()" style="position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; align-items: center; justify-content: center; animation: breathe 3s ease-in-out infinite;">
-        <i class="fas fa-comment-dots" style="color: white; font-size: 24px;"></i>
-    </button>
-
-    <!-- 聊天抽屉 -->
+    <!-- Chat -->
+    <button id="chatToggle" onclick="toggleChat()" style="position: fixed; bottom: 24px; right: 24px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8B9A8E, #7B8B9E, #B5A8C9); border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="打开AI聊天"><i class="fas fa-comment-dots" style="color: white; font-size: 24px;"></i></button>
     <div id="chatDrawer" class="hidden fixed inset-0 z-[60]">
         <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeChat()"></div>
         <div id="chatPanel" class="absolute right-0 top-0 bottom-0 w-full md:w-[400px] md:h-[80vh] md:top-[10vh] md:bottom-auto md:rounded-2xl overflow-hidden shadow-2xl transform translate-x-full transition-transform duration-300 bg-white flex flex-col">
             <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100" style="background: linear-gradient(135deg, #8B9A8E, #7B8B9E);">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center">
-                        <i class="fas fa-robot text-white text-sm"></i>
-                    </div>
-                    <span class="font-semibold text-white">和我的 AI 分身聊聊</span>
-                </div>
-                <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
-                    <i class="fas fa-times text-white"></i>
-                </button>
+                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center"><i class="fas fa-robot text-white text-sm"></i></div><span class="font-semibold text-white">和我的 AI 分身聊聊</span></div>
+                <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors cursor-pointer" aria-label="关闭聊天"><i class="fas fa-times text-white"></i></button>
             </div>
-            <div class="flex-1 w-full overflow-hidden">
-                <iframe id="chatIframe" src="https://www.doubao.com/chat/38423219680043266" frameborder="0" width="100%" height="100%" class="w-full h-full"></iframe>
-            </div>
+            <div class="flex-1 w-full overflow-hidden"><iframe id="chatIframe" src="https://www.doubao.com/chat/38423219680043266" frameborder="0" width="100%" height="100%" class="w-full h-full"></iframe></div>
         </div>
     </div>
 
-    <style>
-        @keyframes breathe {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 154, 142, 0.4); }
-            50% { box-shadow: 0 0 20px 10px rgba(139, 154, 142, 0.2); }
-        }
-    </style>
-
     <script>
-        function toggleChat() {
-            const drawer = document.getElementById('chatDrawer');
-            const panel = document.getElementById('chatPanel');
-            drawer.classList.remove('hidden');
-            setTimeout(() => panel.classList.remove('translate-x-full'), 10);
-        }
-        function closeChat() {
-            const drawer = document.getElementById('chatDrawer');
-            const panel = document.getElementById('chatPanel');
-            panel.classList.add('translate-x-full');
-            setTimeout(() => drawer.classList.add('hidden'), 300);
-        }
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeChat();
+        // ===== Scroll Progress =====
+        window.addEventListener('scroll', () => {
+            const s = document.documentElement.scrollTop, h = document.documentElement.scrollHeight - window.innerHeight;
+            document.getElementById('scrollProgress').style.width = (s / h * 100) + '%';
+            const btn = document.getElementById('backToTop');
+            btn.classList.toggle('visible', s > 400);
+            document.getElementById('navbar').style.boxShadow = s > 50 ? '0 2px 20px rgba(0,0,0,0.06)' : 'none';
         });
+
+        // ===== Custom Cursor =====
+        const cursorDot = document.getElementById('cursorDot'), cursorRing = document.getElementById('cursorRing');
+        let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+        if (window.matchMedia('(pointer: fine)').matches) {
+            document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; cursorDot.style.left = mouseX - 4 + 'px'; cursorDot.style.top = mouseY - 4 + 'px'; });
+            (function a() { ringX += (mouseX - ringX) * 0.15; ringY += (mouseY - ringY) * 0.15; cursorRing.style.left = ringX - 20 + 'px'; cursorRing.style.top = ringY - 20 + 'px'; requestAnimationFrame(a); })();
+            document.querySelectorAll('a, button, .card-3d, .photo-item, .internship-card, .tag-interactive').forEach(el => { el.addEventListener('mouseenter', () => cursorRing.classList.add('hovering')); el.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering')); });
+        } else { cursorDot.style.display = 'none'; cursorRing.style.display = 'none'; }
+
+        // ===== Particles =====
+        const pC = document.getElementById('particles'), mC = ['#8B9A8E','#7B8B9E','#C9A5A5','#A8B5A0','#B5A8C9'];
+        for (let i = 0; i < 15; i++) { const p = document.createElement('div'); p.className = 'particle'; p.style.width = p.style.height = (Math.random()*6+3)+'px'; p.style.background = mC[Math.floor(Math.random()*mC.length)]; p.style.left = (Math.random()*100)+'%'; p.style.top = (Math.random()*100)+'%'; p.style.animationDelay = (Math.random()*8)+'s'; p.style.animationDuration = (6+Math.random()*6)+'s'; pC.appendChild(p); }
+
+        // ===== Reveal =====
+        const rO = new IntersectionObserver(e => e.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); }), { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => rO.observe(el));
+
+        // ===== Active Nav =====
+        const navLinks = document.querySelectorAll('.nav-link');
+        const navO = new IntersectionObserver(e => e.forEach(en => { if (en.isIntersecting) { const id = en.target.id; navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + id)); } }), { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' });
+        document.querySelectorAll('section[id]').forEach(s => navO.observe(s));
+
+        // ===== 3D Tilt =====
+        document.querySelectorAll('.card-3d').forEach(c => {
+            c.addEventListener('mousemove', e => { const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; c.style.transform = `perspective(1000px) rotateX(${((y - r.height/2) / (r.height/2)) * -5}deg) rotateY(${((x - r.width/2) / (r.width/2)) * 5}deg)`; const s = c.querySelector('.card-shine'); if (s) { s.style.setProperty('--mouse-x', (x/r.width*100)+'%'); s.style.setProperty('--mouse-y', (y/r.height*100)+'%'); } });
+            c.addEventListener('mouseleave', () => { c.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)'; });
+        });
+
+        // ===== Skill Bars =====
+        const sO = new IntersectionObserver(e => e.forEach(en => { if (en.isIntersecting) en.target.querySelectorAll('.skill-bar-fill').forEach((b, i) => setTimeout(() => { b.style.width = b.dataset.width + '%'; }, i * 150)); }), { threshold: 0.3 });
+        document.querySelectorAll('.skill-bar-container').forEach(c => sO.observe(c.closest('.reveal') || c));
+        function animateSkillBar(c) { const b = c.querySelector('.skill-bar-fill'), w = b.dataset.width; b.style.transition = 'width 0.3s ease'; b.style.width = (parseInt(w)-5)+'%'; setTimeout(() => { b.style.transition = 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)'; b.style.width = w+'%'; }, 200); }
+
+        // ===== Expand Cards =====
+        function toggleExpand(card) { document.querySelectorAll('.internship-card.expanded').forEach(c => { if (c !== card) { c.classList.remove('expanded'); const h = c.querySelector('.expand-hint'); if (h) h.textContent = '点击展开详情'; } }); card.classList.toggle('expanded'); const hint = card.querySelector('.expand-hint'); if (hint) hint.textContent = card.classList.contains('expanded') ? '点击收起' : '点击展开详情'; }
+
+        // ===== Lightbox =====
+        function openLightbox(el) { const img = el.querySelector('img'); if (img && img.src && !img.src.includes('data:')) { document.getElementById('lightboxImg').src = img.src; document.getElementById('lightbox').classList.add('active'); document.body.style.overflow = 'hidden'; } }
+        function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); document.body.style.overflow = ''; }
+
+        // ===== Ripple =====
+        document.querySelectorAll('.gradient-btn').forEach(b => b.addEventListener('click', function(e) { const r = this.getBoundingClientRect(), rp = document.createElement('span'); rp.className = 'ripple'; rp.style.left = (e.clientX-r.left)+'px'; rp.style.top = (e.clientY-r.top)+'px'; rp.style.width = rp.style.height = Math.max(r.width,r.height)+'px'; this.appendChild(rp); setTimeout(() => rp.remove(), 600); }));
+
+        function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('hidden'); }
+
+        // ===== Project Modal =====
+        const projectData = {
+            project1: { title: '心理学文献精读助教 AI 智能体', content: '<div class="space-y-4"><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">项目背景</h4><p class="text-gray-600 text-sm">针对科研场景下英文文献"实验范式提取慢、生理指标噪音多"的痛点，主导AI智能体的需求分析与PRD撰写，跑通从链接解析到Word结构化报告导出的全链路闭环。</p></div><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">核心职责</h4><ul class="text-gray-600 text-sm space-y-2"><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>AI功能调研与需求定义：</strong>针对科研场景下英文文献痛点，主导AI智能体的需求分析与PRD撰写，跑通从链接解析到Word结构化报告导出的全链路闭环。</span></li><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-gray-green mt-1"></i><span><strong>Prompt策略设计与逻辑调优：</strong>构建自动化拆解逻辑，精准提取被试特征与经典认知实验范式；设计反向约束Prompt指令，成功过滤EEG/fMRI等100%的冗余生理数据干扰，大幅提升核心信息信噪比。</span></li></ul></div></div>', link: './作品1_心理学文献精读助教prd.pdf' },
+            project2: { title: '心理健康教育服务新模式调研（走心驿站）', content: '<div class="space-y-4"><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">项目背景</h4><p class="text-gray-600 text-sm">面向中小学心理健康教育场景，关注数"智"赋能下的心理健康教育，基于浙江百县千校进行深度调研与业务洞察。</p></div><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">核心职责</h4><ul class="text-gray-600 text-sm space-y-2"><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span><strong>大规模用户调研与方案分析：</strong>面向中小学心理健康教育场景，执行并剖析超30,000份定量问卷，辅以10余所学校一线教师的定性深度访谈。提炼并规划"学生心理画像"、"动态赋码转码"等核心业务模块；撰写MRD（市场需求文档），论证产品落地的可行性。</span></li><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-pink mt-1"></i><span><strong>项目落地与社会效益转化：</strong>推动系统在省内多地（如龙游县、桐乡县等）中小学实际部署应用，斩获"挑战杯"省级核心奖项。</span></li></ul></div><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">调研成果</h4><p class="text-gray-600 text-sm">形成完整的心理健康教育服务新模式调研报告，为后续产品设计提供依据。</p></div></div>', link: './【文本】数"智"赋能下的心理健康教育服务新模式-基于浙江百县千校的调研.pdf' },
+            project3: { title: '社团招新智能匹配平台（双边市场应用）', content: '<div class="space-y-4"><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">项目背景</h4><p class="text-gray-600 text-sm">基于低代码平台完成双边匹配系统从0到1的落地，设计基于兴趣标签的向量推荐引擎。</p></div><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">核心职责</h4><ul class="text-gray-600 text-sm space-y-2"><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-sage mt-1"></i><span><strong>低代码快速构建：</strong>基于低代码平台完成双边匹配系统从0到1的落地，设计基于兴趣标签的向量推荐引擎，将新生寻找社团的时间从数天大幅缩短至数分钟，为社团管理者搭建集成自动邀约与状态流转逻辑的拖拽式追踪看板（ATS）。</span></li></ul></div></div>', link: './作品2_社团招新智能匹配平台prd.pdf' },
+            project4: { title: '珠算对儿童认知影响的数据分析', content: '<div class="space-y-4"><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">研究背景</h4><p class="text-gray-600 text-sm">探究珠心算训练对儿童认知能力的迁移效应及其边界条件，是硕士研究的核心课题。</p></div><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">数据分析</h4><ul class="text-gray-600 text-sm space-y-2"><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span>使用 SPSS、MATLAB 进行数据清洗</span></li><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span>相关性分析与回归分析</span></li><li class="flex items-start gap-2"><i class="fas fa-check text-morandi-lavender mt-1"></i><span>认知迁移效应量化评估</span></li></ul></div><div class="bg-gray-50 rounded-xl p-4"><h4 class="font-medium text-gray-800 mb-2">研究结论</h4><p class="text-gray-600 text-sm">揭示珠心算训练对儿童认知能力的积极影响及其适用边界条件。</p></div></div>', link: './珠算对于儿童数学认知的影响数据分析报告.pdf' }
+        };
+        function openModal(id) { const d = projectData[id]; if (!d) return; document.getElementById('modalHeader').querySelector('h3').textContent = d.title; document.getElementById('modalBody').innerHTML = d.content; document.getElementById('modalLink').href = d.link; document.getElementById('modal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); document.body.style.overflow = ''; }
+
+        // ===== Add Internship =====
+        let selectedColor = 'morandi-lavender';
+        function pickColor(btn) { document.querySelectorAll('#add_colorPicker button').forEach(b => b.classList.remove('ring-2')); btn.classList.add('ring-2'); selectedColor = btn.dataset.color; }
+        function openAddInternship() { document.getElementById('addInternshipModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function closeAddInternship() { document.getElementById('addInternshipModal').classList.add('hidden'); document.body.style.overflow = ''; }
+        function submitInternship() {
+            const company = document.getElementById('add_company').value.trim();
+            const position = document.getElementById('add_position').value.trim();
+            const start = document.getElementById('add_start').value.trim();
+            const end = document.getElementById('add_end').value.trim() || '至今';
+            const icon = document.getElementById('add_icon').value.trim() || 'fa-briefcase';
+            const preview = document.getElementById('add_preview').value.trim();
+            const details = document.getElementById('add_details').value.trim();
+            if (!company || !position || !start || !preview) { alert('请填写公司名称、职位、开始时间和预览摘要'); return; }
+
+            const color = selectedColor;
+            const dateStr = start + ' - ' + end;
+
+            // Build detail HTML
+            let detailHTML = '';
+            if (details) {
+                const projects = details.split(/\n\n+/);
+                projects.forEach(proj => {
+                    const lines = proj.split('\n').filter(l => l.trim());
+                    if (lines.length === 0) return;
+                    const title = lines[0];
+                    const isTitleLine = title.match(/^(项目|Project)/i);
+                    let itemsHTML = '';
+                    lines.forEach((line, i) => {
+                        const text = line.replace(/^[-•]\s*/, '');
+                        if (i === 0 && isTitleLine) {
+                            detailHTML += `<p class="font-medium text-gray-700 mb-2">${text}</p>`;
+                        } else {
+                            itemsHTML += `<p class="flex items-start gap-2"><i class="fas fa-check text-morandi-${color.replace('morandi-','')} mt-1"></i><span>${text}</span></p>`;
+                        }
+                    });
+                    if (itemsHTML) detailHTML += itemsHTML;
+                });
+            }
+
+            const card = document.createElement('div');
+            card.className = 'reveal internship-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-pointer border-l-4 border-morandi-' + color.replace('morandi-','');
+            card.onclick = function() { toggleExpand(this); };
+            card.innerHTML = `
+                <div class="card-shine rounded-2xl"></div>
+                <div class="card-inner">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-morandi-${color.replace('morandi-','')} to-morandi-gray-blue flex items-center justify-center"><i class="fas ${icon} text-white"></i></div>
+                            <div><h3 class="font-semibold text-gray-800">${company}</h3><p class="text-sm text-morandi-${color.replace('morandi-','')}">${position}</p></div>
+                        </div>
+                        <div class="flex items-center gap-3 md:ml-auto"><span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-${color.replace('morandi-','')}/20 text-gray-700">${dateStr}</span><i class="fas fa-chevron-down text-gray-400 expand-icon text-sm"></i></div>
+                    </div>
+                    <div class="space-y-3 text-gray-600 text-sm"><p class="flex items-start gap-2"><i class="fas fa-check text-morandi-${color.replace('morandi-','')} mt-1"></i><span>${preview}</span></p></div>
+                    ${detailHTML ? `<div class="expand-content"><div class="space-y-3 text-gray-600 text-sm pt-3 border-t border-gray-100 mt-3">${detailHTML}</div></div>` : ''}
+                    <div class="text-xs text-morandi-${color.replace('morandi-','')} mt-3 expand-hint">点击展开详情</div>
+                </div>`;
+
+            const list = document.getElementById('internshipList');
+            list.insertBefore(card, list.firstChild);
+
+            // Re-observe for reveal, re-bind 3D tilt + cursor
+            rO.observe(card);
+            card.addEventListener('mousemove', function(e) { const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; card.style.transform = `perspective(1000px) rotateX(${((y - r.height/2) / (r.height/2)) * -5}deg) rotateY(${((x - r.width/2) / (r.width/2)) * 5}deg)`; const s = card.querySelector('.card-shine'); if (s) { s.style.setProperty('--mouse-x', (x/r.width*100)+'%'); s.style.setProperty('--mouse-y', (y/r.height*100)+'%'); } });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)'; });
+            if (window.matchMedia('(pointer: fine)').matches) { card.addEventListener('mouseenter', () => cursorRing.classList.add('hovering')); card.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering')); }
+
+            // Trigger reveal
+            setTimeout(() => card.classList.add('visible'), 50);
+
+            // Clear form
+            ['add_company','add_position','add_start','add_end','add_preview','add_details'].forEach(id => document.getElementById(id).value = '');
+            closeAddInternship();
+        }
+
+        // ===== Add Project =====
+        let selectedProjColor = 'morandi-gray-green';
+        function pickProjColor(btn) { document.querySelectorAll('#proj_colorPicker button').forEach(b => b.classList.remove('ring-2')); btn.classList.add('ring-2'); selectedProjColor = btn.dataset.color; }
+        function openAddProject() { document.getElementById('addProjectModal').classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function closeAddProject() { document.getElementById('addProjectModal').classList.add('hidden'); document.body.style.overflow = ''; }
+        function submitProject() {
+            const name = document.getElementById('proj_name').value.trim();
+            const tag = document.getElementById('proj_tag').value.trim() || '项目作品';
+            const desc = document.getElementById('proj_desc').value.trim();
+            const icon = document.getElementById('proj_icon').value.trim() || 'fa-project-diagram';
+            const color = selectedProjColor.replace('morandi-', '');
+            const filePath = document.getElementById('proj_file').value.trim();
+            const fileLabel = document.getElementById('proj_file_label').value.trim() || '下载项目文件';
+            const link = document.getElementById('proj_link').value.trim();
+            const linkLabel = document.getElementById('proj_link_label').value.trim() || '在线体验';
+            if (!name || !desc) { alert('请填写项目名称和简短描述'); return; }
+
+            let buttonsHTML = '';
+            if (link) buttonsHTML += `<a href="${link}" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-${color} text-morandi-${color} hover:bg-morandi-${color}/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-external-link-alt"></i> ${linkLabel}</a>`;
+            if (filePath) buttonsHTML += `<a href="${filePath}" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-${color} text-morandi-${color} hover:bg-morandi-${color}/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> ${fileLabel}</a>`;
+
+            const card = document.createElement('div');
+            card.className = 'reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default';
+            card.innerHTML = `
+                <div class="card-shine rounded-2xl"></div>
+                <div class="card-inner">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-${color} to-morandi-gray-blue flex items-center justify-center mb-4"><i class="fas ${icon} text-white text-xl"></i></div>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-morandi-${color}/20 text-gray-700">${tag}</span>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">${name}</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed mb-4">${desc}</p>
+                    ${buttonsHTML ? `<div class="flex flex-wrap gap-2">${buttonsHTML}</div>` : ''}
+                </div>`;
+
+            const grid = document.querySelector('#projects .grid');
+            grid.appendChild(card);
+
+            // Re-observe + 3D + cursor
+            rO.observe(card);
+            card.addEventListener('mousemove', function(e) { const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; card.style.transform = `perspective(1000px) rotateX(${((y - r.height/2) / (r.height/2)) * -5}deg) rotateY(${((x - r.width/2) / (r.width/2)) * 5}deg)`; const s = card.querySelector('.card-shine'); if (s) { s.style.setProperty('--mouse-x', (x/r.width*100)+'%'); s.style.setProperty('--mouse-y', (y/r.height*100)+'%'); } });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)'; });
+            if (window.matchMedia('(pointer: fine)').matches) { card.addEventListener('mouseenter', () => cursorRing.classList.add('hovering')); card.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering')); }
+            setTimeout(() => card.classList.add('visible'), 50);
+
+            ['proj_name','proj_tag','proj_desc','proj_icon','proj_file','proj_file_label','proj_link','proj_link_label'].forEach(id => { if (id !== 'proj_tag' && id !== 'proj_icon' && id !== 'proj_file_label' && id !== 'proj_link_label') document.getElementById(id).value = ''; });
+            closeAddProject();
+        }
+
+        // ===== Keyboard =====
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeChat(); closeLightbox(); closeAddInternship(); closeAddProject(); } });
+        document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+        document.getElementById('addInternshipModal').addEventListener('click', function(e) { if (e.target === this) closeAddInternship(); });
+        document.getElementById('addProjectModal').addEventListener('click', function(e) { if (e.target === this) closeAddProject(); });
+
+        // ===== Chat =====
+        function toggleChat() { const d = document.getElementById('chatDrawer'), p = document.getElementById('chatPanel'); d.classList.remove('hidden'); setTimeout(() => p.classList.remove('translate-x-full'), 10); }
+        function closeChat() { const d = document.getElementById('chatDrawer'), p = document.getElementById('chatPanel'); p.classList.add('translate-x-full'); setTimeout(() => d.classList.add('hidden'), 300); }
+
+        // ===== Parallax =====
+        document.querySelector('#about').addEventListener('mousemove', e => { document.querySelectorAll('.parallax-layer').forEach(l => { const s = parseFloat(l.dataset.speed) || 0.02, x = (e.clientX / window.innerWidth - 0.5), y = (e.clientY / window.innerHeight - 0.5); l.style.transform = `translate(${x*s*100}px, ${y*s*100}px)`; }); });
+
+        // ===== Hero Name =====
+        const hN = document.getElementById('heroName'); if (hN) { hN.style.opacity = '0'; hN.style.transform = 'translateY(20px)'; hN.style.transition = 'opacity 0.8s ease, transform 0.8s ease'; setTimeout(() => { hN.style.opacity = '1'; hN.style.transform = 'translateY(0)'; }, 200); }
     </script>
+<script type="text/javascript" src="/accessproxy_statics/h5_fp.js" defer></script>
+<script type="text/javascript" src="/accessproxy_statics/wm.js" defer></script>
 </body>
 </html>
