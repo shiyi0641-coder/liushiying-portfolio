@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>样本权重计算工具 · 自定义加权维度</title>
+    <!-- 引入外部样式表 (内嵌升级版) -->
+    <style>
+        /* ============================================
+           重置样式与全局基础 (与原始版本一致，仅微调新增元素)
+        ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1e3a8a;
+            padding: 1.8rem 2rem;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header p {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .upload-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: stretch;
+        }
+
+        .upload-box {
+            flex: 1;
+            min-width: 320px;
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #0f172a;
+        }
+
+        .upload-title i {
+            color: #3b82f6;
+        }
+
+        .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #cbd5e1;
+            border-radius: 1rem;
+            padding: 1.2rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #ffffff;
+        }
+
+        .file-label:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .file-label i {
+            font-size: 2rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-label span {
+            font-size: 0.8rem;
+            color: #334155;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 2rem;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .file-info.success {
+            background: #e0f2e9;
+            color: #2d6a4f;
+        }
+
+        .file-info.error {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .loading-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            z-index: 2000;
+            white-space: nowrap;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loading-toast i {
+            font-size: 16px;
+        }
+
+        /* 映射区域 */
+        .mapping-area {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mapping-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+
+        .mapping-label {
+            font-weight: 500;
+            min-width: 80px;
+            font-size: 0.85rem;
+            color: #334155;
+        }
+
+        select,
+        input {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 0.85rem;
+        }
+
+        .apply-btn,
+        .add-col-btn,
+        .remove-col-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 3rem;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            width: auto;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .add-col-btn {
+            background: #10b981;
+            margin: 0.5rem 0;
+            align-self: flex-start;
+        }
+
+        .remove-col-btn {
+            background: #ef4444;
+            padding: 0.3rem 0.8rem;
+            margin-top: 0.2rem;
+            align-self: flex-start;
+        }
+
+        .apply-btn:hover,
+        .add-col-btn:hover {
+            background: #2563eb;
+        }
+
+        .add-col-btn:hover {
+            background: #059669;
+        }
+
+        .remove-col-btn:hover {
+            background: #dc2626;
+        }
+
+        .extra-col-group,
+        .weight-dim-group {
+            background: #f1f5f9;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .extra-col-header,
+        .dim-header {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            color: #334155;
+        }
+
+        .extra-col-scroll {
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 0.5rem 0;
+        }
+
+        .mapping-status {
+            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            color: #059669;
+        }
+
+        /* 日志区域 */
+        .status-area {
+            background: #f1f5f9;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            font-family: 'Menlo', monospace;
+            font-size: 0.85rem;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .log-line {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .log-icon {
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .log-time {
+            color: #64748b;
+            font-family: monospace;
+            flex-shrink: 0;
+            min-width: 65px;
+        }
+
+        .log-msg {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .log-line.info .log-icon {
+            color: #3b82f6;
+        }
+
+        .log-line.success .log-icon {
+            color: #10b981;
+        }
+
+        .log-line.error .log-icon {
+            color: #ef4444;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            background: #1e3a8a;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:not(:disabled):hover {
+            background: #0f2b5c;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats {
+            background: #eef2ff;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            display: none;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+        }
+
+        .stat-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 1000px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: #1e3a8a;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem 1rem 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #e2e8f0;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .weight-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .weight-table th,
+        .weight-table td {
+            border: 1px solid #e2e8f0;
+            padding: 0.6rem;
+            text-align: center;
+        }
+
+        .weight-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .modal-footer {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .confirm-download {
+            background: #10b981;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .confirm-download:hover {
+            background: #059669;
+        }
+
+        .cancel-btn {
+            background: #6b7280;
+        }
+
+        .cancel-btn:hover {
+            background: #4b5563;
+        }
+
+        /* 新增加权维度区块微调 */
+        .weight-dim-group .mapping-row {
+            margin-bottom: 0.8rem;
+        }
+
+        @media (max-width: 680px) {
+            .content {
+                padding: 1.2rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+
+            .weight-table {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1><i class="fas fa-balance-scale"></i> 样本权重计算工具</h1>
+                <p>基于大盘总体分布（自定义加权维度）自动计算样本权重，支持自定义列名 + 额外匹配列</p>
+                <p>Designed by 猹猹🦡，Powered by DeepSeek🐳，-- v2026.04.15</p>
+            </div>
+            <div class="content">
+                <div class="upload-grid">
+                    <!-- 样本上传卡片（不变） -->
+                    <div class="upload-box">
+                        <div class="upload-title"><i class="fas fa-chart-line"></i> 样本数据</div>
+                        <label class="file-label" id="sampleLabel">
+                            <i class="fas fa-upload"></i>
+                            <span>点击或拖拽上传样本文件 (.xlsx)</span>
+                            <input type="file" id="sampleFile" accept=".xlsx, .xls, .csv">
+                        </label>
+                        <div id="sampleInfo" class="file-info" style="display: none;"></div>
+                        <div id="sampleSheetArea" style="display: none; margin-top: 10px;">
+                            <div class="mapping-row">
+                                <span class="mapping-label">工作表：</span>
+                                <select id="sampleSheetSelect"></select>
+                                <button id="sampleSheetConfirm" class="apply-btn">确认</button>
+                            </div>
+                        </div>
+                        <div id="sampleMapping" class="mapping-area">
+                            <div class="mapping-row">
+                                <span class="mapping-label">UID列：</span>
+                                <select id="sampleUidCol"></select>
+                            </div>
+                            <button class="apply-btn" data-type="sample">应用映射</button>
+                            <div class="mapping-status" id="sampleMappingStatus"></div>
+                        </div>
+                    </div>
+
+                    <!-- 大盘上传卡片 —— 升级：自定义加权维度 -->
+                    <div class="upload-box">
+                        <div class="upload-title"><i class="fas fa-database"></i> 大盘数据</div>
+                        <label class="file-label" id="totalLabel">
+                            <i class="fas fa-upload"></i>
+                            <span>点击或拖拽上传大盘文件 (.xlsx)</span>
+                            <input type="file" id="totalFile" accept=".xlsx, .xls, .csv">
+                        </label>
+                        <div id="totalInfo" class="file-info" style="display: none;"></div>
+                        <div id="totalSheetArea" style="display: none; margin-top: 10px;">
+                            <div class="mapping-row">
+                                <span class="mapping-label">工作表：</span>
+                                <select id="totalSheetSelect"></select>
+                                <button id="totalSheetConfirm" class="apply-btn">确认</button>
+                            </div>
+                        </div>
+                        <div id="totalMapping" class="mapping-area">
+                            <div class="mapping-row">
+                                <span class="mapping-label">UID列：</span>
+                                <select id="totalUidCol"></select>
+                            </div>
+                            <!-- 加权维度配置区域 (替代原有的年龄/性别固定选择) -->
+                            <div style="margin-top: 8px; width: 100%;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 6px;">
+                                    <span class="mapping-label" style="min-width: 80px;">加权维度：</span>
+                                    <span style="font-size: 0.75rem; color: #475569;">(至少一个，用于分组计算权重)</span>
+                                </div>
+                                <div id="weightDimsContainer" class="extra-col-scroll"
+                                    style="max-height: 260px; width: 100%;"></div>
+                                <button class="add-col-btn" id="addWeightDimBtn" style="margin-top: 0.25rem;"><i
+                                        class="fas fa-plus"></i> 添加加权维度</button>
+                            </div>
+                            <!-- 额外匹配列容器 (不变) -->
+                            <div class="extra-col-scroll" id="extraColsContainer" style="margin-top: 12px;"></div>
+                            <button class="add-col-btn" id="addExtraColBtn"><i class="fas fa-plus"></i> 添加额外匹配列</button>
+                            <button class="apply-btn" data-type="total">应用映射</button>
+                            <div class="mapping-status" id="totalMappingStatus"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日志区域 -->
+                <div class="status-area" id="logArea">
+                    <div class="log-line info">
+                        <div class="log-icon"><i class="fas fa-info-circle"></i></div>
+                        <div class="log-time">📌</div>
+                        <div class="log-msg">等待上传文件并配置列映射……</div>
+                    </div>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="stats" id="statsPanel">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statSample">-</div>
+                        <div class="stat-label">有效样本</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statWeightMin">-</div>
+                        <div class="stat-label">权重最小值</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statWeightMax">-</div>
+                        <div class="stat-label">权重最大值</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statWeightMean">-</div>
+                        <div class="stat-label">权重均值</div>
+                    </div>
+                </div>
+
+                <div id="loadingToast" class="loading-toast" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> 正在加载文件，请稍候...
+                </div>
+
+                <div class="action-bar">
+                    <button id="computeBtn" class="btn" disabled><i class="fas fa-calculator"></i> 计算权重</button>
+                </div>
+            </div>
+        </div>
+        <footer>基于自定义加权维度分组，权重 = 大盘比例 / 样本比例（缺失组权重为1）<br>额外匹配列会按UID添加到样本中，不参与权重计算</footer>
+    </div>
+
+    <!-- 权重表预览模态框 (表头动态生成) -->
+    <div id="weightModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-table"></i> 权重表预览</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="overflow-x: auto;">
+                    <table id="weightTable" class="weight-table">
+                        <thead id="weightTableHead">
+                            <!-- 动态生成 -->
+                        </thead>
+                        <tbody id="weightTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button id="downloadWeightTableBtn" class="btn confirm-download"><i class="fas fa-download"></i>
+                        下载权重表</button>
+                    <button id="downloadWeightedDataBtn" class="btn confirm-download" style="background: #3b82f6;"><i
+                            class="fas fa-file-excel"></i> 下载加权数据</button>
+                    <button id="cancelModalBtn" class="btn cancel-btn">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            // ========== 全局变量 ==========
+            let sampleRawData = null;
+            let totalRawData = null;
+            let sampleWorkbook = null;
+            let totalWorkbook = null;
+            let sampleMapping = { uidCol: null };
+            // 大盘映射：uid + 加权维度数组 + 额外列
+            let totalMapping = {
+                uidCol: null,
+                weightDims: [],      // 每个元素 { sourceCol, targetCol }
+                extraCols: []
+            };
+            let sampleMapped = false;
+            let totalMapped = false;
+            let totalColumns = [];
+            let pendingWeightTableData = null;
+            let pendingFinalSample = null;
+
+            // ========== 辅助函数 ==========
+            function addLog(msg, type = 'info') {
+                const logDiv = document.getElementById('logArea');
+                const line = document.createElement('div');
+                line.className = `log-line ${type}`;
+                const timeStr = new Date().toLocaleTimeString();
+                let icon = '';
+                if (type === 'info') icon = '<i class="fas fa-info-circle"></i>';
+                else if (type === 'success') icon = '<i class="fas fa-check-circle"></i>';
+                else if (type === 'error') icon = '<i class="fas fa-exclamation-circle"></i>';
+                else icon = '<i class="fas fa-circle"></i>';
+                line.innerHTML = `<div class="log-icon">${icon}</div><div class="log-time">[${timeStr}]</div><div class="log-msg">${msg}</div>`;
+                logDiv.appendChild(line);
+                line.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                console.log(msg);
+            }
+
+            function readExcelFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const wb = XLSX.read(data, { type: 'array' });
+                            resolve(wb);
+                        } catch (err) { reject(err); }
+                    };
+                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+
+            function suggestColumn(cols, candidates) {
+                for (let cand of candidates) {
+                    const match = cols.find(c => c.toLowerCase().includes(cand.toLowerCase()));
+                    if (match) return match;
+                }
+                return cols[0] || '';
+            }
+
+            function populateSelect(selectId, columns, defaultVal) {
+                const select = document.getElementById(selectId);
+                select.innerHTML = '';
+                columns.forEach(col => {
+                    const opt = document.createElement('option');
+                    opt.value = col;
+                    opt.textContent = col;
+                    if (col === defaultVal) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            }
+
+            // 渲染加权维度 (核心升级)
+            function renderWeightDims() {
+                const container = document.getElementById('weightDimsContainer');
+                container.innerHTML = '';
+                if (!totalMapping.weightDims) totalMapping.weightDims = [];
+                totalMapping.weightDims.forEach((dim, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'weight-dim-group';
+                    div.innerHTML = `
+                        <div class="dim-header">加权维度 ${idx + 1}</div>
+                        <div class="mapping-row">
+                            <span class="mapping-label">大盘列：</span>
+                            <select class="weight-source" data-idx="${idx}"></select>
+                        </div>
+                        <div class="mapping-row">
+                            <span class="mapping-label">目标列名：</span>
+                            <input type="text" class="weight-target" data-idx="${idx}" value="${dim.targetCol || ''}" placeholder="样本中列名">
+                        </div>
+                        <button class="remove-col-btn" data-idx="${idx}"><i class="fas fa-trash"></i> 删除</button>
+                    `;
+                    const sourceSelect = div.querySelector('.weight-source');
+                    totalColumns.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c;
+                        opt.textContent = c;
+                        if (c === dim.sourceCol) opt.selected = true;
+                        sourceSelect.appendChild(opt);
+                    });
+                    container.appendChild(div);
+                });
+                // 事件绑定
+                document.querySelectorAll('.weight-source').forEach(sel => {
+                    sel.addEventListener('change', e => {
+                        const idx = sel.dataset.idx;
+                        if (totalMapping.weightDims[idx]) totalMapping.weightDims[idx].sourceCol = sel.value;
+                    });
+                });
+                document.querySelectorAll('.weight-target').forEach(inp => {
+                    inp.addEventListener('input', e => {
+                        const idx = inp.dataset.idx;
+                        if (totalMapping.weightDims[idx]) totalMapping.weightDims[idx].targetCol = inp.value.trim();
+                    });
+                });
+                document.querySelectorAll('#weightDimsContainer .remove-col-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const idx = parseInt(btn.dataset.idx);
+                        totalMapping.weightDims.splice(idx, 1);
+                        renderWeightDims();
+                    });
+                });
+            }
+
+            // 渲染额外匹配列 (原有逻辑)
+            function renderExtraCols() {
+                const container = document.getElementById('extraColsContainer');
+                container.innerHTML = '';
+                totalMapping.extraCols.forEach((col, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'extra-col-group';
+                    div.innerHTML = `
+                        <div class="extra-col-header">额外匹配列 ${idx + 1}</div>
+                        <div class="mapping-row"><span class="mapping-label">大盘列：</span><select class="extra-source" data-idx="${idx}"></select></div>
+                        <div class="mapping-row"><span class="mapping-label">目标列名：</span><input type="text" class="extra-target" data-idx="${idx}" value="${col.targetCol || ''}"></div>
+                        <button class="remove-col-btn" data-idx="${idx}"><i class="fas fa-trash"></i> 删除</button>
+                    `;
+                    const sel = div.querySelector('.extra-source');
+                    totalColumns.forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.textContent = c; if (c === col.sourceCol) opt.selected = true; sel.appendChild(opt); });
+                    container.appendChild(div);
+                });
+                document.querySelectorAll('.extra-source').forEach(s => s.addEventListener('change', e => { const idx = s.dataset.idx; totalMapping.extraCols[idx].sourceCol = s.value; }));
+                document.querySelectorAll('.extra-target').forEach(i => i.addEventListener('input', e => { const idx = i.dataset.idx; totalMapping.extraCols[idx].targetCol = i.value.trim() || `col_${idx + 1}`; }));
+                document.querySelectorAll('#extraColsContainer .remove-col-btn').forEach(b => b.addEventListener('click', e => { const idx = parseInt(b.dataset.idx); totalMapping.extraCols.splice(idx, 1); renderExtraCols(); }));
+            }
+
+            // 初始化样本映射
+            function initSampleMapping(cols) {
+                const defUid = suggestColumn(cols, ['uid', 'user_id', 'userid', 'id']);
+                populateSelect('sampleUidCol', cols, defUid);
+                document.getElementById('sampleMapping').style.display = 'flex';
+                sampleMapped = false;
+                document.getElementById('sampleMappingStatus').innerHTML = '⚠️ 请点击“应用映射”确认';
+                updateButtonState();
+            }
+
+            // 初始化大盘映射 (默认增加年龄、性别作为初始加权维度)
+            function initTotalMapping(cols) {
+                totalColumns = cols;
+                const defUid = suggestColumn(cols, ['uid', 'user_id', 'userid', 'id']);
+                populateSelect('totalUidCol', cols, defUid);
+
+                // 设置默认加权维度：年龄、性别 (智能推荐)
+                const defaultAge = suggestColumn(cols, ['age', '年龄', 'age_range']);
+                const defaultGender = suggestColumn(cols, ['gender', '性别', 'sex']);
+                totalMapping.weightDims = [
+                    { sourceCol: defaultAge, targetCol: 'age' },
+                    { sourceCol: defaultGender, targetCol: 'gender' }
+                ];
+                totalMapping.extraCols = [];
+                renderWeightDims();
+                renderExtraCols();
+
+                document.getElementById('totalMapping').style.display = 'flex';
+                totalMapped = false;
+                document.getElementById('totalMappingStatus').innerHTML = '⚠️ 请点击“应用映射”确认';
+                updateButtonState();
+            }
+
+            function loadSampleSheet(sheetName) {
+                const sheet = sampleWorkbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+                if (!json.length) { addLog("❌ 工作表无数据", 'error'); return; }
+                sampleRawData = json;
+                const cols = Object.keys(json[0]);
+                addLog(`📊 样本: ${json.length} 行, 列: ${cols.join(', ')}`, 'info');
+                document.getElementById('sampleInfo').innerHTML = `✅ 已加载 ${json.length} 行 (工作表: ${sheetName})`;
+                document.getElementById('sampleSheetArea').style.display = 'none';
+                initSampleMapping(cols);
+            }
+
+            function loadTotalSheet(sheetName) {
+                const sheet = totalWorkbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+                if (!json.length) { addLog("❌ 工作表无数据", 'error'); return; }
+                totalRawData = json;
+                const cols = Object.keys(json[0]);
+                addLog(`📊 大盘: ${json.length} 行, 列: ${cols.join(', ')}`, 'info');
+                document.getElementById('totalInfo').innerHTML = `✅ 已加载 ${json.length} 行 (工作表: ${sheetName})`;
+                document.getElementById('totalSheetArea').style.display = 'none';
+                initTotalMapping(cols);
+            }
+
+            function applySampleMapping() {
+                const uid = document.getElementById('sampleUidCol').value;
+                if (!uid) { addLog("⚠️ 请选择UID列", 'error'); return; }
+                sampleMapping.uidCol = uid;
+                sampleMapped = true;
+                document.getElementById('sampleMappingStatus').innerHTML = `✅ UID → ${uid}`;
+                addLog(`✅ 样本映射: UID=${uid}`, 'success');
+                updateButtonState();
+            }
+
+            function applyTotalMapping() {
+                const uid = document.getElementById('totalUidCol').value;
+                if (!uid) { addLog("⚠️ 请选择大盘UID列", 'error'); return; }
+                // 验证加权维度
+                if (!totalMapping.weightDims || totalMapping.weightDims.length === 0) {
+                    addLog("⚠️ 至少需要指定一个加权维度", 'error'); return;
+                }
+                for (let i = 0; i < totalMapping.weightDims.length; i++) {
+                    const d = totalMapping.weightDims[i];
+                    if (!d.sourceCol) { addLog(`⚠️ 加权维度${i + 1}未选择大盘列`, 'error'); return; }
+                    if (!d.targetCol || d.targetCol.trim() === '') { addLog(`⚠️ 加权维度${i + 1}缺少目标列名`, 'error'); return; }
+                }
+                // 验证额外列
+                for (let i = 0; i < totalMapping.extraCols.length; i++) {
+                    if (!totalMapping.extraCols[i].targetCol?.trim()) { addLog(`⚠️ 额外匹配列${i + 1}缺少目标列名`, 'error'); return; }
+                }
+                totalMapping.uidCol = uid;
+                totalMapped = true;
+                let msg = `✅ 大盘映射: UID=${uid}, 加权维度: ${totalMapping.weightDims.map(d => `${d.sourceCol}→${d.targetCol}`).join(', ')}`;
+                if (totalMapping.extraCols.length) msg += `; 额外: ${totalMapping.extraCols.map(e => `${e.sourceCol}→${e.targetCol}`).join(', ')}`;
+                document.getElementById('totalMappingStatus').innerHTML = msg;
+                addLog(msg, 'success');
+                updateButtonState();
+            }
+
+            function updateButtonState() {
+                const ready = sampleRawData && totalRawData && sampleMapped && totalMapped;
+                document.getElementById('computeBtn').disabled = !ready;
+            }
+
+            async function handleFileUpload(file, type) {
+                const isSample = type === 'sample';
+                const infoDiv = document.getElementById(isSample ? 'sampleInfo' : 'totalInfo');
+                const mappingDiv = document.getElementById(isSample ? 'sampleMapping' : 'totalMapping');
+                const sheetArea = document.getElementById(isSample ? 'sampleSheetArea' : 'totalSheetArea');
+                const sheetSelect = document.getElementById(isSample ? 'sampleSheetSelect' : 'totalSheetSelect');
+                if (!file) {
+                    if (isSample) { sampleRawData = null; sampleWorkbook = null; sampleMapped = false; }
+                    else { totalRawData = null; totalWorkbook = null; totalMapped = false; totalColumns = []; totalMapping.weightDims = []; totalMapping.extraCols = []; }
+                    infoDiv.style.display = 'none'; mappingDiv.style.display = 'none'; sheetArea.style.display = 'none';
+                    updateButtonState(); return;
+                }
+                document.getElementById('loadingToast').style.display = 'flex';
+                try {
+                    addLog(`📁 读取${isSample ? '样本' : '大盘'}: ${file.name}`, 'info');
+                    const wb = await readExcelFile(file);
+                    if (isSample) sampleWorkbook = wb; else totalWorkbook = wb;
+                    const names = wb.SheetNames;
+                    sheetSelect.innerHTML = '';
+                    names.forEach(n => { const opt = document.createElement('option'); opt.value = n; opt.textContent = n; sheetSelect.appendChild(opt); });
+                    sheetArea.style.display = 'block';
+                    infoDiv.style.display = 'block';
+                    infoDiv.className = 'file-info success';
+                    infoDiv.innerHTML = `✅ 已加载，${names.length}个工作表`;
+                    mappingDiv.style.display = 'none';
+                    updateButtonState();
+                } catch (err) {
+                    addLog(`❌ 读取失败: ${err.message}`, 'error');
+                } finally {
+                    document.getElementById('loadingToast').style.display = 'none';
+                }
+            }
+
+            function setupUpload(inputId, type) {
+                const input = document.getElementById(inputId);
+                input.addEventListener('change', e => handleFileUpload(e.target.files[0], type));
+                const label = document.getElementById(inputId === 'sampleFile' ? 'sampleLabel' : 'totalLabel');
+                label.addEventListener('dragover', e => { e.preventDefault(); label.style.borderColor = '#3b82f6'; });
+                label.addEventListener('dragleave', () => { label.style.borderColor = '#cbd5e1'; });
+                label.addEventListener('drop', async e => {
+                    e.preventDefault(); label.style.borderColor = '#cbd5e1';
+                    const file = e.dataTransfer.files[0];
+                    if (!file?.name.match(/\.(xlsx|xls|csv)$/i)) return;
+                    const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+                    await handleFileUpload(file, type);
+                });
+            }
+
+            // 核心计算：根据weightDims分组
+            function calcProportion(data, weightDims) {
+                const groups = new Map();
+                for (const row of data) {
+                    let valid = true;
+                    const values = [];
+                    for (let dim of weightDims) {
+                        const val = row[dim.targetCol];
+                        if (val === undefined || val === null || String(val).trim() === '' || String(val).toLowerCase() === 'unknown') { valid = false; break; }
+                        values.push(String(val));
+                    }
+                    if (!valid) continue;
+                    const key = values.join('|');
+                    groups.set(key, (groups.get(key) || 0) + 1);
+                }
+                const total = Array.from(groups.values()).reduce((a, b) => a + b, 0);
+                const result = [];
+                for (let [key, count] of groups.entries()) {
+                    const parts = key.split('|');
+                    const row = { key, count, prop: count / total };
+                    weightDims.forEach((dim, i) => { row[dim.targetCol] = parts[i]; });
+                    result.push(row);
+                }
+                return result;
+            }
+
+            function showWeightModal(weightTableData, weightDims) {
+                const modal = document.getElementById('weightModal');
+                const thead = document.getElementById('weightTableHead');
+                const tbody = document.getElementById('weightTableBody');
+                // 构建表头
+                let headerHtml = '<tr>';
+                weightDims.forEach(d => { headerHtml += `<th>${d.targetCol}</th>`; });
+                headerHtml += '<th>大盘频次</th><th>大盘比例</th><th>样本频次</th><th>样本比例</th><th>权重</th></tr>';
+                thead.innerHTML = headerHtml;
+                tbody.innerHTML = '';
+                let totalTotal = 0, totalSample = 0;
+                weightTableData.forEach(row => {
+                    totalTotal += row.count_total;
+                    totalSample += row.count_sample;
+                    const tr = document.createElement('tr');
+                    let cells = '';
+                    weightDims.forEach(d => { cells += `<td>${row[d.targetCol] ?? ''}</td>`; });
+                    cells += `<td>${row.count_total}</td><td>${(row.prop_total * 100).toFixed(2)}%</td><td>${row.count_sample}</td><td>${(row.prop_sample * 100).toFixed(2)}%</td><td>${row.weight.toFixed(4)}</td>`;
+                    tr.innerHTML = cells;
+                    tbody.appendChild(tr);
+                });
+                if (weightTableData.length) {
+                    const totalRow = document.createElement('tr');
+                    totalRow.style.fontWeight = 'bold'; totalRow.style.backgroundColor = '#f8fafc';
+                    let totalCells = `<td colspan="${weightDims.length}" style="text-align:center;"><strong>总计</strong></td>`;
+                    totalCells += `<td><strong>${totalTotal}</strong></td><td>—</td><td><strong>${totalSample}</strong></td><td>—</td><td>—</td>`;
+                    totalRow.innerHTML = totalCells;
+                    tbody.appendChild(totalRow);
+                }
+                modal.style.display = 'block';
+            }
+
+            function closeModal() { document.getElementById('weightModal').style.display = 'none'; }
+
+            async function computeWeights() {
+                if (!sampleRawData || !totalRawData || !sampleMapped || !totalMapped) return;
+                try {
+                    addLog("⚙️ 开始计算权重...", 'info');
+                    const weightDims = totalMapping.weightDims;
+                    const extraCols = totalMapping.extraCols;
+
+                    // 样本清洗
+                    const sampleValid = sampleRawData.filter(r => { const v = r[sampleMapping.uidCol]; return v && String(v).trim() !== '' && String(v).toLowerCase() !== 'unknown'; });
+                    addLog(`样本清洗: ${sampleRawData.length} → ${sampleValid.length}`, 'info');
+
+                    // 大盘清洗 (UID + 所有加权维度有效)
+                    const totalCleaned = totalRawData.filter(r => {
+                        const uid = r[totalMapping.uidCol];
+                        if (!uid || String(uid).trim() === '' || String(uid).toLowerCase() === 'unknown') return false;
+                        for (let dim of weightDims) {
+                            const val = r[dim.sourceCol];
+                            if (!val || String(val).trim() === '' || String(val).toLowerCase() === 'unknown') return false;
+                        }
+                        return true;
+                    });
+                    addLog(`大盘清洗: ${totalRawData.length} → ${totalCleaned.length}`, 'info');
+                    if (!totalCleaned.length) { addLog("❌ 无有效大盘数据", 'error'); return; }
+
+                    // 大盘去重
+                    const uniqueMap = new Map();
+                    for (let row of totalCleaned) {
+                        const uidKey = String(row[totalMapping.uidCol]);
+                        if (!uniqueMap.has(uidKey)) {
+                            const obj = { uid: uidKey };
+                            weightDims.forEach(d => obj[d.targetCol] = row[d.sourceCol]);
+                            extraCols.forEach(e => obj[e.targetCol] = row[e.sourceCol]);
+                            uniqueMap.set(uidKey, obj);
+                        }
+                    }
+                    const totalUnique = Array.from(uniqueMap.values());
+                    addLog(`大盘去重后: ${totalUnique.length}`, 'info');
+
+                    // 匹配样本
+                    const totalMap = new Map(totalUnique.map(u => [u.uid, u]));
+                    const matched = sampleValid.map(s => {
+                        const uid = String(s[sampleMapping.uidCol]);
+                        const match = totalMap.get(uid);
+                        const newRow = { ...s };
+                        if (match) {
+                            weightDims.forEach(d => newRow[d.targetCol] = match[d.targetCol]);
+                            extraCols.forEach(e => newRow[e.targetCol] = match[e.targetCol]);
+                        } else {
+                            weightDims.forEach(d => newRow[d.targetCol] = undefined);
+                            extraCols.forEach(e => newRow[e.targetCol] = undefined);
+                        }
+                        return newRow;
+                    });
+
+                    const validSample = matched.filter(r => weightDims.every(d => r[d.targetCol] !== undefined && r[d.targetCol] !== null && String(r[d.targetCol]).trim() !== ''));
+                    addLog(`有效样本(加权维度完整): ${validSample.length}`, 'info');
+                    if (!validSample.length) { addLog("❌ 无有效样本", 'error'); return; }
+
+                    const totalProp = calcProportion(totalCleaned.map(r => { let o = {}; weightDims.forEach(d => o[d.targetCol] = r[d.sourceCol]); return o; }), weightDims);
+                    const sampleProp = calcProportion(validSample, weightDims);
+
+                    const totalDict = new Map(); totalProp.forEach(p => totalDict.set(p.key, p));
+                    const sampleDict = new Map(); sampleProp.forEach(p => sampleDict.set(p.key, p));
+                    const allKeys = new Set([...totalDict.keys(), ...sampleDict.keys()]);
+                    const weightTable = [];
+                    const weightMap = new Map();
+
+                    for (let key of allKeys) {
+                        const t = totalDict.get(key) || { count: 0, prop: 0 };
+                        const s = sampleDict.get(key) || { count: 0, prop: 0 };
+                        const w = s.prop === 0 ? 1 : t.prop / s.prop;
+                        const parts = key.split('|');
+                        const row = { key, count_total: t.count, prop_total: t.prop, count_sample: s.count, prop_sample: s.prop, weight: w };
+                        weightDims.forEach((d, i) => row[d.targetCol] = parts[i]);
+                        weightTable.push(row);
+                        weightMap.set(key, w);
+                    }
+                    weightTable.sort((a, b) => {
+                        for (let d of weightDims) {
+                            const va = String(a[d.targetCol] ?? ''), vb = String(b[d.targetCol] ?? '');
+                            if (va !== vb) return va.localeCompare(vb);
+                        }
+                        return 0;
+                    });
+
+                    const finalSample = validSample.map(r => {
+                        const key = weightDims.map(d => String(r[d.targetCol])).join('|');
+                        return { ...r, weight: weightMap.get(key) ?? 1 };
+                    });
+
+                    const weights = finalSample.map(r => r.weight);
+                    document.getElementById('statSample').innerText = finalSample.length;
+                    document.getElementById('statWeightMin').innerText = Math.min(...weights).toFixed(3);
+                    document.getElementById('statWeightMax').innerText = Math.max(...weights).toFixed(3);
+                    document.getElementById('statWeightMean').innerText = (weights.reduce((a, b) => a + b, 0) / weights.length).toFixed(3);
+                    document.getElementById('statsPanel').style.display = 'flex';
+
+                    pendingWeightTableData = weightTable;
+                    pendingFinalSample = finalSample;
+                    showWeightModal(weightTable, weightDims);
+                    addLog(`✅ 计算完成，${weightTable.length}个分组`, 'success');
+                } catch (e) {
+                    addLog(`❌ 出错: ${e.message}`, 'error');
+                }
+            }
+
+            function downloadWeightTable() {
+                if (!pendingWeightTableData) return;
+                const dims = totalMapping.weightDims;
+                const wsData = pendingWeightTableData.map(r => {
+                    const obj = {};
+                    dims.forEach(d => obj[d.targetCol] = r[d.targetCol]);
+                    obj['大盘频次'] = r.count_total; obj['大盘比例'] = (r.prop_total * 100).toFixed(2) + '%';
+                    obj['样本频次'] = r.count_sample; obj['样本比例'] = (r.prop_sample * 100).toFixed(2) + '%';
+                    obj['权重'] = r.weight.toFixed(4);
+                    return obj;
+                });
+                const ws = XLSX.utils.json_to_sheet(wsData);
+                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "权重表");
+                XLSX.writeFile(wb, `WeightTable_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            }
+
+            function downloadWeightedData() {
+                if (!pendingFinalSample) return;
+                const ws = XLSX.utils.json_to_sheet(pendingFinalSample);
+                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "加权样本");
+                XLSX.writeFile(wb, `WeightedData_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            }
+
+            // 初始化
+            window.onload = () => {
+                setupUpload('sampleFile', 'sample');
+                setupUpload('totalFile', 'total');
+                document.querySelector('[data-type="sample"]').addEventListener('click', applySampleMapping);
+                document.querySelector('[data-type="total"]').addEventListener('click', applyTotalMapping);
+                // 加权维度添加按钮
+                document.getElementById('addWeightDimBtn').addEventListener('click', () => {
+                    if (!totalColumns.length) { addLog('请先加载大盘文件', 'error'); return; }
+                    totalMapping.weightDims.push({ sourceCol: totalColumns[0], targetCol: '' });
+                    renderWeightDims();
+                    // 👇 新增自动滚动
+                    const container = document.getElementById('weightDimsContainer');
+                    container.scrollTop = container.scrollHeight;
+                });
+
+                // 额外匹配列添加按钮
+                document.getElementById('addExtraColBtn').addEventListener('click', () => {
+                    totalMapping.extraCols.push({ sourceCol: totalColumns[0] || '', targetCol: '' });
+                    renderExtraCols();
+                    // 👇 新增自动滚动
+                    const container = document.getElementById('extraColsContainer');
+                    container.scrollTop = container.scrollHeight;
+                });
+                document.getElementById('computeBtn').addEventListener('click', computeWeights);
+                document.getElementById('sampleSheetConfirm').addEventListener('click', () => {
+                    const name = document.getElementById('sampleSheetSelect').value;
+                    if (name) loadSampleSheet(name);
+                });
+                document.getElementById('totalSheetConfirm').addEventListener('click', () => {
+                    const name = document.getElementById('totalSheetSelect').value;
+                    if (name) loadTotalSheet(name);
+                });
+
+                const modal = document.getElementById('weightModal');
+                document.querySelector('.close').onclick = closeModal;
+                document.getElementById('cancelModalBtn').onclick = closeModal;
+                document.getElementById('downloadWeightTableBtn').onclick = downloadWeightTable;
+                document.getElementById('downloadWeightedDataBtn').onclick = downloadWeightedData;
+                window.onclick = e => { if (e.target === modal) closeModal(); };
+            };
+        })();
+    </script>
+</body>
+
+</html>

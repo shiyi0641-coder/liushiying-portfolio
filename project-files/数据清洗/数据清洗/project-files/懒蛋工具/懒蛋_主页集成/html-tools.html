@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 工具 · 懒蛋工具集</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+        
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+        .tool-card:hover .preview-area {
+            transform: scale(1.02);
+        }
+        .preview-area {
+            transition: transform 0.4s ease;
+        }
+        .launch-btn {
+            transition: all 0.2s ease;
+        }
+        .launch-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .category-tab {
+            transition: all 0.2s ease;
+        }
+        .category-tab:hover {
+            background: rgba(0,0,0,0.04);
+        }
+        .category-tab.active {
+            background: #1e3a8a;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="flex min-h-screen">
+        
+        <!-- 左侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-900 text-white rounded-xl flex items-center justify-center font-bold text-lg">懒</div>
+                    <div>
+                        <h1 class="font-semibold text-gray-900">懒蛋工具集</h1>
+                        <p class="text-xs text-gray-500">快手主战分析部</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-1">
+                <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    <span class="font-medium">首页</span>
+                </a>
+                <a href="skills.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span>Skill 工具</span>
+                </a>
+                <a href="html-tools.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-50 text-blue-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                    <span class="font-medium">HTML 工具</span>
+                </a>
+                <a href="admin.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>管理后台</span>
+                </a>
+            </nav>
+
+            <div class="px-4 py-4 border-t border-gray-200">
+                <p class="text-xs text-gray-400">v2026.05.12</p>
+                <p class="text-xs text-gray-400 mt-1">🐳 DeepSeek · 🦞 龙虾</p>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col">
+            
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-lg font-semibold text-gray-900">HTML 工具</h2>
+                    <span class="text-sm text-gray-400">|</span>
+                    <span class="text-sm text-gray-500">可视化与数据处理工具</span>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="搜索 HTML 工具..." 
+                               class="w-64 pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               onkeyup="searchTools()">
+                    </div>
+                    
+                    <button class="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition" onclick="openUploadModal()">
+                        + 上传工具
+                    </button>
+                    
+                    <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                        <div class="text-right">
+                            <p class="text-sm font-medium text-gray-900">懒蛋用户</p>
+                            <p class="text-xs text-gray-500">快手主战分析部</p>
+                        </div>
+                        <div class="w-9 h-9 bg-blue-900 text-white rounded-full flex items-center justify-center font-bold text-sm">懒</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-auto p-8">
+                
+                <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-3xl">🌐</span>
+                        <h1 class="text-2xl font-bold text-gray-900">HTML 工具</h1>
+                    </div>
+                    <p class="text-gray-600">可视化与数据处理工具 · 浏览器打开即可使用</p>
+                    <p class="text-sm text-gray-400 mt-1">💡 无需安装，点开即用，懒人福音</p>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="flex items-center gap-3 mb-8">
+                    <button class="category-tab active px-5 py-2 rounded-full text-sm font-medium" onclick="filterCategory('all', this)">全部</button>
+                    <button class="category-tab px-5 py-2 rounded-full text-sm font-medium text-gray-600" onclick="filterCategory('data', this)">数据处理</button>
+                    <button class="category-tab px-5 py-2 rounded-full text-sm font-medium text-gray-600" onclick="filterCategory('visual', this)">可视化</button>
+                    <button class="category-tab px-5 py-2 rounded-full text-sm font-medium text-gray-600" onclick="filterCategory('survey', this)">问卷相关</button>
+                </div>
+
+                <!-- HTML Tools Grid -->
+                <div class="grid grid-cols-2 gap-6" id="toolsGrid">
+
+                    <!-- Tool 1: 开放题编码 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 overflow-hidden" data-category="data survey" data-name="开放题自动编码">
+                        <div class="preview-area h-40 bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 flex items-center justify-center relative">
+                            <div class="absolute inset-0 bg-black/10"></div>
+                            <div class="relative text-center text-white">
+                                <div class="text-5xl mb-2">📝</div>
+                                <div class="text-lg font-semibold">开放题自动编码</div>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <span class="text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm">热门</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold mb-2 text-gray-900">开放题自动编码工具</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                针对问卷答卷中的开放题进行聚类编码，提取相应维度和原声，生成维度比例和原声引用表格。
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg border border-emerald-100">聚类分析</span>
+                                <span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg border border-emerald-100">维度提取</span>
+                                <span class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg border border-emerald-100">原声引用</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <a href="detail.html?tool=open-coding" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                    查看详情 →
+                                </a>
+                                <button class="launch-btn bg-blue-900 text-white px-5 py-2 rounded-xl font-medium text-sm hover:bg-blue-800 transition" onclick="launchTool('开放题自动编码', 'tools/open-coding.html')">
+                                    立即使用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 2: 自动匹配权重 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 overflow-hidden" data-category="data" data-name="自动匹配权重">
+                        <div class="preview-area h-40 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-600 flex items-center justify-center relative">
+                            <div class="absolute inset-0 bg-black/10"></div>
+                            <div class="relative text-center text-white">
+                                <div class="text-5xl mb-2">⚖️</div>
+                                <div class="text-lg font-semibold">自动匹配权重</div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold mb-2 text-gray-900">自动匹配权重工具</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                根据 uid 将大盘数据匹配到样本数据中，分别计算加权数据比例，生成权重表。
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100">数据匹配</span>
+                                <span class="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100">权重计算</span>
+                                <span class="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg border border-blue-100">比例分析</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <a href="detail.html?tool=weight-matching" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                    查看详情 →
+                                </a>
+                                <button class="launch-btn bg-blue-900 text-white px-5 py-2 rounded-xl font-medium text-sm hover:bg-blue-800 transition" onclick="launchTool('自动匹配权重', 'tools/weight-matching.html')">
+                                    立即使用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 3: 访谈稿件编码 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 overflow-hidden" data-category="data" data-name="访谈稿件编码">
+                        <div class="preview-area h-40 bg-gradient-to-br from-violet-400 via-purple-500 to-pink-600 flex items-center justify-center relative">
+                            <div class="absolute inset-0 bg-black/10"></div>
+                            <div class="relative text-center text-white">
+                                <div class="text-5xl mb-2">🎤</div>
+                                <div class="text-lg font-semibold">访谈稿件编码</div>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <span class="text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm">AI 驱动</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold mb-2 text-gray-900">访谈稿件自动编码工具</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                提纲驱动的访谈文本分析工具，生成树形维度、可视化展示结论，支持导出 Markdown 报告。
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="text-xs bg-violet-50 text-violet-600 px-3 py-1.5 rounded-lg border border-violet-100">提纲解析</span>
+                                <span class="text-xs bg-violet-50 text-violet-600 px-3 py-1.5 rounded-lg border border-violet-100">树形维度</span>
+                                <span class="text-xs bg-violet-50 text-violet-600 px-3 py-1.5 rounded-lg border border-violet-100">Markdown 导出</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <a href="detail.html?tool=interview-coding" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                    查看详情 →
+                                </a>
+                                <button class="launch-btn bg-blue-900 text-white px-5 py-2 rounded-xl font-medium text-sm hover:bg-blue-800 transition" onclick="launchTool('访谈稿件编码', 'tools/interview-coding.html')">
+                                    立即使用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 4: 显著性标色 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 overflow-hidden" data-category="data visual" data-name="显著性标色">
+                        <div class="preview-area h-40 bg-gradient-to-br from-rose-400 via-pink-500 to-rose-600 flex items-center justify-center relative">
+                            <div class="absolute inset-0 bg-black/10"></div>
+                            <div class="relative text-center text-white">
+                                <div class="text-5xl mb-2">🎨</div>
+                                <div class="text-lg font-semibold">显著性标色</div>
+                            </div>
+                            <div class="absolute top-4 right-4">
+                                <span class="text-xs bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm">实用</span>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold mb-2 text-gray-900">显著性标色小工具</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                自动将 SPSS 输出结果表格中的显著单元格标高亮，告别无脑但繁琐的手工操作。
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="text-xs bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg border border-rose-100">SPSS 兼容</span>
+                                <span class="text-xs bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg border border-rose-100">一键标色</span>
+                                <span class="text-xs bg-rose-50 text-rose-600 px-3 py-1.5 rounded-lg border border-rose-100">支持导出</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <a href="detail.html?tool=significance-tool" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                    查看详情 →
+                                </a>
+                                <button class="launch-btn bg-blue-900 text-white px-5 py-2 rounded-xl font-medium text-sm hover:bg-blue-800 transition" onclick="launchTool('显著性标色', 'tools/significance-tool.html')">
+                                    立即使用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 5: 词云图生成 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 overflow-hidden" data-category="visual" data-name="词云图生成">
+                        <div class="preview-area h-40 bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 flex items-center justify-center relative">
+                            <div class="absolute inset-0 bg-black/10"></div>
+                            <div class="relative text-center text-white">
+                                <div class="text-5xl mb-2">☁️</div>
+                                <div class="text-lg font-semibold">词云图生成</div>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <h3 class="text-lg font-bold mb-2 text-gray-900">词云图生成工具</h3>
+                            <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                                无需安装 Python，直接在浏览器中生成中文词云图，支持自定义停用词和样式。
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="text-xs bg-sky-50 text-sky-600 px-3 py-1.5 rounded-lg border border-sky-100">中文分词</span>
+                                <span class="text-xs bg-sky-50 text-sky-600 px-3 py-1.5 rounded-lg border border-sky-100">停用词</span>
+                                <span class="text-xs bg-sky-50 text-sky-600 px-3 py-1.5 rounded-lg border border-sky-100">高清导出</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <a href="detail.html?tool=wordcloud" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                                    查看详情 →
+                                </a>
+                                <button class="launch-btn bg-blue-900 text-white px-5 py-2 rounded-xl font-medium text-sm hover:bg-blue-800 transition" onclick="launchTool('词云图生成', 'tools/wordcloud.html')">
+                                    立即使用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 6: Coming Soon -->
+                    <div class="tool-card bg-gray-50 rounded-xl border border-dashed border-gray-300 flex flex-col items-center justify-center p-10 min-h-[360px]" data-category="coming">
+                        <div class="text-6xl mb-4">🚧</div>
+                        <h3 class="text-lg font-semibold text-gray-400 mb-2">更多工具开发中</h3>
+                        <p class="text-sm text-gray-400 text-center">如果你有好的工具想法，<br>欢迎联系 @柳诗颖 投稿</p>
+                        <button class="mt-6 px-6 py-3 rounded-xl border border-gray-300 text-gray-500 hover:bg-white hover:border-gray-400 transition" onclick="showToast('投稿功能开发中... 🚧')">
+                            我要投稿
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <footer class="bg-white border-t border-gray-200 px-8 py-4">
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <p>© 2024 快手主战分析部 · 懒蛋工具集 · 生命不息，懒蛋不止！🥚</p>
+                    <p>有问题可以联系：柳诗颖、查一畅</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">上传 HTML 工具</h3>
+                <p class="text-gray-500 text-sm mb-6">将你自己的 HTML 工具上传到平台</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">工具名称</label>
+                        <input type="text" placeholder="给你的工具起个名字" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">工具描述</label>
+                        <textarea placeholder="简单描述这个工具的用途" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">上传文件</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gray-400 transition cursor-pointer" onclick="showToast('文件选择功能开发中... 🚧')">
+                            <div class="text-4xl mb-2">📁</div>
+                            <p class="text-sm text-gray-500">点击选择 .html 文件</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button class="flex-1 bg-blue-900 text-white py-3 rounded-xl font-medium hover:bg-blue-800 transition" onclick="showToast('上传功能开发中... 🚧'); closeUploadModal();">
+                        上传
+                    </button>
+                    <button class="px-6 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition" onclick="closeUploadModal()">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-blue-900 text-white px-6 py-3 rounded-xl shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // Search tools
+        function searchTools() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.tool-card');
+            
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name').toLowerCase();
+                if (name.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter by category
+        function filterCategory(category, btn) {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.classList.add('text-gray-600');
+            });
+            btn.classList.add('active');
+            btn.classList.remove('text-gray-600');
+
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach(card => {
+                const categories = card.getAttribute('data-category');
+                if (category === 'all' || categories.includes(category)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const categoryNames = { all: '全部', data: '数据处理', visual: '可视化', survey: '问卷相关' };
+            showToast(`已筛选: ${categoryNames[category]}`);
+        }
+
+        // Launch tool
+        function launchTool(toolName, toolPath) {
+            showToast(`🚀 正在打开 ${toolName}...`);
+            setTimeout(() => {
+                window.open(toolPath, '_blank');
+            }, 500);
+        }
+
+        // Upload modal
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('show');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('show');
+        }
+
+        // Close modal on outside click
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeUploadModal();
+            }
+        });
+    </script>
+<script type="text/javascript" src="/accessproxy_statics/h5_fp.js" defer></script>
+<script type="text/javascript" src="/accessproxy_statics/wm.js" defer></script>
+</body>
+</html>

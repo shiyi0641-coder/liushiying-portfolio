@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill 工具 · 懒蛋工具集</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; }
+        
+        .tool-card {
+            transition: all 0.3s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        .category-tab {
+            transition: all 0.2s ease;
+        }
+        .category-tab:hover {
+            background: rgba(0,0,0,0.04);
+        }
+        .category-tab.active {
+            background: #1e3a8a;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <div class="flex min-h-screen">
+        
+        <!-- 左侧边栏 -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-900 text-white rounded-xl flex items-center justify-center font-bold text-lg">懒</div>
+                    <div>
+                        <h1 class="font-semibold text-gray-900">懒蛋工具集</h1>
+                        <p class="text-xs text-gray-500">快手主战分析部</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 px-4 py-6 space-y-1">
+                <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    <span class="font-medium">首页</span>
+                </a>
+                <a href="skills.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-50 text-blue-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span class="font-medium">Skill 工具</span>
+                </a>
+                <a href="html-tools.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                    <span>HTML 工具</span>
+                </a>
+                <a href="admin.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>管理后台</span>
+                </a>
+            </nav>
+
+            <div class="px-4 py-4 border-t border-gray-200">
+                <p class="text-xs text-gray-400">v2026.05.12</p>
+                <p class="text-xs text-gray-400 mt-1">🐳 DeepSeek · 🦞 龙虾</p>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col">
+            
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Skill 工具</h2>
+                    <span class="text-sm text-gray-400">|</span>
+                    <span class="text-sm text-gray-500">AI 与自动化能力中心</span>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="搜索 Skill..." 
+                               class="w-64 pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               onkeyup="searchSkills()">
+                    </div>
+                    
+                    <button class="bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition" onclick="showToast('Skill 创建向导开发中... 🚧')">
+                        + 创建 Skill
+                    </button>
+                    
+                    <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                        <div class="text-right">
+                            <p class="text-sm font-medium text-gray-900">懒蛋用户</p>
+                            <p class="text-xs text-gray-500">快手主战分析部</p>
+                        </div>
+                        <div class="w-9 h-9 bg-blue-900 text-white rounded-full flex items-center justify-center font-bold text-sm">懒</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-auto p-8">
+                
+                <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-3xl">⚡</span>
+                        <h1 class="text-2xl font-bold text-gray-900">Skill 工具</h1>
+                    </div>
+                    <p class="text-gray-600">AI 与自动化能力中心 · 发送给 MarioClaw 安装后即可使用</p>
+                    <p class="text-sm text-gray-400 mt-1">🦞 就像给龙虾装上了智能大脑，让重复工作自动消失</p>
+                </div>
+
+                <!-- Category Tabs -->
+                <div class="flex items-center gap-3 mb-8">
+                    <button class="category-tab active px-5 py-2 rounded-full text-sm font-medium" onclick="filterCategory('all', this)">全部</button>
+                    <button class="category-tab px-5 py-2 rounded-full text-sm font-medium text-gray-600" onclick="filterCategory('survey', this)">问卷相关</button>
+                    <button class="category-tab px-5 py-2 rounded-full text-sm font-medium text-gray-600" onclick="filterCategory('data', this)">数据分析</button>
+                    <button class="category-tab px-5 py-2 rounded-full text-sm font-medium text-gray-600" onclick="filterCategory('ai', this)">AI 辅助</button>
+                </div>
+
+                <!-- Skill Cards Grid -->
+                <div class="grid grid-cols-3 gap-6" id="skillsGrid">
+
+                    <!-- Skill 1: 问卷导入 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 p-6" data-category="survey" data-name="问卷网模板自动导入工具">
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-3xl">📋</div>
+                            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">热门</span>
+                        </div>
+
+                        <h3 class="text-lg font-bold mb-3 text-gray-900">问卷网模板自动导入工具</h3>
+
+                        <p class="text-gray-500 text-sm leading-relaxed mb-5">
+                            根据 Docs 问卷大纲，自动生成符合问卷网模板要求的 Excel 文件，可用于自动导入问卷网。
+                        </p>
+
+                        <div class="flex flex-wrap gap-2 mb-5">
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">支持 7 种题型</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">自动逻辑</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">矩阵题</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-sm text-gray-400 mb-5 pb-5 border-b border-gray-100">
+                            <span>v1.2.0</span>
+                            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                            <span class="text-green-600">● 可用</span>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-blue-900 text-white py-3 rounded-xl font-medium hover:bg-blue-800 transition" onclick="installSkill('questionnaire-import')">
+                                🦞 安装 Skill
+                            </button>
+                            <a href="detail.html?tool=questionnaire-import" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center justify-center text-sm font-medium">
+                                详情
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Skill 2: 问卷检查 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 p-6" data-category="survey" data-name="问卷网模板自动检查工具">
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center text-3xl">✅</div>
+                            <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">实用</span>
+                        </div>
+
+                        <h3 class="text-lg font-bold mb-3 text-gray-900">问卷网模板自动检查工具</h3>
+
+                        <p class="text-gray-500 text-sm leading-relaxed mb-5">
+                            检查录入问卷的错字、逻辑等基础问题，确保问卷质量，减少人工核对时间。
+                        </p>
+
+                        <div class="flex flex-wrap gap-2 mb-5">
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">错字检查</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">逻辑校验</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">批量处理</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-sm text-gray-400 mb-5 pb-5 border-b border-gray-100">
+                            <span>v1.1.0</span>
+                            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                            <span class="text-green-600">● 可用</span>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-blue-900 text-white py-3 rounded-xl font-medium hover:bg-blue-800 transition" onclick="installSkill('questionnaire-check')">
+                                🦞 安装 Skill
+                            </button>
+                            <a href="detail.html?tool=questionnaire-check" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center justify-center text-sm font-medium">
+                                详情
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Skill 3: 交叉分析 -->
+                    <div class="tool-card bg-white rounded-xl border border-gray-100 p-6" data-category="data" data-name="数据交叉分析工具">
+                        <div class="flex items-start justify-between mb-5">
+                            <div class="w-14 h-14 bg-purple-50 rounded-xl flex items-center justify-center text-3xl">📊</div>
+                            <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">AI 驱动</span>
+                        </div>
+
+                        <h3 class="text-lg font-bold mb-3 text-gray-900">数据交叉分析工具</h3>
+
+                        <p class="text-gray-500 text-sm leading-relaxed mb-5">
+                            读取在线表格或本地 Excel，分析对应维度的交叉结果，输出结论和策略建议。
+                        </p>
+
+                        <div class="flex flex-wrap gap-2 mb-5">
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">显著性检验</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">策略建议</span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg">多维度</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-sm text-gray-400 mb-5 pb-5 border-b border-gray-100">
+                            <span>v1.0.2</span>
+                            <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                            <span class="text-green-600">● 可用</span>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-blue-900 text-white py-3 rounded-xl font-medium hover:bg-blue-800 transition" onclick="installSkill('cross-analysis')">
+                                🦞 安装 Skill
+                            </button>
+                            <a href="detail.html?tool=cross-analysis" class="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center justify-center text-sm font-medium">
+                                详情
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- How to Install Section -->
+                <div class="mt-10 bg-white rounded-xl border border-gray-100 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">📖 如何安装 Skill？</h3>
+
+                    <div class="grid grid-cols-3 gap-8">
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">下载压缩包</h4>
+                                <p class="text-sm text-gray-500">从上方点击「安装 Skill」下载 .zip 文件</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">发送给 MarioClaw</h4>
+                                <p class="text-sm text-gray-500">将文件发送给 MarioClaw 并说「安装这个 skill」</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 mb-1">等待安装完成</h4>
+                                <p class="text-sm text-gray-500">MarioClaw 会自动完成安装，之后即可直接使用</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="bg-white border-t border-gray-200 px-8 py-4">
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <p>© 2024 快手主战分析部 · 懒蛋工具集 · 生命不息，懒蛋不止！🥚</p>
+                    <p>有问题可以联系：柳诗颖、查一畅</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-blue-900 text-white px-6 py-3 rounded-xl shadow-xl opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+        // Show toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+
+        // Search skills
+        function searchSkills() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.tool-card');
+            
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name').toLowerCase();
+                if (name.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter by category
+        function filterCategory(category, btn) {
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.classList.add('text-gray-600');
+            });
+            btn.classList.add('active');
+            btn.classList.remove('text-gray-600');
+
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const categoryNames = { all: '全部', survey: '问卷相关', data: '数据分析', ai: 'AI 辅助' };
+            showToast(`已筛选: ${categoryNames[category]}`);
+        }
+
+        // Skill file mapping
+        const skillFiles = {
+            'questionnaire-import': 'questionnaire-import.gz',
+            'questionnaire-check': 'questionnaire-check.zip',
+            'cross-analysis': 'cross-analysis.gz'
+        };
+
+        // Install skill
+        function installSkill(toolId) {
+            const filename = skillFiles[toolId];
+            const toolNames = {
+                'questionnaire-import': '问卷网模板自动导入工具',
+                'questionnaire-check': '问卷网模板自动检查工具',
+                'cross-analysis': '数据交叉分析工具'
+            };
+            
+            if (filename) {
+                showToast(`📦 ${toolNames[toolId]} 下载中...`);
+                const link = document.createElement('a');
+                link.href = `skills/${filename}`;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => {
+                    showToast('✅ 下载完成！请发送给 MarioClaw 安装');
+                }, 500);
+            } else {
+                showToast('❌ 文件不存在');
+            }
+        }
+    </script>
+<script type="text/javascript" src="/accessproxy_statics/h5_fp.js" defer></script>
+<script type="text/javascript" src="/accessproxy_statics/wm.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文词云生成器</title>
+    <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js">
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        #text-input {
+            height: 200px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1.4;
+            height: 38px;
+            box-sizing: border-box;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 80px;
+            height: 38px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        #canvas-container {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .canvas-wrapper {
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        #wordcloud-canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 70vh;
+            width: auto;
+            height: auto;
+        }
+
+        .download-btn {
+            background: #2196F3;
+            margin-top: 12px;
+        }
+
+        .stats {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .word-list {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .word-tag {
+            background: #e3f2fd;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #1976d2;
+        }
+
+        .preset-sizes {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .preset-btn {
+            padding: 6px 12px;
+            font-size: 13px;
+            height: 30px;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 90px;
+        }
+
+        .preset-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .stopwords-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .stopwords-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stopwords-header label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        #custom-stopwords {
+            height: 80px;
+            font-size: 13px;
+        }
+
+        #custom-fullwords {
+            height: 80px;
+            font-size: 13px;
+        }
+
+        .stopwords-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* 折叠区域样式 */
+        details.foldable {
+            margin-top: 8px;
+        }
+
+        details.foldable summary {
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            list-style: none;
+            /* 隐藏默认箭头 */
+            ;
+        }
+
+        details.foldable summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.foldable summary::before {
+            content: '▶ ';
+            display: inline-block;
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+
+        details.foldable[open] summary::before {
+            content: '▼ ';
+        }
+
+        details.foldable summary:hover {
+            color: #1976d2;
+        }
+
+        .site-footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>☁️ 中文词云生成器</h1>
+    <div class="container">
+        <p style="color: #666; margin-bottom: 12px;">输入中文文本，自动生成填满画布的词云图</p>
+
+        <textarea id="text-input" placeholder="在这里粘贴你想要生成词云的中文文本...
+可以是文章、评论、聊天记录等。文本越长效果越好。"></textarea>
+
+        <!-- 停用词设置区域 -->
+        <div class="stopwords-section">
+            <div class="stopwords-header">
+                <label><input type="checkbox" id="use-default-stopwords" checked> 使用默认停用词</label>
+                <label style="margin-left: auto; font-size: 13px; color: #666;">
+                    默认包含 85 个常见虚词
+                </label>
+            </div>
+
+            <!-- 自定义停用词折叠区 -->
+            <details class="foldable" id="custom-stopwords-details">
+                <summary>自定义停用词（可选）</summary>
+                <textarea id="custom-stopwords" placeholder="在这里输入额外的停用词，用空格、逗号或换行分隔...
+例如：公司 产品 名称 某个特定词汇"></textarea>
+                <p class="stopwords-hint">支持多字词，系统会自动匹配过滤</p>
+            </details>
+        </div>
+
+        <!-- 自定义完整词折叠区 -->
+        <div class="stopwords-section" style="margin-top: 12px;">
+            <details class="foldable" id="custom-fullwords-details">
+                <summary>自定义完整词（可选）</summary>
+                <textarea id="custom-fullwords" placeholder="在这里输入不希望被拆分的完整词，用空格、逗号或换行分隔...
+例如：鞠婧祎 机器学习 人工智能"></textarea>
+                <p class="stopwords-hint">这些词将在分词时保持完整，不会被拆开</p>
+            </details>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>宽度：</label>
+                <input type="number" id="width" value="1200" min="400" max="4000" step="100">
+                <label>px</label>
+            </div>
+            <div class="control-group">
+                <label>高度：</label>
+                <input type="number" id="height" value="800" min="300" max="3000" step="100">
+                <label>px</label>
+            </div>
+            <div class="preset-sizes">
+                <label>预设：</label>
+                <button class="preset-btn" onclick="setSize(800,600)">800×600</button>
+                <button class="preset-btn" onclick="setSize(1200,800)">1200×800</button>
+                <button class="preset-btn" onclick="setSize(1920,1080)">1920×1080</button>
+                <button class="preset-btn" onclick="setSize(1000,1000)">1000×1000</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <label>最大词数：<input type="number" id="max-words" value="100" min="10" max="500" style="width: 60px;"></label>
+            <label>配色方案：
+                <select id="color-theme">
+                    <option value="viridis">viridis</option>
+                    <option value="plasma">plasma</option>
+                    <option value="cool">cool</option>
+                    <option value="warm">warm</option>
+                    <option value="random">随机彩色</option>
+                </select>
+            </label>
+            <button onclick="generateWordCloud()" id="gen-btn">生成词云</button>
+        </div>
+
+        <div id="canvas-container">
+            <div class="canvas-wrapper">
+                <canvas id="wordcloud-canvas"></canvas>
+            </div>
+            <br>
+            <button class="download-btn" onclick="downloadImage()">📥 下载高清图片</button>
+        </div>
+
+        <div id="stats" class="stats" style="display: none;"></div>
+    </div>
+    <footer class="site-footer">中文词云生成器 · Designed by 猹猹🦡 · Powered by DeepSeek🐳 --v2026.05.09</footer>
+    <script>
+        // 默认停用词表
+        const defaultStopwords = new Set([
+            "的", "了", "在", "是", "我", "有", "和", "就", "不", "人", "都", "一个", "一些", "上", "也", "很",
+            "到", "说", "要", "去", "你", "会", "着", "没有", "看", "好", "自己", "这", "那", "我们", "来", "他", "她",
+            "它", "呢", "吧", "啊", "什么", "这儿", "那儿", "而", "与", "于", "对", "但", "或", "如果", "因为",
+            "所以", "而且", "然后", "而是", "不是", "可以", "可能", "通过", "以及", "非常", "还是", "已经", "为了",
+            "比如", "其中", "时候", "东西", "地方", "怎么", "就是", "又", "还", "只", "最", "更", "让", "给", "把",
+            "被", "从", "向", "跟", "比", "到", "以", "及", "等", "得", "地", "着", "过", "吗", "嘛", "哦", "嗯",
+            "这个", "那个", "现在", "那种"
+        ]);
+
+        function setSize(w, h) {
+            document.getElementById('width').value = w;
+            document.getElementById('height').value = h;
+        }
+
+        // 获取合并后的停用词表
+        function getStopwords() {
+            const stopwords = new Set();
+
+            // 添加默认停用词
+            if (document.getElementById('use-default-stopwords').checked) {
+                defaultStopwords.forEach(w => stopwords.add(w));
+            }
+
+            // 添加自定义停用词
+            const customInput = document.getElementById('custom-stopwords').value.trim();
+            if (customInput) {
+                const customWords = customInput.split(/[\s,，]+/).filter(w => w.length > 0);
+                customWords.forEach(w => stopwords.add(w));
+            }
+
+            return stopwords;
+        }
+
+        // 获取自定义完整词列表
+        function getFullWords() {
+            const input = document.getElementById('custom-fullwords').value.trim();
+            if (!input) return [];
+            return input.split(/[\s,，]+/).filter(w => w.length > 0);
+        }
+
+        // 基础中文分词（不含完整词处理）
+        function segmentDefault(text, stopwords) {
+            const segmenter = new Intl.Segmenter('zh', { granularity: 'word' });
+            const segments = Array.from(segmenter.segment(text));
+            const words = [];
+            for (const seg of segments) {
+                const word = seg.segment.trim();
+                if (word.length >= 2 &&
+                    !stopwords.has(word) &&
+                    !/^\d+$/.test(word) &&
+                    !/^[^\w\u4e00-\u9fff]+$/.test(word) &&
+                    !/^[a-zA-Z]$/.test(word)) {
+                    words.push(word);
+                }
+            }
+            return words;
+        }
+
+        // 中文分词（含完整词保护）
+        function segment(text, stopwords, fullWords = []) {
+            if (fullWords.length === 0) {
+                return segmentDefault(text, stopwords);
+            }
+
+            const matches = [];
+            fullWords.forEach(fw => {
+                let pos = 0;
+                while ((pos = text.indexOf(fw, pos)) !== -1) {
+                    matches.push({ start: pos, end: pos + fw.length, word: fw });
+                    pos += fw.length;
+                }
+            });
+
+            matches.sort((a, b) => a.start - b.start);
+
+            const validMatches = [];
+            let lastEnd = 0;
+            for (const m of matches) {
+                if (m.start >= lastEnd) {
+                    validMatches.push(m);
+                    lastEnd = m.end;
+                }
+            }
+
+            const fullWordResults = validMatches.map(m => m.word);
+
+            let remainingParts = [];
+            lastEnd = 0;
+            for (const m of validMatches) {
+                if (m.start > lastEnd) {
+                    remainingParts.push(text.slice(lastEnd, m.start));
+                }
+                lastEnd = m.end;
+            }
+            if (lastEnd < text.length) {
+                remainingParts.push(text.slice(lastEnd));
+            }
+            const remainingText = remainingParts.join('');
+
+            const segmentWords = segmentDefault(remainingText, stopwords);
+
+            return [...segmentWords, ...fullWordResults];
+        }
+
+        function generateWordCloud() {
+            const text = document.getElementById('text-input').value.trim();
+            if (!text) {
+                alert('请先输入一些文本');
+                return;
+            }
+
+            const width = parseInt(document.getElementById('width').value) || 1200;
+            const height = parseInt(document.getElementById('height').value) || 800;
+            const stopwords = getStopwords();
+            const fullWords = getFullWords();
+
+            const btn = document.getElementById('gen-btn');
+            btn.disabled = true;
+            btn.textContent = '生成中...';
+
+            setTimeout(() => {
+                try {
+                    const words = segment(text, stopwords, fullWords);
+                    if (words.length === 0) {
+                        alert('未提取到有效词语，请检查输入文本或调整停用词设置');
+                        btn.disabled = false;
+                        btn.textContent = '生成词云';
+                        return;
+                    }
+
+                    const freq = {};
+                    words.forEach(w => freq[w] = (freq[w] || 0) + 1);
+
+                    let wordList = Object.entries(freq)
+                        .map(([word, count]) => [word, count])
+                        .sort((a, b) => b[1] - a[1]);
+
+                    const maxWords = parseInt(document.getElementById('max-words').value) || 100;
+                    wordList = wordList.slice(0, maxWords);
+
+                    const themes = {
+                        viridis: ['#440154', '#31688e', '#35b779', '#fde725'],
+                        plasma: ['#0d0887', '#7e03a8', '#cc4778', '#f0f921'],
+                        cool: ['#6e40aa', '#417de0', '#1ac7c2', '#d8f224'],
+                        warm: ['#8c2a00', '#ff6e00', '#ffc400', '#ffeb90'],
+                        random: null
+                    };
+
+                    const theme = themes[document.getElementById('color-theme').value];
+
+                    const canvas = document.getElementById('wordcloud-canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const maxCount = Math.max(...wordList.map(w => w[1]));
+                    const minDim = Math.min(width, height);
+
+                    WordCloud(canvas, {
+                        list: wordList,
+                        gridSize: 8,
+                        weightFactor: function (size) {
+                            return Math.pow(size / maxCount, 0.6) * minDim * 0.25 + 12;
+                        },
+                        fontFamily: '-apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+                        color: theme ? function (word, weight) {
+                            return theme[Math.floor(Math.random() * theme.length)];
+                        } : 'random-dark',
+                        rotateRatio: 0.3,
+                        rotationSteps: 2,
+                        backgroundColor: '#fff',
+                        drawOutOfBound: false,
+                        shrinkToFit: true,
+                        shape: 'square',
+                        ellipticity: 1,
+                        clearCanvas: true
+                    });
+
+                    document.getElementById('canvas-container').style.display = 'block';
+
+                    const statsDiv = document.getElementById('stats');
+                    const topWords = wordList.slice(0, 20).map(([w, c]) =>
+                        `<span class="word-tag">${w} (${c})</span>`
+                    ).join('');
+                    const fullWordsInfo = fullWords.length > 0 ? `，${fullWords.length} 个自定义完整词` : '';
+                    statsDiv.innerHTML = `
+                        <strong>尺寸：</strong>${width}×${height}px | 
+                        <strong>统计：</strong>共 ${words.length} 个有效词，${wordList.length} 个不重复词
+                        （使用了 ${stopwords.size} 个停用词${fullWordsInfo}）<br>
+                        <strong>Top 20 词频：</strong><div class="word-list">${topWords}</div>
+                    `;
+                    statsDiv.style.display = 'block';
+
+                } catch (e) {
+                    alert('生成失败: ' + e.message);
+                    console.error(e);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = '生成词云';
+                }
+            }, 100);
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById('wordcloud-canvas');
+            const link = document.createElement('a');
+            link.download = `wordcloud_${canvas.width}x${canvas.height}.png`;
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        }
+    </script>
+</body>
+
+</html>
