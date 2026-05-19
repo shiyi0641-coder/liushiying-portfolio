@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开放题编码系统 · 全量统计版</title>
+
+    <style>
+        /* ========== 全局样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        #app {
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c3e50 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #e8e8e8;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .step-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .step-section:last-child {
+            border-bottom: none;
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #2c3e50;
+            color: white;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .upload-area {
+            border: 2px dashed #d9d9d9;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #2c3e50;
+            background: #eef1f5;
+        }
+
+        .upload-area.dragover {
+            border-color: #2c3e50;
+            background: #dce1e8;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #bfbfbf;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .upload-small {
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            gap: 6px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn-primary {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #34495e;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-danger {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e74c3c;
+        }
+
+        .btn-warning {
+            background: #e67e22;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f39c12;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .btn-xs {
+            padding: 3px 8px;
+            font-size: 11px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-highlight {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            font-weight: 600;
+            font-size: 15px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+        }
+
+        .btn-highlight:hover:not(:disabled) {
+            background: linear-gradient(135deg, #34495e, #3b5998);
+            box-shadow: 0 6px 16px rgba(44, 62, 80, 0.4);
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #eef2f7;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .radio-card:hover {
+            background: #dce3ec;
+            border-color: #a0afc2;
+        }
+
+        .radio-card input {
+            margin-right: 10px;
+        }
+
+        .radio-desc {
+            display: block;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .check-item:hover {
+            background: #f5f7fa;
+        }
+
+        .check-item input {
+            margin-right: 8px;
+        }
+
+        .check-group-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: white;
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+            font-size: 13px;
+        }
+
+        textarea:focus,
+        input:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .rule-group {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .rule-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .rule-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .rule-options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .ai-tip {
+            background: #eef1f5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .forced-dim-card {
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .forced-dim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #eef1f5;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .forced-dim-body {
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #cbd5e0;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .mode-switch label {
+            flex: 1;
+            text-align: center;
+            padding: 6px;
+            border-radius: 4px;
+            background: #f5f5f5;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .mode-switch label.active {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .mode-switch input {
+            display: none;
+        }
+
+        .forced-dim-list {
+            margin-bottom: 10px;
+        }
+
+        .forced-dim-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f9f9f9;
+            padding: 6px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+
+        .dim-level-tag {
+            font-size: 12px;
+            background: #dce3ec;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .dim-name {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 0 4px;
+        }
+
+        .btn-icon:hover {
+            color: #c0392b;
+        }
+
+        .add-forced-dim {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .level-select {
+            width: 70px;
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            flex: 1 1 180px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(44, 62, 80, 0.15);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .stats-grid2 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 15px 0 20px;
+        }
+
+        .stat-card-sm {
+            background: #f8fafc;
+            padding: 16px 12px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 3px solid #2c3e50;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .stat-card-sm:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(44, 62, 80, 0.1);
+        }
+
+        .stat-card-sm .stat-value {
+            font-size: 26px;
+            color: #2c3e50;
+        }
+
+        .stat-card-sm .stat-label {
+            font-size: 12px;
+            color: #5a6d86;
+        }
+
+        .stat-card-sm .stat-percent {
+            font-size: 13px;
+            color: #2c3e50;
+            margin-top: 6px;
+            background: #eef1f5;
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: #2c3e50;
+        }
+
+        .tab.active {
+            color: #2c3e50;
+            border-bottom-color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #2c3e50;
+            animation: slideIn 0.2s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+            }
+
+            to {
+                transform: scaleX(1);
+            }
+        }
+
+        .data-preview {
+            max-height: 300px;
+            overflow: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid #e8e8e8;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .data-table tr:hover td {
+            background: #f5f7fa;
+        }
+
+        .dim-tree {
+            margin-top: 20px;
+        }
+
+        .dim-item {
+            margin-bottom: 8px;
+        }
+
+        .dim-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dim-header:hover {
+            background: #e8ecf4;
+        }
+
+        .dim-header.level-1 {
+            background: #e3edf7;
+            border-left: 3px solid #2c3e50;
+        }
+
+        .dim-header.level-2 {
+            background: #eef5ee;
+            border-left: 3px solid #27ae60;
+            margin-left: 20px;
+        }
+
+        .dim-header.level-3 {
+            background: #fdf5e6;
+            border-left: 3px solid #e67e22;
+            margin-left: 40px;
+        }
+
+        .dim-toggle {
+            width: 16px;
+            margin-right: 8px;
+            color: #999;
+        }
+
+        .dim-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .dim-count {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+
+        .dim-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .dim-quotes-preview {
+            margin: 10px 0 15px 60px;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .dim-quote-item {
+            background: white;
+            border-left: 3px solid #2c3e50;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 0 6px 6px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .dim-quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .dim-quote-uid {
+            margin-bottom: 0;
+        }
+
+        .dim-quote-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dim-quote-text {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 6px;
+        }
+
+        .dim-quote-source {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .dim-quote-empty {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .uid-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .quote-uid-badge {
+            margin-bottom: 8px;
+        }
+
+        .quote-item {
+            background: #f8f9fa;
+            border-left: 3px solid #2c3e50;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .quote-text {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .quote-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2c3e50, #34495e);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .tag-blue {
+            background: #e3edf7;
+            color: #2c3e50;
+        }
+
+        .tag-green {
+            background: #eef5ee;
+            color: #27ae60;
+        }
+
+        .tag-orange {
+            background: #fdf5e6;
+            color: #e67e22;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .alert-info {
+            background: #e3edf7;
+            border: 1px solid #a0c4e8;
+            color: #2c3e50;
+        }
+
+        .alert-success {
+            background: #eef5ee;
+            border: 1px solid #a3d7b5;
+            color: #27ae60;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+        }
+
+        .chart-level-switch {
+            display: flex;
+            gap: 5px;
+        }
+
+        .chart-level-switch .btn {
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+        }
+
+        .chart-level-switch .btn.btn-primary {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to right, #f8fafc, white);
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .config-item label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .move-dim-tree {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e8e8e8;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #999;
+        }
+
+        textarea.custom-instruction {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+            font-size: 12px;
+            resize: vertical;
+            margin-top: 5px;
+        }
+
+        textarea.custom-instruction:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        .instruction-card {
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            border: 1px solid #f0f0f0;
+            transition: box-shadow 0.2s;
+        }
+
+        .instruction-card:hover {
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.08);
+        }
+
+        .instruction-label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 12px;
+        }
+
+        .instruction-label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            bottom: 2px;
+            width: 4px;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 4px;
+        }
+
+        .label-icon {
+            margin-right: 6px;
+            font-size: 16px;
+        }
+
+        .optional {
+            font-size: 12px;
+            font-weight: 400;
+            color: #999;
+            margin-left: 6px;
+        }
+
+        .instruction-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            background: #fafafa;
+            transition: all 0.2s;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+
+        .instruction-textarea:focus {
+            outline: none;
+            border-color: #2c3e50;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .paste-import-area {
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f8fafc;
+            margin-top: 12px;
+        }
+
+        .paste-import-area .paste-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .paste-import-area .paste-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+            resize: vertical;
+            background: #fff;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            transition: all 0.2s;
+        }
+
+        .paste-import-area .paste-textarea:focus {
+            outline: none;
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.08);
+        }
+
+        .paste-import-area .paste-textarea::placeholder {
+            color: #bbb;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .paste-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .paste-actions .btn-paste-import {
+            background: #27ae60;
+            color: white;
+            font-weight: 600;
+        }
+
+        .paste-actions .btn-paste-import:hover {
+            background: #219a52;
+        }
+
+        .paste-actions .btn-clear-paste {
+            background: #f5f5f5;
+            color: #999;
+            font-size: 12px;
+            padding: 4px 10px;
+        }
+
+        .paste-actions .btn-clear-paste:hover {
+            background: #e8e8e8;
+        }
+
+        .paste-or-divider {
+            font-size: 11px;
+            color: #bbb;
+            margin: 0 4px;
+        }
+
+        .btn-link-upload {
+            background: none;
+            border: none;
+            color: #2c3e50;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: underline;
+            padding: 4px 8px;
+        }
+
+        .btn-link-upload:hover {
+            color: #34495e;
+        }
+
+        .copy-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 9999;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 1.8s forwards;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 400px;
+            }
+
+            .stats-grid2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div v-if="showCopyToast" class="copy-toast">{{ copyToastMessage }}</div>
+
+        <div class="header">
+            <h1>✍️ 开放题编码系统：全量统计 + 原声引用</h1>
+            <p>Designed by 猹猹🦡，Powered by DeepSeek🐳 & Mario Claw🦞 -- v2026.04.28</p>
+        </div>
+
+        <div class="main-container">
+            <div class="sidebar">
+                <div class="step-section">
+                    <div class="step-title"><span class="step-number">1</span> 📁 数据准备</div>
+                    <div class="upload-area" @click="triggerUpload" @drop.prevent="handleDrop"
+                        @dragover.prevent="dragover = true" @dragleave="dragover = false"
+                        :class="{ dragover: dragover }">
+                        <div class="upload-icon">📊</div>
+                        <div class="upload-text">点击或拖拽上传文件</div>
+                        <div class="upload-hint">支持 Excel (.xlsx, .xls) 和 CSV 格式</div>
+                        <input type="file" ref="fileInput" @change="handleFileChange" accept=".xlsx,.xls,.csv"
+                            style="display: none;">
+                    </div>
+                    <div v-if="fileName" class="alert alert-success" style="margin-top: 15px;">✅ 已上传: {{ fileName }}
+                    </div>
+                </div>
+
+                <div v-if="sheets.length > 0" class="step-section">
+                    <div class="step-title"><span class="step-number">2</span> 📑 工作表分析模式</div>
+                    <div class="radio-group">
+                        <label class="radio-card"><input type="radio" v-model="analysisMode" value="merge">
+                            <span><strong>合并分析</strong><span class="radio-desc">将所有工作表合并为一个数据集</span></span></label>
+                        <label class="radio-card"><input type="radio" v-model="analysisMode" value="separate">
+                            <span><strong>独立分析</strong><span class="radio-desc">每个工作表分别独立分析</span></span></label>
+                    </div>
+                    <div v-if="analysisMode === 'merge'" style="margin-top: 15px;">
+                        <div class="check-group-label">选择要合并的工作表：</div>
+                        <div v-for="sheet in sheets" :key="sheet" class="check-item"><input type="checkbox"
+                                :id="'sheet_' + sheet" :value="sheet" v-model="selectedSheets"> <label
+                                :for="'sheet_' + sheet">{{ sheet }}</label></div>
+                        <button class="btn btn-primary btn-block" @click="loadMergedSheets"
+                            :disabled="selectedSheets.length === 0">加载合并数据</button>
+                    </div>
+                    <div v-if="analysisMode === 'separate'" style="margin-top: 15px;">
+                        <div class="check-group-label">选择要分析的工作表：</div>
+                        <select v-model="selectedSheet" @change="loadSheet" class="form-select">
+                            <option v-for="sheet in sheets" :value="sheet">{{ sheet }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div v-if="columns.length > 0" class="step-section">
+                    <div class="step-title"><span class="step-number">3</span> 📋 文本列选择</div>
+                    <div v-for="col in columns" :key="col" class="check-item"><input type="checkbox" :id="col"
+                            :value="col" v-model="selectedColumns"> <label :for="col">{{ col }}</label></div>
+                </div>
+
+                <div class="step-section" v-if="columns.length > 0">
+                    <div class="step-title"><span class="step-number">4</span> 🧹 清洗与维度</div>
+                    <div class="rule-group">
+                        <div class="rule-label">清洗规则：</div>
+                        <div class="rule-options">
+                            <label><input type="checkbox" v-model="filterMinLength"> 过滤长度&lt;2</label>
+                            <label><input type="checkbox" v-model="filterMeaningless"> 过滤无意义词</label>
+                            <label><input type="checkbox" v-model="filterPunctuation"> 过滤纯标点</label>
+                        </div>
+                    </div>
+                    <div class="rule-group" style="margin-top: 12px;">
+                        <div class="rule-label">维度层数：</div>
+                        <div class="rule-options">
+                            <label><input type="radio" v-model="dimensionLevels" :value="2"
+                                    @change="onDimensionLevelChange"> 2层</label>
+                            <label><input type="radio" v-model="dimensionLevels" :value="3"
+                                    @change="onDimensionLevelChange"> 3层</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-block btn-highlight" @click="extractText"
+                        :disabled="selectedColumns.length === 0">🚀 提取文本</button>
+                </div>
+
+                <div v-if="extractedTexts.length > 0" class="step-section">
+                    <div class="step-title"><span class="step-number">5</span> 🤖 AI 自动编码</div>
+                    <div class="ai-tip">
+                        <p>1. 导出数据 → 自动复制完整Prompt（含原声）<br>2. 粘贴到AI对话中<br>3. 粘贴AI返回的JSON结果</p>
+                    </div>
+
+                    <div class="forced-dim-card">
+                        <div class="forced-dim-header" @click="showForcedDimSection = !showForcedDimSection"><span>📌
+                                强制指定维度</span><span>{{ showForcedDimSection ? '▼' : '▶' }}</span></div>
+                        <div v-if="showForcedDimSection" class="forced-dim-body">
+                            <div class="mode-switch">
+                                <label :class="{ active: forcedMode === 'include' }"><input type="radio"
+                                        v-model="forcedMode" value="include"> 强制包含</label>
+                                <label :class="{ active: forcedMode === 'exact' }"><input type="radio"
+                                        v-model="forcedMode" value="exact"> 严格限制</label>
+                            </div>
+                            <div v-if="forcedDimensions.length > 0" class="forced-dim-list">
+                                <div v-for="(item, idx) in forcedDimensions" :key="idx" class="forced-dim-item"><span
+                                        class="dim-level-tag">{{ ['一','二','三'][item.level-1] }}级</span><span
+                                        class="dim-name">{{ item.name }}</span><button class="btn-icon"
+                                        @click="removeForcedDimension(idx)">✕</button></div>
+                            </div>
+                            <div class="add-forced-dim">
+                                <select v-model="newForcedLevel" class="level-select">
+                                    <option value="1">一级</option>
+                                    <option value="2">二级</option>
+                                    <option value="3" :disabled="dimensionLevels === 2">三级</option>
+                                </select>
+                                <input type="text" v-model="newForcedName" placeholder="维度名称"
+                                    @keyup.enter="addForcedDimension">
+                                <button class="btn btn-primary btn-sm" @click="addForcedDimension"
+                                    :disabled="!newForcedName.trim()">添加</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="instruction-card">
+                        <label class="instruction-label"><span class="label-icon">✏️</span>自定义编码指令 <span
+                                class="optional">(可选)</span></label>
+                        <textarea v-model="customAIInstruction" rows="2" class="instruction-textarea"
+                            placeholder="例如：请重点关注用户体验相关的维度..."></textarea>
+                    </div>
+
+                    <button class="btn btn-primary btn-block btn-highlight" @click="exportForAI">📤 导出数据给 AI
+                        编码</button>
+
+                    <div class="paste-import-area">
+                        <div class="paste-label">📥 粘贴 AI 编码结果</div>
+                        <textarea v-model="pastedJsonText" class="paste-textarea"
+                            placeholder="将 AI 返回的 JSON 结果粘贴到这里...&#10;支持直接粘贴纯JSON或带 ```json 代码块的格式"
+                            @input="onPasteInput"></textarea>
+                        <div class="paste-actions">
+                            <button class="btn btn-paste-import btn-block" @click="handlePasteImport"
+                                :disabled="!pastedJsonText.trim()">📋 导入粘贴的 JSON</button>
+                            <button class="btn btn-clear-paste btn-sm" @click="clearPastedJson"
+                                :disabled="!pastedJsonText.trim()">清空</button>
+                            <span class="paste-or-divider">或</span>
+                            <button class="btn-link-upload" @click="triggerImport">上传 JSON 文件</button>
+                            <input type="file" ref="importInput" @change="handleImportFile" accept=".json"
+                                style="display: none;">
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="dimensions.length > 0" class="step-section">
+                    <div class="step-title"><span class="step-number">6</span> 💾 导出结果</div>
+                    <button class="btn btn-success btn-block" @click="exportResults">导出编码结果 (Excel)</button>
+                    <button class="btn btn-primary btn-block" style="margin-top: 8px;"
+                        @click="exportDimensionStats">导出维度占比表格</button>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="stats-grid" v-if="extractedTexts.length > 0">
+                    <div class="stat-card" @click="showExcludedTexts">
+                        <div class="stat-value">{{ extractedTexts.length + excludedTexts.length }}</div>
+                        <div class="stat-label">原始文本总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ dimensions.length }}</div>
+                        <div class="stat-label">一级维度</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ secondLevelCount }}</div>
+                        <div class="stat-label">二级维度</div>
+                    </div>
+                    <div class="stat-card" v-if="dimensionLevels === 3">
+                        <div class="stat-value">{{ totalThirdDimensions }}</div>
+                        <div class="stat-label">三级维度</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid2" v-if="rawTextTotal > 0">
+                    <div class="stat-card-sm" @click="showExcludedTexts" style="cursor: pointer;">
+                        <div class="stat-value">{{ rawTextTotal }}</div>
+                        <div class="stat-label">原始总数</div>
+                        <div class="stat-percent">100%</div>
+                    </div>
+                    <div class="stat-card-sm" @click="showExcludedTexts" style="cursor: pointer;">
+                        <div class="stat-value">{{ nonEmptyTextTotal }}</div>
+                        <div class="stat-label">非空文本数</div>
+                        <div class="stat-percent">{{ ((nonEmptyTextTotal / rawTextTotal) * 100).toFixed(1) }}%</div>
+                    </div>
+                    <div class="stat-card-sm" @click="showCleanedTexts" style="cursor: pointer;">
+                        <div class="stat-value">{{ extractedTexts.length }}</div>
+                        <div class="stat-label">清洗后有效文本</div>
+                        <div class="stat-percent">{{ ((extractedTexts.length / rawTextTotal) * 100).toFixed(1) }}%</div>
+                    </div>
+                    <div class="stat-card-sm" @click="showInvalidAITexts" style="cursor: pointer;">
+                        <div class="stat-value">{{ invalidAfterAI }}</div>
+                        <div class="stat-label">AI无效文本</div>
+                        <div class="stat-percent">{{ aiImported ? ((invalidAfterAI / rawTextTotal) * 100).toFixed(1) +
+                            '%' : '0.0%' }}</div>
+                    </div>
+                    <div class="stat-card-sm" @click="showFinalValidTexts" style="cursor: pointer;">
+                        <div class="stat-value">{{ finalValidAfterAI }}</div>
+                        <div class="stat-label">最终有效文本</div>
+                        <div class="stat-percent">{{ aiImported ? ((finalValidAfterAI / rawTextTotal) * 100).toFixed(1)
+                            + '%' : '0.0%' }}</div>
+                    </div>
+                </div>
+
+                <div class="tabs" v-if="extractedTexts.length > 0">
+                    <div class="tab" :class="{ active: activeTab === 'data' }" @click="activeTab = 'data'">原始数据</div>
+                    <div class="tab" :class="{ active: activeTab === 'dimensions' }" @click="activeTab = 'dimensions'">
+                        维度体系</div>
+                    <div class="tab" :class="{ active: activeTab === 'coding' }" @click="activeTab = 'coding'">编码工作区
+                    </div>
+                    <div class="tab" :class="{ active: activeTab === 'results' }" @click="activeTab = 'results'">分析结果
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'data'" class="fade-in">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">原始数据预览</div>
+                            <button class="btn btn-secondary btn-sm" @click="showAllData = !showAllData">{{ showAllData
+                                ? '收起' : '展开全部' }}</button>
+                        </div>
+                        <div class="data-preview">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th v-if="analysisMode === 'merge' || sheets.length > 1">来源Sheet</th>
+                                        <th v-for="col in selectedColumns" :key="col">{{ col }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(row, idx) in displayedData" :key="idx">
+                                        <td>{{ idx + 1 }}</td>
+                                        <td v-if="analysisMode === 'merge' || sheets.length > 1"><span
+                                                class="tag tag-blue">{{ row.__sheetName || selectedSheet }}</span></td>
+                                        <td v-for="col in selectedColumns" :key="col" :title="row[col]">{{ row[col] }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'dimensions'" class="fade-in">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">{{ dimensionLevels }}层维度体系</div>
+                            <button class="btn btn-primary btn-sm" @click="showAddDimension = true">+ 添加一级维度</button>
+                        </div>
+                        <div class="dim-tree">
+                            <div v-for="(dim1, idx1) in dimensions" :key="dim1.id" class="dim-item">
+                                <div class="dim-header level-1" @click="dim1.expanded = !dim1.expanded">
+                                    <span class="dim-toggle">{{ dim1.expanded ? '▼' : '▶' }}</span>
+                                    <span class="dim-name">{{ dim1.name }}</span>
+                                    <span class="dim-count">{{ getQuoteCount(dim1) }}条引用</span>
+                                    <div class="dim-actions">
+                                        <button class="btn btn-secondary btn-sm" @click.stop="addSubDimension(dim1)">+
+                                            {{ dimensionLevels === 2 ? '末级' : '二级' }}</button>
+                                        <button class="btn btn-warning btn-sm"
+                                            @click.stop="openEditDim(dim1)">编辑</button>
+                                        <button class="btn btn-danger btn-sm"
+                                            @click.stop="removeDimension(idx1)">删除</button>
+                                    </div>
+                                </div>
+                                <div v-if="dim1.expanded" class="dim-children">
+                                    <div v-for="(dim2, idx2) in dim1.children" :key="dim2.id" class="dim-item">
+                                        <div v-if="dimensionLevels === 2" class="dim-header level-2"
+                                            @click="viewDimensionQuotes(dim2)">
+                                            <span class="dim-toggle">{{ viewingDim?.id === dim2.id ? '▼' : '▶' }}</span>
+                                            <span class="dim-name">{{ dim2.name }}</span>
+                                            <span class="dim-count">{{ dim2.quotes?.length || 0 }}条引用</span>
+                                            <div class="dim-actions">
+                                                <button class="btn btn-primary btn-sm"
+                                                    @click.stop="manageQuotes(dim2)">管理引用</button>
+                                                <button class="btn btn-warning btn-sm"
+                                                    @click.stop="openEditDim(dim2, dim1)">编辑</button>
+                                                <button class="btn btn-danger btn-sm"
+                                                    @click.stop="removeSubDimension(dim1, idx2)">删除</button>
+                                            </div>
+                                        </div>
+                                        <div v-else class="dim-header level-2" @click="dim2.expanded = !dim2.expanded">
+                                            <span class="dim-toggle">{{ dim2.expanded ? '▼' : '▶' }}</span>
+                                            <span class="dim-name">{{ dim2.name }}</span>
+                                            <span class="dim-count">{{ getQuoteCount(dim2) }}条引用</span>
+                                            <div class="dim-actions">
+                                                <button class="btn btn-secondary btn-sm"
+                                                    @click.stop="addThirdDimension(dim1, dim2)">+ 三级</button>
+                                                <button class="btn btn-warning btn-sm"
+                                                    @click.stop="openEditDim(dim2, dim1)">编辑</button>
+                                                <button class="btn btn-danger btn-sm"
+                                                    @click.stop="removeSubDimension(dim1, idx2)">删除</button>
+                                            </div>
+                                        </div>
+                                        <div v-if="dimensionLevels === 2 && viewingDim?.id === dim2.id"
+                                            class="dim-quotes-preview">
+                                            <div v-if="dim2.quotes?.length > 0">
+                                                <div v-for="(quote, qIdx) in dim2.quotes" :key="qIdx"
+                                                    class="dim-quote-item">
+                                                    <div class="dim-quote-header">
+                                                        <div class="dim-quote-uid" v-if="quote.uid"><span
+                                                                class="uid-badge">👤 {{ quote.uid }}</span></div>
+                                                        <div class="dim-quote-actions">
+                                                            <button class="btn btn-primary btn-xs"
+                                                                @click.stop="openMoveQuote(quote, dim2)">移动</button>
+                                                            <button class="btn btn-danger btn-xs"
+                                                                @click.stop="removeQuoteFromDim(quote, dim2)">删除</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="dim-quote-text">{{ quote.content }}</div>
+                                                    <div class="dim-quote-source">ID: {{ quote.id }} | {{ quote.source
+                                                        }}</div>
+                                                </div>
+                                            </div>
+                                            <div v-else class="dim-quote-empty">暂无原声引用</div>
+                                        </div>
+                                        <div v-if="dimensionLevels === 3 && dim2.expanded" class="dim-children">
+                                            <div v-for="(dim3, idx3) in dim2.children" :key="dim3.id" class="dim-item">
+                                                <div class="dim-header level-3" @click="viewDimensionQuotes(dim3)">
+                                                    <span class="dim-toggle">{{ viewingDim?.id === dim3.id ? '▼' : '▶'
+                                                        }}</span>
+                                                    <span class="dim-name">{{ dim3.name }}</span>
+                                                    <span class="dim-count">{{ dim3.quotes?.length || 0 }}条引用</span>
+                                                    <div class="dim-actions">
+                                                        <button class="btn btn-primary btn-sm"
+                                                            @click.stop="manageQuotes(dim3)">管理引用</button>
+                                                        <button class="btn btn-warning btn-sm"
+                                                            @click.stop="openEditDim(dim3, dim2, dim1)">编辑</button>
+                                                        <button class="btn btn-danger btn-sm"
+                                                            @click.stop="removeThirdDimension(dim2, idx3)">删除</button>
+                                                    </div>
+                                                </div>
+                                                <div v-if="viewingDim?.id === dim3.id" class="dim-quotes-preview">
+                                                    <div v-if="dim3.quotes?.length > 0">
+                                                        <div v-for="(quote, qIdx) in dim3.quotes" :key="qIdx"
+                                                            class="dim-quote-item">
+                                                            <div class="dim-quote-header">
+                                                                <div class="dim-quote-uid" v-if="quote.uid"><span
+                                                                        class="uid-badge">👤 {{ quote.uid }}</span>
+                                                                </div>
+                                                                <div class="dim-quote-actions">
+                                                                    <button class="btn btn-primary btn-xs"
+                                                                        @click.stop="openMoveQuote(quote, dim3)">移动</button>
+                                                                    <button class="btn btn-danger btn-xs"
+                                                                        @click.stop="removeQuoteFromDim(quote, dim3)">删除</button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="dim-quote-text">{{ quote.content }}</div>
+                                                            <div class="dim-quote-source">ID: {{ quote.id }} | {{
+                                                                quote.source }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else class="dim-quote-empty">暂无原声引用</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'coding'" class="fade-in">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">编码工作区</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="tag tag-blue" v-if="aiImported">已编码: {{ codedCount }} / {{
+                                    extractedTexts.length }} (无效: {{ invalidAfterAI }})</span>
+                                <span class="tag tag-blue" v-else>进度: {{ codingProgress }}% ({{ codedCount }}/{{
+                                    extractedTexts.length }})</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" :style="{ width: codingProgress + '%' }"></div>
+                        </div>
+                        <div v-if="currentText" style="margin-top: 20px;">
+                            <div class="quote-item">
+                                <div v-if="currentText.uid" class="quote-uid-badge"><span class="uid-badge">👤 {{
+                                        currentText.uid }}</span></div>
+                                <div class="quote-text">{{ currentText.content }}</div>
+                                <div class="quote-meta">ID: {{ currentText.id }} | 来源: {{ currentText.source }}</div>
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <div class="section-title">选择维度编码</div>
+                                <div v-for="dim1 in dimensions" :key="dim1.id" style="margin-bottom: 15px;">
+                                    <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">{{ dim1.name }}
+                                    </div>
+                                    <div v-for="dim2 in dim1.children" :key="dim2.id"
+                                        style="margin-left: 20px; margin-bottom: 10px;">
+                                        <div style="font-weight: 500; color: #27ae60; margin-bottom: 5px;">{{ dim2.name
+                                            }}</div>
+                                        <div style="margin-left: 20px;">
+                                            <template v-if="dimensionLevels === 2">
+                                                <button v-for="dim in [dim2]" :key="dim.id" class="btn btn-sm"
+                                                    :class="{ 'btn-primary': isCoded(currentText, dim), 'btn-secondary': !isCoded(currentText, dim) }"
+                                                    @click="toggleCode(currentText, dim)" style="margin: 3px;">{{
+                                                    dim.name }}</button>
+                                            </template>
+                                            <template v-else>
+                                                <button v-for="dim3 in dim2.children" :key="dim3.id" class="btn btn-sm"
+                                                    :class="{ 'btn-primary': isCoded(currentText, dim3), 'btn-secondary': !isCoded(currentText, dim3) }"
+                                                    @click="toggleCode(currentText, dim3)" style="margin: 3px;">{{
+                                                    dim3.name }}</button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+                                <button class="btn btn-secondary" @click="prevText" :disabled="currentIndex === 0">←
+                                    上一条</button>
+                                <button class="btn btn-primary" @click="nextText"
+                                    :disabled="currentIndex === extractedTexts.length - 1">下一条 →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'results'" class="fade-in">
+                    <div class="card" v-if="chartDimensions.length > 0">
+                        <div class="card-header">
+                            <div class="card-title">📊 维度占比条形图</div>
+                            <div class="chart-level-switch">
+                                <button class="btn btn-sm" :class="{ 'btn-primary': chartLevel === 'level1' }"
+                                    @click="chartLevel = 'level1'">一级维度</button>
+                                <button class="btn btn-sm" :class="{ 'btn-primary': chartLevel === 'level2' }"
+                                    @click="chartLevel = 'level2'">二级维度</button>
+                                <button v-if="dimensionLevels === 3" class="btn btn-sm"
+                                    :class="{ 'btn-primary': chartLevel === 'level3' }"
+                                    @click="chartLevel = 'level3'">三级维度</button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <div v-for="dim in chartDimensions" :key="dim.id"
+                                style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; cursor: pointer;"
+                                @click="viewDimensionQuotesDetail(dim)">
+                                <div style="width: min(350px, 30%); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                    :title="dim.name">{{ dim.name }}</div>
+                                <div
+                                    style="flex: 1; height: 24px; background: #f0f0f0; border-radius: 12px; overflow: hidden;">
+                                    <div class="bar-fill"
+                                        :style="{ width: dim.percent + '%', background: 'linear-gradient(90deg, #2c3e50, #34495e)' }"
+                                        style="height: 100%; border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 100px; font-size: 13px; text-align: right; white-space: nowrap;">{{
+                                    dim.count }}条 {{ dim.percent }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">维度分布统计</div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>一级维度</th>
+                                    <th>二级维度</th>
+                                    <th v-if="dimensionLevels === 3">三级维度</th>
+                                    <th>引用数量</th>
+                                    <th>占比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template v-for="dim1 in dimensions" :key="dim1.id">
+                                    <template v-for="dim2 in dim1.children" :key="dim2.id">
+                                        <template v-if="dimensionLevels === 2">
+                                            <tr style="cursor: pointer;"
+                                                @click="viewDimensionQuotesDetail({ name: dim1.name + ' > ' + dim2.name, quotes: dim2.quotes })">
+                                                <td>{{ dim1.name }}</td>
+                                                <td>{{ dim2.name }}</td>
+                                                <td>{{ dim2.quotes?.length || 0 }}</td>
+                                                <td>{{ ((dim2.quotes?.length || 0) / totalQuotes * 100).toFixed(1) }}%
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <template v-else>
+                                            <tr v-for="dim3 in dim2.children" :key="dim3.id" style="cursor: pointer;"
+                                                @click="viewDimensionQuotesDetail({ name: dim1.name + ' > ' + dim2.name + ' > ' + dim3.name, quotes: dim3.quotes })">
+                                                <td>{{ dim1.name }}</td>
+                                                <td>{{ dim2.name }}</td>
+                                                <td>{{ dim3.name }}</td>
+                                                <td>{{ dim3.quotes?.length || 0 }}</td>
+                                                <td>{{ ((dim3.quotes?.length || 0) / totalQuotes * 100).toFixed(1) }}%
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </template>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card" v-for="dim1 in dimensions" :key="dim1.id">
+                        <div class="card-header">
+                            <div class="card-title">{{ dim1.name }} - 原声引用</div>
+                        </div>
+                        <template v-for="dim2 in dim1.children" :key="dim2.id">
+                            <template v-if="dimensionLevels === 2">
+                                <div v-if="dim2.quotes?.length > 0" style="margin-bottom: 20px;">
+                                    <div
+                                        style="font-weight: 600; color: #666; margin-bottom: 10px; padding: 8px; background: #f5f5f5; border-radius: 4px;">
+                                        {{ dim2.name }} ({{ dim2.quotes.length }}条)</div>
+                                    <div v-for="(quote, idx) in dim2.quotes" :key="idx" class="quote-item">
+                                        <div v-if="quote.uid" class="quote-uid-badge"><span class="uid-badge">👤 {{
+                                                quote.uid }}</span></div>
+                                        <div class="quote-text">{{ quote.content }}</div>
+                                        <div class="quote-meta">ID: {{ quote.id }} | 来源: {{ quote.source }}</div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <template v-for="dim3 in dim2.children" :key="dim3.id">
+                                    <div v-if="dim3.quotes?.length > 0" style="margin-bottom: 20px;">
+                                        <div
+                                            style="font-weight: 600; color: #666; margin-bottom: 10px; padding: 8px; background: #f5f5f5; border-radius: 4px;">
+                                            {{ dim2.name }} > {{ dim3.name }} ({{ dim3.quotes.length }}条)</div>
+                                        <div v-for="(quote, idx) in dim3.quotes" :key="idx" class="quote-item">
+                                            <div v-if="quote.uid" class="quote-uid-badge"><span class="uid-badge">👤 {{
+                                                    quote.uid }}</span></div>
+                                            <div class="quote-text">{{ quote.content }}</div>
+                                            <div class="quote-meta">ID: {{ quote.id }} | 来源: {{ quote.source }}</div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+
+                <div v-if="extractedTexts.length === 0" class="card empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h3>开始质性研究分析</h3>
+                    <p>上传数据文件，提取文本并建立维度体系进行编码</p>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showAddDimension" class="modal-overlay" @click.self="showAddDimension = false">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>添加一级维度</h3><button class="btn btn-secondary btn-sm" @click="showAddDimension = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="config-item"><label>维度名称</label><input type="text" v-model="newDimensionName"
+                            placeholder="请输入维度名称" @keyup.enter="confirmAddDimension"></div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary"
+                        @click="showAddDimension = false">取消</button><button class="btn btn-primary"
+                        @click="confirmAddDimension">确定</button></div>
+            </div>
+        </div>
+
+        <div v-if="showManageQuotes" class="modal-overlay" @click.self="showManageQuotes = false">
+            <div class="modal" style="max-width: 900px;">
+                <div class="modal-header">
+                    <h3>管理引用 - {{ currentDim?.name }}</h3><button class="btn btn-secondary btn-sm"
+                        @click="showManageQuotes = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group"><input type="text" v-model="quoteSearch" placeholder="搜索文本内容..."><button
+                            class="btn btn-primary" @click="searchQuotes">搜索</button></div>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <div v-for="text in filteredTexts" :key="text.id" class="check-item"
+                            style="border-bottom: 1px solid #f0f0f0; padding: 12px 8px;">
+                            <input type="checkbox" :checked="isQuoted(text)" @change="toggleQuote(text)">
+                            <div style="flex: 1;">
+                                <div v-if="text.uid" style="margin-bottom: 4px;"><span class="uid-badge"
+                                        style="font-size: 11px; padding: 2px 8px;">👤 {{ text.uid }}</span></div>
+                                <div>{{ text.content.substring(0, 100) }}...</div>
+                                <div style="font-size: 12px; color: #999; margin-top: 4px;">ID: {{ text.id }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary"
+                        @click="showManageQuotes = false">关闭</button></div>
+            </div>
+        </div>
+
+        <div v-if="showEditDimModal" class="modal-overlay" @click.self="showEditDimModal = false">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>编辑维度</h3><button class="btn btn-secondary btn-sm" @click="showEditDimModal = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="config-item"><label>维度名称</label><input type="text" v-model="editDimName"
+                            placeholder="请输入维度名称"></div>
+                    <div
+                        style="margin-top: 15px; padding: 10px; background: #f5f7fa; border-radius: 4px; font-size: 12px; color: #666;">
+                        <strong>路径：</strong>{{ getEditDimPath() }}</div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary"
+                        @click="showEditDimModal = false">取消</button><button class="btn btn-primary"
+                        @click="saveEditDim">保存</button></div>
+            </div>
+        </div>
+
+        <div v-if="showMoveQuoteModal" class="modal-overlay" @click.self="showMoveQuoteModal = false">
+            <div class="modal" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h3>移动原声引用</h3><button class="btn btn-secondary btn-sm"
+                        @click="showMoveQuoteModal = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 15px; padding: 12px; background: #eef1f5; border-radius: 4px;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">当前引用内容：</div>
+                        <div style="font-size: 14px; color: #333;">{{ editingQuote?.content }}</div>
+                        <div v-if="editingQuote?.uid" style="margin-top: 8px;"><span class="uid-badge">👤 {{
+                                editingQuote.uid }}</span></div>
+                    </div>
+                    <div style="margin-bottom: 10px; font-weight: 600; color: #333;">选择目标维度：</div>
+                    <div class="move-dim-tree"
+                        style="max-height: 400px; overflow-y: auto; border: 1px solid #e8e8e8; border-radius: 4px; padding: 10px;">
+                        <div v-for="dim1 in dimensions" :key="dim1.id" style="margin-bottom: 10px;">
+                            <div
+                                style="font-weight: 600; color: #333; padding: 8px; background: #f5f5f5; border-radius: 4px; margin-bottom: 5px;">
+                                {{ dim1.name }}</div>
+                            <div v-if="dimensionLevels === 2" style="padding-left: 15px;">
+                                <div v-for="dim2 in dim1.children" :key="dim2.id"
+                                    style="padding: 6px 10px; margin: 3px 0; border-radius: 4px; cursor: pointer;"
+                                    :style="{ background: moveTargetDim?.id === dim2.id ? '#e3edf7' : 'transparent', border: moveTargetDim?.id === dim2.id ? '1px solid #2c3e50' : '1px solid transparent' }"
+                                    @click="selectMoveTarget(dim2)">{{ dim2.name }} ({{ dim2.quotes?.length || 0 }}条)
+                                </div>
+                            </div>
+                            <div v-else style="padding-left: 15px;">
+                                <div v-for="dim2 in dim1.children" :key="dim2.id" style="margin-bottom: 5px;">
+                                    <div style="font-weight: 500; color: #555; padding: 4px 0;">{{ dim2.name }}</div>
+                                    <div style="padding-left: 15px;">
+                                        <div v-for="dim3 in dim2.children" :key="dim3.id"
+                                            style="padding: 5px 10px; margin: 2px 0; border-radius: 4px; cursor: pointer;"
+                                            :style="{ background: moveTargetDim?.id === dim3.id ? '#e3edf7' : 'transparent', border: moveTargetDim?.id === dim3.id ? '1px solid #2c3e50' : '1px solid transparent' }"
+                                            @click="selectMoveTarget(dim3)">{{ dim3.name }} ({{ dim3.quotes?.length || 0
+                                            }}条)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary"
+                        @click="showMoveQuoteModal = false">取消</button><button class="btn btn-primary"
+                        @click="confirmMoveQuote" :disabled="!moveTargetDim">移动到选中维度</button></div>
+            </div>
+        </div>
+
+        <div v-if="showListModal" class="modal-overlay" @click.self="showListModal = false">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3>{{ modalListTitle }}</h3><button class="btn btn-secondary btn-sm"
+                        @click="showListModal = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        <div v-for="(item, idx) in modalListItems" :key="idx" class="dim-quote-item"
+                            style="margin-bottom: 8px;">
+                            <div v-if="item.uid" class="dim-quote-uid"><span class="uid-badge">👤 {{ item.uid }}</span>
+                            </div>
+                            <div class="dim-quote-text">{{ item.content }}</div>
+                            <div class="dim-quote-source">ID: {{ item.id }} | 来源: {{ item.source }}
+                                <span v-if="item.reason" style="margin-left: 10px; color: #c0392b;">排除原因: {{ item.reason
+                                    }}</span>
+                                <span v-if="item.invalidReason" style="margin-left: 10px; color: #c0392b;">AI标记无效原因: {{
+                                    item.invalidReason }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary" @click="showListModal = false">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showDimQuotesModal" class="modal-overlay" @click.self="showDimQuotesModal = false">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3>维度原声 - {{ currentDimForQuotes?.name }}</h3><button class="btn btn-secondary btn-sm"
+                        @click="showDimQuotesModal = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 15px;">共 {{ currentDimForQuotes?.quotes?.length || 0 }} 条原声引用</div>
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        <div v-for="(quote, idx) in currentDimForQuotes?.quotes" :key="idx" class="dim-quote-item"
+                            style="margin-bottom: 12px;">
+                            <div v-if="quote.uid" class="dim-quote-uid"><span class="uid-badge">👤 {{ quote.uid
+                                    }}</span></div>
+                            <div class="dim-quote-text">{{ quote.content }}</div>
+                            <div class="dim-quote-source">ID: {{ quote.id }} | 来源: {{ quote.source }}</div>
+                        </div>
+                        <div v-if="!currentDimForQuotes?.quotes?.length" class="dim-quote-empty">暂无原声引用</div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button class="btn btn-secondary"
+                        @click="showDimQuotesModal = false">关闭</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    fileName: '',
+                    sheets: [],
+                    selectedSheet: '',
+                    selectedSheets: [],
+                    analysisMode: 'merge',
+                    workbook: null,
+                    columns: [],
+                    selectedColumns: [],
+                    rawData: [],
+                    dragover: false,
+                    uidColumn: null,
+                    extractedTexts: [],
+                    excludedTexts: [],
+                    showAllData: false,
+                    dimensions: [],
+                    showAddDimension: false,
+                    newDimensionName: '',
+                    activeTab: 'data',
+                    currentIndex: 0,
+                    showManageQuotes: false,
+                    currentDim: null,
+                    viewingDim: null,
+                    quoteSearch: '',
+                    filteredTexts: [],
+                    editingQuote: null,
+                    showMoveQuoteModal: false,
+                    moveTargetDim: null,
+                    editingDimension: null,
+                    showEditDimModal: false,
+                    editDimName: '',
+                    filterMinLength: true,
+                    filterMeaningless: true,
+                    filterPunctuation: true,
+                    dimensionLevels: 3,
+                    customAIInstruction: '',
+                    forcedDimensions: [],
+                    forcedMode: 'include',
+                    showForcedDimSection: true,
+                    newForcedLevel: 1,
+                    newForcedName: '',
+                    rawTextTotal: 0,
+                    nonEmptyTextTotal: 0,
+                    aiImported: false,
+                    showListModal: false,
+                    modalListTitle: '',
+                    modalListItems: [],
+                    showDimQuotesModal: false,
+                    currentDimForQuotes: null,
+                    chartLevel: 'level1',
+                    pastedJsonText: '',
+                    showCopyToast: false,
+                    copyToastMessage: '',
+                    copyToastTimer: null,
+                };
+            },
+            computed: {
+                displayedData() {
+                    return this.showAllData ? this.rawData : this.rawData.slice(0, 10);
+                },
+                currentText() {
+                    return this.extractedTexts[this.currentIndex];
+                },
+                codingProgress() {
+                    if (this.extractedTexts.length === 0) return 0;
+                    const coded = this.extractedTexts.filter(t => t.codes && t.codes.length > 0).length;
+                    return Math.round(coded / this.extractedTexts.length * 100);
+                },
+                secondLevelCount() {
+                    return this.dimensions.reduce((sum, d1) => sum + (d1.children ? d1.children.length : 0), 0);
+                },
+                totalThirdDimensions() {
+                    if (this.dimensionLevels === 2) return 0;
+                    return this.dimensions.reduce((sum, d) => sum + d.children.reduce((s, c) => s + (c.children ? c.children.length : 0), 0), 0);
+                },
+                totalQuotes() {
+                    let total = 0;
+                    this.dimensions.forEach(dim1 => {
+                        dim1.children.forEach(dim2 => {
+                            if (this.dimensionLevels === 2) total += dim2.quotes?.length || 0;
+                            else dim2.children.forEach(dim3 => total += dim3.quotes?.length || 0);
+                        });
+                    });
+                    return total || 1;
+                },
+                invalidAfterAI() {
+                    if (!this.aiImported) return 0;
+                    return this.extractedTexts.filter(t => t.invalid).length;
+                },
+                finalValidAfterAI() {
+                    if (!this.aiImported) return 0;
+                    return this.extractedTexts.filter(t => t.codes && t.codes.length > 0).length;
+                },
+                codedCount() {
+                    return this.extractedTexts.filter(t => t.codes && t.codes.length > 0).length;
+                },
+                chartDimensions() {
+                    const result = [];
+                    if (this.chartLevel === 'level1') {
+                        this.dimensions.forEach(d1 => {
+                            let quotes = [];
+                            const collect = (d) => { if (d.quotes) quotes = quotes.concat(d.quotes); if (d.children) d.children.forEach(collect); };
+                            collect(d1);
+                            result.push({ id: d1.id, name: d1.name, count: quotes.length, percent: ((quotes.length / this.totalQuotes) * 100).toFixed(1), quotes });
+                        });
+                    } else if (this.chartLevel === 'level2') {
+                        if (this.dimensionLevels === 2) {
+                            this.dimensions.forEach(d1 => {
+                                d1.children.forEach(d2 => {
+                                    const quotes = d2.quotes || [];
+                                    result.push({ id: d2.id, name: `${d1.name} > ${d2.name}`, count: quotes.length, percent: ((quotes.length / this.totalQuotes) * 100).toFixed(1), quotes });
+                                });
+                            });
+                        } else {
+                            this.dimensions.forEach(d1 => {
+                                d1.children.forEach(d2 => {
+                                    let quotes = [];
+                                    const collect = (d) => { if (d.quotes) quotes = quotes.concat(d.quotes); if (d.children) d.children.forEach(collect); };
+                                    collect(d2);
+                                    result.push({ id: d2.id, name: `${d1.name} > ${d2.name}`, count: quotes.length, percent: ((quotes.length / this.totalQuotes) * 100).toFixed(1), quotes });
+                                });
+                            });
+                        }
+                    } else if (this.chartLevel === 'level3' && this.dimensionLevels === 3) {
+                        this.dimensions.forEach(d1 => {
+                            d1.children.forEach(d2 => {
+                                d2.children.forEach(d3 => {
+                                    const quotes = d3.quotes || [];
+                                    result.push({ id: d3.id, name: `${d1.name} > ${d2.name} > ${d3.name}`, count: quotes.length, percent: ((quotes.length / this.totalQuotes) * 100).toFixed(1), quotes });
+                                });
+                            });
+                        });
+                    }
+                    return result;
+                }
+            },
+            watch: {
+                dimensionLevels(newVal, oldVal) {
+                    if (this.dimensions.length > 0 && newVal !== oldVal) {
+                        if (confirm('切换维度层数将清空当前维度体系，确定吗？')) this.dimensions = [];
+                        else this.dimensionLevels = oldVal;
+                    }
+                    if (newVal === 2 && this.chartLevel === 'level3') this.chartLevel = 'level2';
+                }
+            },
+            methods: {
+                onDimensionLevelChange() { },
+                showToastMessage(message) {
+                    if (this.copyToastTimer) clearTimeout(this.copyToastTimer);
+                    this.copyToastMessage = message;
+                    this.showCopyToast = true;
+                    this.copyToastTimer = setTimeout(() => { this.showCopyToast = false; this.copyToastTimer = null; }, 2200);
+                },
+                triggerUpload() { this.$refs.fileInput.click(); },
+                handleFileChange(e) {
+                    const file = e.target.files[0];
+                    if (file) this.processFile(file);
+                },
+                handleDrop(e) {
+                    this.dragover = false;
+                    const file = e.dataTransfer.files[0];
+                    if (file) this.processFile(file);
+                },
+                processFile(file) {
+                    this.fileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const data = new Uint8Array(e.target.result);
+                        this.workbook = XLSX.read(data, { type: 'array' });
+                        this.sheets = this.workbook.SheetNames;
+                        this.selectedSheet = this.sheets[0];
+                        this.selectedSheets = [...this.sheets];
+                        this.analysisMode = this.sheets.length > 1 ? 'merge' : 'separate';
+                        if (this.sheets.length === 1) this.loadSheet();
+                    };
+                    reader.readAsArrayBuffer(file);
+                },
+                loadSheet() {
+                    const worksheet = this.workbook.Sheets[this.selectedSheet];
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                    if (rawData.length === 0) { this.rawData = []; this.columns = []; return; }
+                    const headerRow = rawData[0];
+                    const columnNames = [];
+                    for (let i = 0; i < headerRow.length; i++) {
+                        const cell = headerRow[i];
+                        if (cell && cell.toString().trim() !== "") columnNames.push(cell.toString().trim());
+                        else columnNames.push(`Column_${String.fromCharCode(65 + i)}`);
+                    }
+                    const jsonData = [];
+                    for (let i = 1; i < rawData.length; i++) {
+                        const row = rawData[i];
+                        if (!row) continue;
+                        const obj = { __sheetName: this.selectedSheet };
+                        for (let j = 0; j < columnNames.length; j++) obj[columnNames[j]] = row[j] !== undefined ? row[j] : "";
+                        jsonData.push(obj);
+                    }
+                    this.rawData = jsonData;
+                    this.columns = columnNames;
+                    this.selectedColumns = [];
+                    this.extractedTexts = [];
+                    this.excludedTexts = [];
+                    this.rawTextTotal = 0;
+                },
+                loadMergedSheets() {
+                    let allData = [];
+                    let allColumnsSet = new Set();
+                    this.selectedSheets.forEach(sheetName => {
+                        const worksheet = this.workbook.Sheets[sheetName];
+                        const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                        if (rawData.length === 0) return;
+                        const headerRow = rawData[0];
+                        const columnNames = [];
+                        for (let i = 0; i < headerRow.length; i++) {
+                            const cell = headerRow[i];
+                            if (cell && cell.toString().trim() !== "") columnNames.push(cell.toString().trim());
+                            else columnNames.push(`Column_${String.fromCharCode(65 + i)}`);
+                        }
+                        columnNames.forEach(col => allColumnsSet.add(col));
+                        for (let i = 1; i < rawData.length; i++) {
+                            const row = rawData[i];
+                            if (!row) continue;
+                            const obj = { __sheetName: sheetName };
+                            for (let j = 0; j < columnNames.length; j++) obj[columnNames[j]] = row[j] !== undefined ? row[j] : "";
+                            allData.push(obj);
+                        }
+                    });
+                    this.rawData = allData;
+                    this.columns = Array.from(allColumnsSet);
+                    this.selectedColumns = [];
+                    this.extractedTexts = [];
+                    this.excludedTexts = [];
+                    this.rawTextTotal = 0;
+                    alert(`已合并 ${this.selectedSheets.length} 个工作表，共 ${allData.length} 行数据`);
+                },
+                extractText() {
+                    this.extractedTexts = [];
+                    this.excludedTexts = [];
+                    this.aiImported = false;
+                    let idCounter = 1;
+                    const uidColumns = ['uid', 'UID', 'Uid', 'user_id', 'userId', 'userID', 'id', 'ID', '用户ID', '用户id'];
+                    this.uidColumn = null;
+                    for (let col of this.columns) {
+                        if (uidColumns.includes(col)) { this.uidColumn = col; break; }
+                    }
+                    const isMeaningful = (text) => {
+                        const s = String(text).trim();
+                        if (this.filterMinLength && s.length < 2) return false;
+                        if (this.filterMeaningless) {
+                            const meaningless = ['没有', '无', '暂无', '不知道', 'nan', 'null', 'undefined', ''];
+                            if (meaningless.includes(s.toLowerCase())) return false;
+                        }
+                        if (this.filterPunctuation && /^[.,!?;:、，。！？；：\s]+$/.test(s)) return false;
+                        return true;
+                    };
+                    const textColumns = this.selectedColumns.filter(col => col !== this.uidColumn);
+                    this.rawTextTotal = this.rawData.length * textColumns.length;
+                    let nonEmptyCount = 0;
+                    this.rawData.forEach((row, rowIdx) => {
+                        const sheetName = row.__sheetName || this.selectedSheet || 'Sheet1';
+                        textColumns.forEach(col => {
+                            const rawContent = row[col];
+                            const trimmedContent = rawContent ? String(rawContent).trim() : '';
+                            if (trimmedContent.length > 0) nonEmptyCount++;
+                            if (rawContent && isMeaningful(rawContent)) {
+                                const uid = this.uidColumn ? row[this.uidColumn] : null;
+                                const source = `${sheetName}_Row${rowIdx + 1}_${col}`;
+                                this.extractedTexts.push({
+                                    id: `T${String(idCounter).padStart(4, '0')}`,
+                                    content: trimmedContent,
+                                    source: source,
+                                    uid: uid ? String(uid).trim() : null,
+                                    codes: []
+                                });
+                                idCounter++;
+                            } else {
+                                if (rawContent && trimmedContent.length > 0) {
+                                    const uid = this.uidColumn ? row[this.uidColumn] : null;
+                                    const source = `${sheetName}_Row${rowIdx + 1}_${col}`;
+                                    let reason = '';
+                                    const s = trimmedContent;
+                                    if (this.filterMinLength && s.length < 2) reason = '长度小于2';
+                                    else if (this.filterMeaningless && ['没有', '无', '暂无', '不知道', 'nan', 'null', 'undefined'].includes(s.toLowerCase())) reason = '无意义词';
+                                    else if (this.filterPunctuation && /^[.,!?;:、，。！？；：\s]+$/.test(s)) reason = '纯标点符号';
+                                    else reason = '其他规则';
+                                    this.excludedTexts.push({
+                                        id: `E${String(idCounter).padStart(4, '0')}`,
+                                        content: trimmedContent,
+                                        source: source,
+                                        uid: uid ? String(uid).trim() : null,
+                                        reason: reason
+                                    });
+                                    idCounter++;
+                                }
+                            }
+                        });
+                    });
+                    this.nonEmptyTextTotal = nonEmptyCount;
+                    const uidMsg = this.uidColumn ? `\n检测到 uid 列：${this.uidColumn}，已关联用户信息` : '';
+                    alert(`成功提取 ${this.extractedTexts.length} 条有效文本\n被排除文本 ${this.excludedTexts.length} 条\n原始候选条目: ${this.rawTextTotal}\n非空条目: ${this.nonEmptyTextTotal}${uidMsg}`);
+                    this.activeTab = 'dimensions';
+                },
+                confirmAddDimension() {
+                    if (this.newDimensionName.trim()) {
+                        this.dimensions.push({
+                            id: Date.now(),
+                            name: this.newDimensionName.trim(),
+                            expanded: true,
+                            children: []
+                        });
+                        this.newDimensionName = '';
+                        this.showAddDimension = false;
+                    }
+                },
+                addSubDimension(dim1) {
+                    const name = prompt('请输入二级维度名称:');
+                    if (name) {
+                        const newDim = { id: Date.now(), name: name.trim() };
+                        if (this.dimensionLevels === 2) newDim.quotes = [];
+                        else { newDim.expanded = true; newDim.children = []; }
+                        dim1.children.push(newDim);
+                    }
+                },
+                addThirdDimension(dim1, dim2) {
+                    const name = prompt('请输入三级维度名称:');
+                    if (name) dim2.children.push({ id: Date.now(), name: name.trim(), quotes: [] });
+                },
+                removeDimension(idx) { if (confirm('确定删除此维度及其所有子维度?')) this.dimensions.splice(idx, 1); },
+                removeSubDimension(dim1, idx) { if (confirm('确定删除此维度及其所有子维度?')) dim1.children.splice(idx, 1); },
+                removeThirdDimension(dim2, idx) { if (confirm('确定删除此维度?')) dim2.children.splice(idx, 1); },
+                getQuoteCount(dim) {
+                    if (dim.children) return dim.children.reduce((sum, c) => sum + this.getQuoteCount(c), 0);
+                    return dim.quotes?.length || 0;
+                },
+                isCoded(text, dim) { return text.codes && text.codes.includes(dim.id); },
+                toggleCode(text, dim) {
+                    if (!text.codes) text.codes = [];
+                    const idx = text.codes.indexOf(dim.id);
+                    if (idx > -1) {
+                        text.codes.splice(idx, 1);
+                        if (dim.quotes) {
+                            const qIdx = dim.quotes.findIndex(q => q.id === text.id);
+                            if (qIdx > -1) dim.quotes.splice(qIdx, 1);
+                        }
+                    } else {
+                        text.codes.push(dim.id);
+                        if (!dim.quotes) dim.quotes = [];
+                        dim.quotes.push({
+                            id: text.id,
+                            content: text.content,
+                            source: text.source,
+                            uid: text.uid
+                        });
+                    }
+                },
+                viewDimensionQuotes(dim) { this.viewingDim = this.viewingDim?.id === dim.id ? null : dim; },
+                openEditDim(dim, parentDim = null, grandparentDim = null) {
+                    this.editingDimension = { dim, parentDim, grandparentDim };
+                    this.editDimName = dim.name;
+                    this.showEditDimModal = true;
+                },
+                getEditDimPath() {
+                    if (!this.editingDimension) return '';
+                    const { dim, parentDim, grandparentDim } = this.editingDimension;
+                    if (grandparentDim) return `${grandparentDim.name} > ${parentDim.name} > ${dim.name}`;
+                    if (parentDim) return `${parentDim.name} > ${dim.name}`;
+                    return dim.name;
+                },
+                saveEditDim() {
+                    if (this.editingDimension && this.editDimName.trim()) {
+                        this.editingDimension.dim.name = this.editDimName.trim();
+                        this.showEditDimModal = false;
+                        this.editingDimension = null;
+                        this.editDimName = '';
+                    }
+                },
+                openMoveQuote(quote, currentDim) {
+                    this.editingQuote = { ...quote, currentDim };
+                    this.moveTargetDim = null;
+                    this.showMoveQuoteModal = true;
+                },
+                selectMoveTarget(dim) { this.moveTargetDim = dim; },
+                confirmMoveQuote() {
+                    if (!this.editingQuote || !this.moveTargetDim) return;
+                    const { currentDim, id, content, source, uid } = this.editingQuote;
+                    if (currentDim.quotes) {
+                        const idx = currentDim.quotes.findIndex(q => q.id === id);
+                        if (idx > -1) currentDim.quotes.splice(idx, 1);
+                    }
+                    const text = this.extractedTexts.find(t => t.id === id);
+                    if (text && text.codes) {
+                        const codeIdx = text.codes.indexOf(currentDim.id);
+                        if (codeIdx > -1) text.codes.splice(codeIdx, 1);
+                        text.codes.push(this.moveTargetDim.id);
+                    }
+                    if (!this.moveTargetDim.quotes) this.moveTargetDim.quotes = [];
+                    if (!this.moveTargetDim.quotes.some(q => q.id === id)) {
+                        this.moveTargetDim.quotes.push({ id, content, source, uid });
+                    }
+                    this.showMoveQuoteModal = false;
+                    this.editingQuote = null;
+                    this.moveTargetDim = null;
+                },
+                removeQuoteFromDim(quote, dim) {
+                    if (!confirm('确定从该维度移除此原声引用？\n（原声仍会保留在其他维度中）')) return;
+                    if (dim.quotes) {
+                        const idx = dim.quotes.findIndex(q => q.id === quote.id);
+                        if (idx > -1) dim.quotes.splice(idx, 1);
+                    }
+                    const text = this.extractedTexts.find(t => t.id === quote.id);
+                    if (text && text.codes) {
+                        const codeIdx = text.codes.indexOf(dim.id);
+                        if (codeIdx > -1) text.codes.splice(codeIdx, 1);
+                    }
+                },
+                prevText() { if (this.currentIndex > 0) this.currentIndex--; },
+                nextText() { if (this.currentIndex < this.extractedTexts.length - 1) this.currentIndex++; },
+                manageQuotes(dim) {
+                    this.currentDim = dim;
+                    this.showManageQuotes = true;
+                    this.filteredTexts = [...this.extractedTexts];
+                },
+                searchQuotes() {
+                    if (this.quoteSearch.trim()) {
+                        this.filteredTexts = this.extractedTexts.filter(t => t.content.includes(this.quoteSearch.trim()));
+                    } else {
+                        this.filteredTexts = [...this.extractedTexts];
+                    }
+                },
+                isQuoted(text) {
+                    return this.currentDim?.quotes?.some(q => q.id === text.id);
+                },
+                toggleQuote(text) {
+                    const quoted = this.isQuoted(text);
+                    if (quoted) {
+                        const idx = this.currentDim.quotes.findIndex(q => q.id === text.id);
+                        if (idx > -1) this.currentDim.quotes.splice(idx, 1);
+                        const codeIdx = text.codes?.indexOf(this.currentDim.id);
+                        if (codeIdx > -1) text.codes.splice(codeIdx, 1);
+                    } else {
+                        if (!this.currentDim.quotes) this.currentDim.quotes = [];
+                        this.currentDim.quotes.push({ id: text.id, content: text.content, source: text.source, uid: text.uid });
+                        if (!text.codes) text.codes = [];
+                        if (!text.codes.includes(this.currentDim.id)) text.codes.push(this.currentDim.id);
+                    }
+                },
+                exportResults() {
+                    const totalQuotes = this.totalQuotes;
+                    const exportData = [];
+                    this.dimensions.forEach(dim1 => {
+                        const dim1Total = dim1.children.reduce((sum, d2) => {
+                            if (this.dimensionLevels === 2) return sum + (d2.quotes?.length || 0);
+                            else return sum + d2.children.reduce((s, d3) => s + (d3.quotes?.length || 0), 0);
+                        }, 0);
+                        const dim1Pct = ((dim1Total / totalQuotes) * 100).toFixed(1);
+                        dim1.children.forEach(dim2 => {
+                            const dim2Total = this.dimensionLevels === 2 ? (dim2.quotes?.length || 0) : dim2.children.reduce((sum, d3) => sum + (d3.quotes?.length || 0), 0);
+                            const dim2Pct = ((dim2Total / totalQuotes) * 100).toFixed(1);
+                            if (this.dimensionLevels === 2) {
+                                const quotes = dim2.quotes || [];
+                                if (quotes.length === 0) exportData.push({ '维度1': `${dim1.name} (${dim1Pct}%)`, '维度2': `${dim2.name} (${dim2Pct}%)`, '维度3': '', '原声引用': '' });
+                                else quotes.forEach(q => exportData.push({ '维度1': `${dim1.name} (${dim1Pct}%)`, '维度2': `${dim2.name} (${dim2Pct}%)`, '维度3': '', '原声引用': q.uid ? `[${q.uid}] ${q.content}` : q.content }));
+                            } else {
+                                dim2.children.forEach(dim3 => {
+                                    const quotes = dim3.quotes || [];
+                                    const dim3Pct = ((quotes.length / totalQuotes) * 100).toFixed(1);
+                                    if (quotes.length === 0) exportData.push({ '维度1': `${dim1.name} (${dim1Pct}%)`, '维度2': `${dim2.name} (${dim2Pct}%)`, '维度3': `${dim3.name} (${dim3Pct}%)`, '原声引用': '' });
+                                    else quotes.forEach(q => exportData.push({ '维度1': `${dim1.name} (${dim1Pct}%)`, '维度2': `${dim2.name} (${dim2Pct}%)`, '维度3': `${dim3.name} (${dim3Pct}%)`, '原声引用': q.uid ? `[${q.uid}] ${q.content}` : q.content }));
+                                });
+                            }
+                        });
+                    });
+                    if (exportData.length === 0) { alert('暂无数据可导出'); return; }
+                    const ws = XLSX.utils.json_to_sheet(exportData);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, '编码结果');
+                    XLSX.writeFile(wb, '质性研究编码结果.xlsx');
+                    alert('编码结果导出成功！');
+                },
+                exportDimensionStats() {
+                    const totalQuotes = this.totalQuotes;
+                    const statsData = this.dimensionLevels === 2 ? [['一级维度', '二级维度', '引用数量', '占比']] : [['一级维度', '二级维度', '三级维度', '引用数量', '占比']];
+                    this.dimensions.forEach(dim1 => {
+                        dim1.children.forEach(dim2 => {
+                            if (this.dimensionLevels === 2) {
+                                const count = dim2.quotes?.length || 0;
+                                statsData.push([dim1.name, dim2.name, count, ((count / totalQuotes) * 100).toFixed(1) + '%']);
+                            } else {
+                                dim2.children.forEach(dim3 => {
+                                    const count = dim3.quotes?.length || 0;
+                                    statsData.push([dim1.name, dim2.name, dim3.name, count, ((count / totalQuotes) * 100).toFixed(1) + '%']);
+                                });
+                            }
+                        });
+                    });
+                    if (statsData.length <= 1) { alert('暂无统计数据'); return; }
+                    const ws = XLSX.utils.aoa_to_sheet(statsData);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, '维度占比统计');
+                    XLSX.writeFile(wb, '维度占比统计.xlsx');
+                    alert('维度占比统计导出成功！');
+                },
+                getAIPrompt() {
+                    const levels = this.dimensionLevels;
+                    const desc = levels === 2 ? '（一级维度为分类，二级维度为具体主题，二级维度带quotes数组）' : '（一级维度为分类，二级维度为大类，三级维度为具体主题，三级维度带quotes数组）';
+                    let prompt = `你是一名资深的互联网用户研究专家，请对提供的开放题文本进行编码分析。
+
+【编码要求】
+1. 根据文本内容归纳维度体系
+2. 支持 ${levels} 层维度结构${desc}
+3. 将每条文本编码到对应维度，每条文本可以有多个编码
+4. 保留文本原始 uid 信息（如有）
+5. 每个编码后的文本需要在对应末级维度的 quotes 数组中保留完整引用
+6. 考虑到需要准确反映各维度原声比例，应尽可能覆盖所有文本内容，即使文本内容重复也不应排除
+7. 如果某个维度只有极少数原声提及（例如1条），可以忽略该原声，或通过调整维度命名的方式将该原声编入其它的某个维度
+8. 无效文本处理：如果某条文本是整体性的泛化评价（例如"不清楚"、"暂时没有"、"没啥吧"等）、或没有特定维度指向的笼统积极评价（如"都挺好的"、"很好"、"挺满意的"等）、或无意义或无法归类的评价，则认定为无效文本，应被排除，请将其ID添加到返回的 \`invalid_texts\` 数组中，并可在 \`invalid_reasons\` 对象中提供原因（可选）。这些文本将不会出现在任何维度的 \`quotes\` 中。
+
+【输出格式】
+返回严格的 JSON 格式：
+
+{
+  "version": "1.0",
+  "type": "ai_coding_result",
+  "dimension_levels": ${levels},
+  "dimensions": [ ... ],
+  "texts": [ ... ],
+  "invalid_texts": [ "T0001", "T0003" ],
+  "invalid_reasons": {
+    "T0001": "纯标点符号",
+    "T0003": "无意义内容"
+  }
+}
+
+【维度示例】
+- 刷视频场景问题：时效性、原创性、推荐匹配度、内容丰富度、营销感、负反馈灵敏度、清晰度、流畅性
+- 看评论场景问题：评论质量、评论排序、功能体验、互动活跃度
+- 发作品场景问题：魔法表情特效、创作工具、热门玩法、流量分发
+- 社交互动场景问题：PYMK、周围朋友在用、朋友Tab、社交玩法、私信功能
+- 直播场景问题：直播功能、丰富度、直播质量、公会联动，主播素质、推荐符合兴趣、直播玩法、互动氛围
+- 搜索场景问题：结果质量、结果权威、结果时效、结果准确、结果形态丰富多样、营销数量、搜索流畅、推荐词条
+- 激励场景问题：金币收益下降、任务规则复杂
+- Push场景问题：推送内容不满、推送频率不满
+- 社区风气问题：视频风气、评论风气、私信风气、直播风气
+
+【关键规则】
+- 末级维度必须有 quotes 数组，存储匹配的原声引用
+- quotes 数组中的每条必须包含：id、content、source、uid（可选）
+- texts 数组必须原样返回，不要修改
+- 无效文本必须通过 invalid_texts 数组明确列出
+- 返回纯JSON格式，不要有 markdown 代码块`;
+                    if (this.forcedDimensions.length > 0) {
+                        let fPrompt = '';
+                        if (this.forcedMode === 'include') fPrompt = '【强制包含维度】AI在编码时必须包含以下用户指定的维度（可额外补充其他维度）：\n';
+                        else fPrompt = '【严格限制维度】AI在编码时只能使用以下用户指定的维度，禁止创建其他维度：\n';
+                        const l1 = this.forcedDimensions.filter(d => d.level === 1).map(d => d.name);
+                        const l2 = this.forcedDimensions.filter(d => d.level === 2).map(d => d.name);
+                        const l3 = this.forcedDimensions.filter(d => d.level === 3).map(d => d.name);
+                        if (l1.length) fPrompt += `一级维度：${l1.join('、')}\n`;
+                        if (l2.length) fPrompt += `二级维度：${l2.join('、')}\n`;
+                        if (l3.length) fPrompt += `三级维度：${l3.join('、')}\n`;
+                        prompt += `\n\n${fPrompt}`;
+                    }
+                    if (this.customAIInstruction && this.customAIInstruction.trim()) {
+                        prompt += `\n\n【用户自定义指令】\n${this.customAIInstruction.trim()}`;
+                    }
+                    return prompt;
+                },
+                exportForAI() {
+                    const textsToExport = this.extractedTexts.map(t => ({ id: t.id, content: t.content, source: t.source, uid: t.uid }));
+                    const customPrompt = this.getAIPrompt();
+
+                    // 构建剪贴板内容：Prompt + 原声列表
+                    let fullClipboardText = customPrompt + '\n\n';
+                    fullClipboardText += '【待分析的原声文本列表（请严格基于此列表进行编码）】\n';
+                    fullClipboardText += '────────────────────────────────────────\n';
+                    textsToExport.forEach(t => {
+                        const uidStr = t.uid ? ` [UID:${t.uid}]` : '';
+                        fullClipboardText += `${t.id}${uidStr}: ${t.content}\n`;
+                    });
+                    fullClipboardText += '────────────────────────────────────────\n';
+                    fullClipboardText += `共计 ${textsToExport.length} 条文本。请按照上述要求输出 JSON 结果。`;
+
+                    // 下载 JSON 文件
+                    const exportData = {
+                        version: '1.0',
+                        type: 'ai_coding_request',
+                        stats: {
+                            original_texts: this.extractedTexts.length,
+                            export_texts: textsToExport.length,
+                            sentence_split: false,
+                            dimension_levels: this.dimensionLevels,
+                            has_uid: textsToExport.some(t => t.uid)
+                        },
+                        prompt: customPrompt,
+                        dimension_levels: this.dimensionLevels,
+                        texts: textsToExport
+                    };
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = '待AI编码数据.json';
+                    link.click();
+                    URL.revokeObjectURL(url);
+
+                    // 复制完整内容到剪贴板
+                    this.copyPromptToClipboard(fullClipboardText);
+                    alert(`数据已导出！\n\n✅ 完整Prompt（含所有原声文本）已复制到剪贴板，可直接粘贴到 AI 对话框。\n数据 json 文件已开始下载。`);
+                },
+                copyPromptToClipboard(text) {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            this.showToastMessage('✅ 完整Prompt+原声已复制！');
+                        }).catch(() => {
+                            this.fallbackCopy(text);
+                        });
+                    } else {
+                        this.fallbackCopy(text);
+                    }
+                },
+                fallbackCopy(text) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        this.showToastMessage('✅ 完整Prompt+原声已复制！');
+                    } catch (e) {
+                        this.showToastMessage('⚠️ 复制失败，请手动复制（数据已在文件中）');
+                    }
+                    document.body.removeChild(textarea);
+                },
+                triggerImport() { this.$refs.importInput.click(); },
+                handleImportDrop(e) {
+                    const file = e.dataTransfer.files[0];
+                    if (file) this.processImportFile(file);
+                },
+                handleImportFile(e) {
+                    const file = e.target.files[0];
+                    if (file) this.processImportFile(file);
+                },
+                processImportFile(file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            this.processImportedData(data, '文件导入');
+                        } catch (err) {
+                            alert('解析文件失败: ' + err.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                },
+                onPasteInput() { },
+                clearPastedJson() { this.pastedJsonText = ''; },
+                handlePasteImport() {
+                    const rawText = this.pastedJsonText.trim();
+                    if (!rawText) { alert('请先粘贴 AI 返回的 JSON 结果'); return; }
+                    let jsonText = rawText;
+                    const match = jsonText.match(/```(?:json)?\s*\n?([\s\S]*?)```/);
+                    if (match) jsonText = match[1].trim();
+                    try {
+                        const data = JSON.parse(jsonText);
+                        this.processImportedData(data, '粘贴导入');
+                        this.pastedJsonText = '';
+                    } catch (err) {
+                        alert('JSON 解析失败: ' + err.message + '\n\n请确保粘贴的是有效的 JSON 格式。');
+                    }
+                },
+                processImportedData(data, sourceType) {
+                    const normalizeDimensions = (dims) => {
+                        return (dims || []).map(dim => ({
+                            ...dim,
+                            name: dim.name || dim.dimension || '未命名',
+                            children: normalizeDimensions(dim.children || dim.sub_dimensions || []),
+                            quotes: dim.quotes || []
+                        }));
+                    };
+                    if (!data.dimensions || !data.texts) {
+                        alert('数据格式不正确！需要包含 dimensions 和 texts 字段。\n来源：' + sourceType);
+                        return;
+                    }
+                    this.dimensions = normalizeDimensions(data.dimensions);
+                    let idCounter = 1;
+                    const assignIds = (dims) => {
+                        dims.forEach(d => {
+                            d.id = idCounter++;
+                            d.expanded = true;
+                            if (d.children && d.children.length) assignIds(d.children);
+                        });
+                    };
+                    assignIds(this.dimensions);
+                    this.extractedTexts = data.texts.map(t => ({
+                        ...t,
+                        codes: [],
+                        invalid: false,
+                        invalidReason: null
+                    }));
+                    if (data.invalid_texts && Array.isArray(data.invalid_texts)) {
+                        const reasons = data.invalid_reasons || {};
+                        this.extractedTexts.forEach(t => {
+                            if (data.invalid_texts.includes(t.id)) {
+                                t.invalid = true;
+                                t.invalidReason = reasons[t.id] || 'AI标记为无效';
+                            }
+                        });
+                    }
+                    const detectedLevels = data.dimension_levels || (this.dimensions[0]?.children?.[0]?.children ? 3 : 2);
+                    this.dimensionLevels = detectedLevels;
+                    this.dimensions.forEach(dim1 => {
+                        if (!dim1.children) dim1.children = [];
+                        dim1.children.forEach(dim2 => {
+                            if (detectedLevels === 2 || !dim2.children) {
+                                if (!dim2.quotes) dim2.quotes = [];
+                                dim2.quotes.forEach(q => {
+                                    const text = this.extractedTexts.find(t => t.id === q.id);
+                                    if (text && !text.invalid) {
+                                        if (!text.codes) text.codes = [];
+                                        text.codes.push(dim2.id);
+                                    }
+                                });
+                            } else {
+                                dim2.children.forEach(dim3 => {
+                                    if (!dim3.quotes) dim3.quotes = [];
+                                    dim3.quotes.forEach(q => {
+                                        const text = this.extractedTexts.find(t => t.id === q.id);
+                                        if (text && !text.invalid) {
+                                            if (!text.codes) text.codes = [];
+                                            text.codes.push(dim3.id);
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    });
+                    this.extractedTexts.forEach(t => {
+                        if (!t.invalid && (!t.codes || t.codes.length === 0)) {
+                            t.invalid = true;
+                            t.invalidReason = 'AI未分配编码且未标记无效';
+                        }
+                    });
+                    this.aiImported = true;
+                    alert(`✅ AI 编码结果导入成功！（${sourceType}）\n维度层数: ${detectedLevels}层\n文本数量: ${this.extractedTexts.length}\n一级维度: ${this.dimensions.length}`);
+                    this.activeTab = 'dimensions';
+                },
+                addForcedDimension() {
+                    if (this.newForcedName.trim()) {
+                        this.forcedDimensions.push({ level: Number(this.newForcedLevel), name: this.newForcedName.trim() });
+                        this.newForcedName = '';
+                    }
+                },
+                removeForcedDimension(index) { this.forcedDimensions.splice(index, 1); },
+                showExcludedTexts() {
+                    if (this.excludedTexts.length === 0) { alert('暂无被排除的文本'); return; }
+                    this.modalListTitle = '被清洗规则排除的文本';
+                    this.modalListItems = this.excludedTexts.map(t => ({
+                        ...t,
+                        display: t.uid ? `[${t.uid}] ${t.content} (原因: ${t.reason})` : `${t.content} (原因: ${t.reason})`
+                    }));
+                    this.showListModal = true;
+                },
+                showInvalidAITexts() {
+                    if (!this.aiImported) { alert('尚未导入 AI 编码结果'); return; }
+                    const invalidList = this.extractedTexts.filter(t => t.invalid);
+                    if (invalidList.length === 0) { alert('暂无 AI 标记的无效文本'); return; }
+                    this.modalListTitle = 'AI 标记的无效文本';
+                    this.modalListItems = invalidList.map(t => ({
+                        ...t,
+                        display: t.uid ? `[${t.uid}] ${t.content}` : t.content,
+                        reason: t.invalidReason
+                    }));
+                    this.showListModal = true;
+                },
+                showCleanedTexts() {
+                    if (this.extractedTexts.length === 0) { alert('暂无清洗后有效文本'); return; }
+                    this.modalListTitle = '清洗后有效文本（共 ' + this.extractedTexts.length + ' 条）';
+                    this.modalListItems = this.extractedTexts.map(t => ({
+                        ...t,
+                        display: t.uid ? `[${t.uid}] ${t.content}` : t.content
+                    }));
+                    this.showListModal = true;
+                },
+                showFinalValidTexts() {
+                    if (!this.aiImported) { alert('尚未导入 AI 编码结果'); return; }
+                    const validList = this.extractedTexts.filter(t => t.codes && t.codes.length > 0);
+                    if (validList.length === 0) { alert('暂无最终有效文本'); return; }
+                    this.modalListTitle = '最终有效文本（有编码，共 ' + validList.length + ' 条）';
+                    this.modalListItems = validList.map(t => ({
+                        ...t,
+                        display: t.uid ? `[${t.uid}] ${t.content}` : t.content
+                    }));
+                    this.showListModal = true;
+                },
+                viewDimensionQuotesDetail(dim) {
+                    this.currentDimForQuotes = dim;
+                    this.showDimQuotesModal = true;
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>

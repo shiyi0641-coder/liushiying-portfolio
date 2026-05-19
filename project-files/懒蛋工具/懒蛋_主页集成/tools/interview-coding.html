@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>访谈稿件编码分析工具 - AI集成</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+            line-height: 1.5;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        :root {
+            --radius-card: 1.25rem;
+            --radius-element: 0.875rem;
+            --radius-sm: 0.75rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-card);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .step .step-num {
+            width: 28px;
+            height: 28px;
+            background: #e2e8f0;
+            border-radius: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+
+        .step.active .step-num {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        .step.completed .step-num {
+            background: #10b981;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            transition: all 0.2s ease;
+            border: 1px solid #eef2f6;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem 0.75rem 1.5rem;
+            border-bottom: 1px solid #f0f2f5;
+            background: #fefefe;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #0f172a;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .card-footer {
+            background: #fafcff;
+            padding: 0.75rem 1.5rem;
+            border-top: 1px solid #edf2f7;
+            font-size: 0.75rem;
+            color: #5b6e8c;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .info-tips-top {
+            background: #f1f8fe;
+            border-radius: var(--radius-element);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            color: #1e3a8a;
+            border-left: 3px solid #3b82f6;
+        }
+
+        @media (max-width: 780px) {
+            body {
+                padding: 1rem;
+            }
+
+            .step-indicator {
+                padding: 0.8rem;
+            }
+        }
+
+        textarea,
+        input[type="text"],
+        input[type="file"],
+        .preview-box,
+        .user-name-input,
+        .user-textarea {
+            border-radius: var(--radius-element);
+        }
+
+        textarea,
+        input[type="text"],
+        .user-name-input {
+            padding-left: 1.2rem;
+        }
+
+        .user-name-input {
+            border-radius: 2rem;
+        }
+
+        .btn,
+        .add-user-btn,
+        .btn-icon {
+            border-radius: 2rem;
+        }
+
+        .btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            background: #eef2f6;
+            color: #8a99b0;
+            border-color: #dce3ec;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-primary:disabled {
+            background: #cbd5e1;
+            color: #f1f5f9;
+        }
+
+        .btn-success:disabled {
+            background: #cbd5e1;
+            color: #f1f5f9;
+        }
+
+        .btn-outline:disabled {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #a0afc0;
+        }
+
+        .users-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-card {
+            background: #fefefe;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-element);
+            padding: 1rem;
+            transition: box-shadow 0.1s;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .user-name-input {
+            flex: 2;
+            min-width: 150px;
+            padding: 0.4rem 0.8rem;
+            border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        .user-name-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .user-textarea {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            padding: 0.6rem 0.8rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            resize: vertical;
+        }
+
+        .btn-icon {
+            background: #f1f5f9;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .btn-icon:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            color: #b91c1c;
+        }
+
+        .btn-danger:hover {
+            background: #fee2e2;
+        }
+
+        .add-user-btn {
+            margin-top: 0.5rem;
+            background: #eef2ff;
+            border: 1px dashed #94a3b8;
+            width: 100%;
+            padding: 0.6rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .add-user-btn:hover {
+            background: #e0e7ff;
+        }
+
+        textarea,
+        input[type="file"],
+        .preview-box {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            padding: 0.8rem 1rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .preview-box {
+            background: #f8fafc;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 260px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            background: #f1f5f9;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e293b;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            border: 1px solid #cbd5e1;
+            background: white;
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #047857;
+        }
+
+        .btn-report {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .btn-report:hover {
+            background: #6d28d9;
+        }
+
+        .research-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            width: 100%;
+        }
+
+        .research-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .research-field label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1e293b;
+        }
+
+        .tab-header {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 2rem;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .tab-btn.active {
+            background: #eef2ff;
+            color: #2563eb;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .batch-textarea {
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .tree-root {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .tree-node {
+            list-style: none;
+            margin: 0.2rem 0;
+        }
+
+        .tree-node-header {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+            padding: 0.3rem 0.2rem;
+            border-radius: var(--radius-sm);
+            transition: background 0.1s;
+        }
+
+        .tree-node-header:hover {
+            background: #f1f5f9;
+        }
+
+        .toggle-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.2rem;
+            height: 1.2rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #3b82f6;
+            user-select: none;
+        }
+
+        .node-title {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .node-details {
+            margin-left: 1.6rem;
+            margin-top: 0.3rem;
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .node-findings {
+            background: #fef9e3;
+            border-radius: var(--radius-element);
+            padding: 0.6rem;
+            margin: 0.4rem 0;
+            font-size: 0.85rem;
+        }
+
+        .node-findings strong {
+            color: #b45309;
+        }
+
+        .node-quotes {
+            background: #f8fafc;
+            border-radius: var(--radius-element);
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .node-quotes ul {
+            margin-left: 1.2rem;
+            margin-top: 0.2rem;
+        }
+
+        .children-container {
+            padding-left: 1.2rem;
+            overflow: hidden;
+            transition: max-height 0.2s ease;
+        }
+
+        .children-container.collapsed {
+            display: none;
+        }
+
+        .empty-placeholder {
+            color: #94a3b8;
+            text-align: center;
+            padding: 2rem;
+            background: #fafcff;
+            font-size: 0.85rem;
+        }
+
+        .status-msg {
+            font-size: 0.75rem;
+            padding: 0.3rem 0;
+            color: #2c6e2f;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 550px;
+            width: 90%;
+            padding: 1.5rem;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 0.75rem;
+            color: #1e40af;
+        }
+
+        .examples-list {
+            background: #f8fafc;
+            border-radius: var(--radius-element);
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .examples-list p {
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background: #ffffff;
+            border-radius: 0.6rem;
+            border-left: 2px solid #3b82f6;
+            white-space: pre-wrap;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 2rem;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .badge-icon {
+            background: #eef2ff;
+            border-radius: 2rem;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .outline-preview {
+            background: #f8fafc;
+            border-radius: var(--radius-element);
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            border-left: 3px solid #8b5cf6;
+        }
+
+        .checkbox-field {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 0.25rem;
+        }
+
+        .checkbox-field input {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        .checkbox-field label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1e293b;
+            cursor: pointer;
+        }
+
+        .report-section {
+            margin-top: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .report-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.25rem 0.1rem 0.6rem 0.1rem;
+            border-bottom: 1px solid #e8eef6;
+            margin-bottom: 0.75rem;
+        }
+
+        .report-section-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .report-section-subtitle {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .report-section-body {
+            background: #ffffff;
+            border: 1px solid #eef2f6;
+            border-radius: var(--radius-card);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+            padding: 0.9rem 1rem;
+        }
+
+        .extra-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .extra-item {
+            padding: 0.75rem 0.85rem;
+            border-radius: var(--radius-element);
+            background: #f8fafc;
+            border: 1px solid #e8eef6;
+        }
+
+        .extra-item-title {
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #334155;
+            margin-bottom: 0.35rem;
+        }
+
+        .extra-item-desc {
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.55;
+        }
+
+        .extra-item-quotes {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #475569;
+        }
+
+        .extra-item-quotes ul {
+            margin-left: 1.2rem;
+            margin-top: 0.25rem;
+        }
+
+        .quote-toggle-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.2rem 0;
+            margin-bottom: 0.3rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .quote-toggle-btn:hover {
+            text-decoration: underline;
+            color: #2563eb;
+        }
+
+        .quotes-list-container {
+            margin-top: 0.25rem;
+        }
+
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: toastFadeInOut 1.5s ease forwards;
+            pointer-events: none;
+        }
+
+        @keyframes toastFadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+
+            15% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            85% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+        }
+
+        /* 头图样式 - 深紫渐变背景 */
+        .hero-header {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            padding: 2rem 1.5rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .hero-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white !important;
+            margin-bottom: 0.5rem;
+            background: none !important;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-header p {
+            color: #e0e7ff !important;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* 用户画像卡片样式 */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .profile-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-element);
+            padding: 0.85rem 1rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .profile-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-card-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #1e293b;
+            margin-bottom: 0.35rem;
+        }
+
+        .profile-card-text {
+            font-size: 0.85rem;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        /* 手动粘贴区域样式 */
+        .manual-json-area {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: var(--radius-element);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .manual-json-area h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+
+        .toggle-manual-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.3rem 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .toggle-manual-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 780px) {
+            .hero-header {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .hero-header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="hero-header">
+            <h1>👤 访谈稿件编码分析工具 · AI 嵌入版</h1>
+            <p>Designed by 猹猹🦡，Powered by DeepSeek🐳 --v2026.04.28</p>
+        </div>
+
+        <div class="step-indicator">
+            <div class="step" data-step="1"><span class="step-num">1</span> 研究定向+提纲解析</div>
+            <div class="step" data-step="2"><span class="step-num">2</span> 多用户访谈</div>
+            <div class="step" data-step="3"><span class="step-num">3</span> AI调用</div>
+            <div class="step" data-step="4"><span class="step-num">4</span> 分析结果展示</div>
+        </div>
+
+        <!-- 卡片1：研究定向 & 提纲解析 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span>📚 01. 研究定向 & 提纲层级解析</span></div>
+            </div>
+            <div class="card-body">
+                <div class="tab-header" style="margin-bottom: 1.5rem;">
+                    <button class="tab-btn active" data-tab="single">✍️ 单块输入 (默认)</button>
+                    <button class="tab-btn" data-tab="batch">📦 整体一键输入</button>
+                </div>
+                <div class="tab-content active" id="tab-single">
+                    <div class="research-vertical">
+                        <div class="research-field"><label>📌 访谈主题</label><textarea id="researchTopic" rows="3"
+                                placeholder="（选填）概括访谈的主题问题"></textarea></div>
+                        <div class="research-field"><label>📄 背景信息</label><textarea id="projectBackground" rows="4"
+                                placeholder="（选填）描述项目相关背景信息"></textarea></div>
+                        <div class="research-field"><label>🎯 研究目标</label><textarea id="researchBackground" rows="4"
+                                placeholder="（选填）描述希望回答的核心问题"></textarea></div>
+                        <div class="research-field"><label>📋 提纲维度</label><textarea id="interviewOutline" rows="8"
+                                placeholder="（必填）示例：&#10;1. 使用习惯&#10;1.1 使用频率&#10;1.2 使用场景&#10;2. 痛点分析"></textarea>
+                            <div id="outlinePreview" class="outline-preview" style="display:none;"><strong>📐
+                                    识别到的提纲层级：</strong>
+                                <div id="outlineTreeContainer" class="tree-root"></div>
+                            </div>
+                        </div>
+                        <div class="research-field"><label>⭐ 重点关注</label><textarea id="focusContent" rows="4"
+                                placeholder="（选填）请描述您希望AI在分析时特别关注的内容"></textarea>
+                            <div style="font-size:0.75rem; color:#475569;">💡 填写后，AI会优先提取相关原声和结论。</div>
+                        </div>
+                        <div class="research-field">
+                            <div class="checkbox-field"><input type="checkbox" id="allowExtraFindings"><label
+                                    for="allowExtraFindings">✨ 允许AI补充额外发现维度</label></div>
+                        </div>
+                        <div class="research-field"><label>✏️ 自定义指令</label><textarea id="customInstructions" rows="4"
+                                placeholder="（选填）例如：每个维度至少归纳2个核心观点"></textarea></div>
+                    </div>
+                    <div id="researchSaveMsg" class="status-msg"></div>
+                </div>
+                <div class="tab-content" id="tab-batch">
+                    <div class="batch-input-area">
+                        <div style="margin-bottom: 0.8rem;"><label style="font-weight: 500;">📁 上传文件（.txt /
+                                .md）</label><input type="file" id="batchFileInput" accept=".txt,.md"
+                                style="margin-top: 0.3rem;"></div>
+                        <div style="margin-bottom: 0.8rem;"><label style="font-weight: 500;">✍️ 或粘贴包含以下标题的完整文本：</label>
+                            <div style="font-size: 0.7rem; color: #3b82f6;">【访谈主题】、【背景信息】、【研究目标】、【提纲维度】、【重点关注】、【自定义指令】
+                            </div>
+                            <textarea id="batchText" rows="12" class="batch-textarea"
+                                placeholder="示例格式：&#10;【访谈主题】智能客服使用体验研究&#10;【背景信息】企业上线AI客服半年..."></textarea>
+                        </div>
+                        <div class="button-group"><button id="clearBatchBtn" class="btn btn-outline">🗑️
+                                清空文本</button><button id="parseBatchBtn" class="btn btn-primary">📝 解析并填充到表单</button>
+                        </div>
+                        <div id="batchMsg" class="status-msg"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer"><button id="clearResearchBtn" class="btn btn-outline">🗑️ 清空</button><button
+                    id="saveResearchBtn" class="btn btn-success">✅ 保存研究定向 & 解析提纲</button></div>
+        </div>
+
+        <!-- 卡片2：多用户访谈文本 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span>👥 02. 多用户访谈文本</span></div>
+            </div>
+            <div class="card-body">
+                <div id="usersContainer" class="users-container"></div><button id="addUserBtn" class="add-user-btn">+
+                    添加受访者</button>
+                <div id="textSaveMsg" class="status-msg"></div>
+            </div>
+            <div class="card-footer"><button id="clearAllUsersBtn" class="btn btn-outline">🗑️ 清空所有用户</button><button
+                    id="saveAllUsersBtn" class="btn btn-success">✅ 保存所有用户</button></div>
+        </div>
+
+        <!-- 卡片3：生成定向AI Prompt + DeepSeek API 集成 + 手动粘贴JSON -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span>🤖 03. 生成定向AI Prompt & 智能分析</span></div><span class="badge-icon">DeepSeek
+                    驱动</span>
+            </div>
+            <div class="card-body">
+                <!-- API 配置区域 -->
+                <div class="api-config-area"
+                    style="background: #f0f9ff; padding: 1rem; border-radius: 1rem; margin-bottom: 1.5rem; border: 1px solid #b9d9ff;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+                        <div style="flex: 2; min-width: 200px;">
+                            <label style="font-weight: 600; font-size: 0.8rem;">🔑 DeepSeek API Key</label>
+                            <input type="password" id="deepseekApiKey" class="api-key-input"
+                                placeholder="sk-xxxxxxxxxxxxxxxx"
+                                style="width: 100%; padding: 0.5rem; border-radius: 2rem; border: 1px solid #cbd5e1;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-weight: 600; font-size: 0.8rem;">🌐 模型</label>
+                            <select id="modelSelect"
+                                style="padding: 0.5rem; border-radius: 2rem; border: 1px solid #cbd5e1;">
+                                <option value="deepseek-v4-flash">DeepSeek-V4-Flash</option>
+                                <option value="deepseek-v4-pro">DeepSeek-V4-Pro</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <label style="font-size: 0.75rem;"><input type="checkbox" id="rememberApiKey"> 记住Key</label>
+                            <button id="clearApiKeyBtn" class="btn-outline" style="padding: 0.3rem 0.8rem;">清除</button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.6rem; font-size: 0.7rem; color: #3b7cbf;">💡 输入您的DeepSeek API Key，点击下方「🚀
+                        一键发送至DeepSeek」自动分析并展示结果。</div>
+                </div>
+
+                <div class="button-group" style="margin-top:0;">
+                    <button id="generatePromptBtn" class="btn btn-primary" disabled>✨ 生成完整Prompt并复制</button>
+                    <button id="callDeepSeekBtn" class="btn btn-success" disabled style="background: #0d9488;">🚀
+                        一键发送至DeepSeek并自动解析</button>
+                </div>
+                <div id="apiCallStatus" class="status-msg" style="margin-top: 0.5rem; font-weight: 500;"></div>
+                <div style="margin-top: 1rem;">
+                    <div style="font-weight:500; font-size:0.85rem;">📌 Prompt预览</div>
+                    <div id="promptPreview" class="preview-box" style="max-height: 220px;">点击「生成Prompt」后显示完整指令+多用户访谈内容
+                    </div>
+                    <div class="status-msg" id="promptStatusMsg"></div>
+                </div>
+
+                <!-- 手动粘贴区域（折叠） -->
+                <div style="margin-top:1rem; border-top: 1px solid #e2e8f0; padding-top:0.5rem;">
+                    <button id="toggleManualBtn" class="toggle-manual-btn">📋 手动粘贴AI返回的JSON结果（备选）▶</button>
+                    <div id="manualPasteSection" style="display: none;">
+                        <div class="manual-json-area" style="margin-top:0.5rem;">
+                            <h4>📋 粘贴AI返回的JSON</h4>
+                            <p style="font-size:0.75rem; color:#475569; margin-bottom:0.5rem;">
+                                如果您已通过其他方式调用AI并获得JSON结果，请粘贴到下方，点击「解析并展示」即可生成报告。
+                            </p>
+                            <textarea id="manualJsonInput" rows="10"
+                                placeholder='粘贴AI返回的JSON，例如：&#10;{&#10;  "outline_insights": [...],&#10;  "additional_findings": [...],&#10;  "user_profiles": [...]&#10;}'
+                                style="font-family: monospace; font-size:0.8rem;"></textarea>
+                            <div class="button-group" style="margin-top:0.5rem;">
+                                <button id="parseManualJsonBtn" class="btn btn-primary">🔍 解析并展示</button>
+                                <button id="clearManualJsonBtn" class="btn btn-outline">🗑️ 清空</button>
+                            </div>
+                            <div id="manualParseStatus" class="status-msg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer" style="justify-content: flex-start; background:#f8fafc;">📎
+                流程提示：可选择自动调用API或手动粘贴AI结果JSON，两者效果相同。</div>
+        </div>
+
+        <!-- 卡片4：AI结果回传 & 提纲洞察报告 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span>📊 04. AI 结果报告</span></div>
+            </div>
+            <div class="card-body">
+                <div id="vizContainer" class="coding-viz" style="margin-top: 0;">
+                    <div class="empty-placeholder">✨ 等待AI分析结果，将按提纲树形结构展示结论与用户原声。</div>
+                </div>
+                <div id="jsonSaveMsg" class="status-msg"></div>
+            </div>
+            <div class="card-footer"><button id="exportReportBtn" class="btn btn-report" disabled>📑
+                    导出Markdown报告</button></div>
+        </div>
+        <footer>访谈稿件编码分析工具 2026.04.28 ｜ Designed by 猹猹🦡 ｜ Powered by DeepSeek🐳</footer>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="codeModal" class="modal">
+        <div class="modal-content"><span class="close-modal">&times;</span>
+            <h3 id="modalCodeName">节点详情</h3>
+            <p><strong>结论：</strong> <span id="modalDesc"></span></p>
+            <p><strong>原文引述：</strong></p>
+            <div id="modalExamples" class="examples-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- 全局变量 ----------
+        let users = [];
+        let nextUserId = 1;
+        let currentFullPrompt = "";
+        let currentOutlineInsights = [];
+        let currentAdditionalFindings = [];
+        let parsedOutlineTree = [];
+        let currentUserProfiles = [];
+
+        const usersContainer = document.getElementById('usersContainer');
+        const addUserBtn = document.getElementById('addUserBtn');
+        const clearAllUsersBtn = document.getElementById('clearAllUsersBtn');
+        const saveAllUsersBtn = document.getElementById('saveAllUsersBtn');
+        const textSaveMsg = document.getElementById('textSaveMsg');
+
+        const deepseekApiKeyInput = document.getElementById('deepseekApiKey');
+        const rememberApiKeyCheck = document.getElementById('rememberApiKey');
+        const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+        const modelSelect = document.getElementById('modelSelect');
+        const callDeepSeekBtn = document.getElementById('callDeepSeekBtn');
+        const apiCallStatus = document.getElementById('apiCallStatus');
+
+        // ---------- 统一更新所有相关按钮状态 ----------
+        function updateAllButtonsState() {
+            const outline = document.getElementById('interviewOutline').value.trim();
+            const hasOutline = outline.length > 0;
+            const singleTab = document.getElementById('tab-single');
+            const isSingleActive = singleTab && singleTab.classList.contains('active');
+
+            const clearResearchBtn = document.getElementById('clearResearchBtn');
+            const saveResearchBtn = document.getElementById('saveResearchBtn');
+            if (clearResearchBtn && saveResearchBtn) {
+                const shouldEnable = isSingleActive && hasOutline;
+                clearResearchBtn.disabled = !shouldEnable;
+                saveResearchBtn.disabled = !shouldEnable;
+            }
+
+            const hasValidUser = users.some(u => u.content.trim().length > 0);
+            const hasAtLeastOneUser = users.length > 0;
+            const shouldEnableUserBtns = hasAtLeastOneUser && hasValidUser;
+            if (clearAllUsersBtn) clearAllUsersBtn.disabled = !shouldEnableUserBtns;
+            if (saveAllUsersBtn) saveAllUsersBtn.disabled = !shouldEnableUserBtns;
+
+            const generateBtn = document.getElementById('generatePromptBtn');
+            if (generateBtn) {
+                generateBtn.disabled = !(hasOutline && hasValidUser);
+            }
+            if (callDeepSeekBtn) {
+                callDeepSeekBtn.disabled = !(hasOutline && hasValidUser);
+            }
+        }
+
+        // ---------- 选项卡切换 ----------
+        function initTabs() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    tabContents.forEach(content => {
+                        if (content.id === `tab-${tabId}`) content.classList.add('active');
+                        else content.classList.remove('active');
+                    });
+                    updateAllButtonsState();
+                });
+            });
+            const outlineTextarea = document.getElementById('interviewOutline');
+            if (outlineTextarea) outlineTextarea.addEventListener('input', updateAllButtonsState);
+            updateAllButtonsState();
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notify';
+            if (isError) toast.style.background = 'rgba(185, 28, 28, 0.9)';
+            else toast.style.background = 'rgba(0, 0, 0, 0.85)';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        }
+
+        // ---------- 提纲解析 ----------
+        function parseOutlineToTree(outlineText) {
+            if (!outlineText.trim()) return [];
+            const lines = outlineText.split(/\r?\n/);
+            const stack = [];
+            const tree = [];
+            const patterns = [
+                {
+                    regex: /^(#+)\s+(.+)$/, getLevel: (m) => m[1].length, process: (m) => {
+                        const raw = m[2].trim();
+                        const matchNum = raw.match(/^(\d+(?:\.\d+)*)\s+(.+)$/);
+                        if (matchNum) return { numbered: `${matchNum[1]} ${matchNum[2]}`, clean: matchNum[2] };
+                        else return { numbered: raw, clean: raw };
+                    }
+                },
+                { regex: /^(\d+(?:\.\d+)*)\s+[.、]?\s*(.+)$/, getLevel: (m) => m[1].split('.').length, process: (m) => ({ numbered: `${m[1]} ${m[2].trim()}`, clean: m[2].trim() }) },
+                { regex: /^([一二三四五六七八九十]+[、])\s*(.+)$/, getLevel: () => 1, process: (m) => ({ numbered: `${m[1]} ${m[2].trim()}`, clean: m[2].trim() }) },
+                { regex: /^\((\d+)\)\s*(.+)$/, getLevel: () => 1, process: (m) => ({ numbered: `(${m[1]}) ${m[2].trim()}`, clean: m[2].trim() }) }
+            ];
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                for (let p of patterns) {
+                    const match = line.match(p.regex);
+                    if (match) {
+                        const level = p.getLevel(match);
+                        const { numbered, clean } = p.process(match);
+                        const node = { title: clean, numberedTitle: numbered, level, children: [], fullPath: numbered };
+                        while (stack.length >= level) stack.pop();
+                        if (stack.length === 0) tree.push(node);
+                        else stack[stack.length - 1].children.push(node);
+                        stack.push(node);
+                        break;
+                    }
+                }
+            }
+            function setFullPath(node, parentPath = '') {
+                node.fullPath = parentPath ? `${parentPath} > ${node.numberedTitle}` : node.numberedTitle;
+                if (node.children) node.children.forEach(child => setFullPath(child, node.fullPath));
+            }
+            tree.forEach(root => setFullPath(root));
+            return tree;
+        }
+
+        function renderTreeContainer(container, treeData, showDetails = false, insightsMap = new Map()) {
+            if (!treeData || treeData.length === 0) {
+                container.innerHTML = '<div class="empty-placeholder">无内容</div>';
+                return;
+            }
+            const ul = document.createElement('ul');
+            ul.className = 'tree-root';
+            function buildNode(node, level = 0) {
+                const li = document.createElement('li');
+                li.className = 'tree-node';
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'tree-node-header';
+                const toggleSpan = document.createElement('span');
+                toggleSpan.className = 'toggle-icon';
+                const hasChildren = node.children && node.children.length > 0;
+                if (hasChildren) { toggleSpan.textContent = '▼'; toggleSpan.style.cursor = 'pointer'; }
+                else { toggleSpan.textContent = '•'; toggleSpan.style.opacity = '0.5'; }
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'node-title';
+                titleSpan.textContent = node.numberedTitle || node.title;
+                headerDiv.appendChild(toggleSpan);
+                headerDiv.appendChild(titleSpan);
+                li.appendChild(headerDiv);
+                if (showDetails) {
+                    const insight = insightsMap.get(node.fullPath);
+                    if (insight && (insight.key_findings || (insight.supporting_quotes && insight.supporting_quotes.length))) {
+                        const detailsDiv = document.createElement('div');
+                        detailsDiv.className = 'node-details';
+                        if (insight.key_findings) {
+                            const findingsDiv = document.createElement('div');
+                            findingsDiv.className = 'node-findings';
+                            findingsDiv.innerHTML = `<strong>🔍 结论：</strong> ${escapeHtml(insight.key_findings)}`;
+                            detailsDiv.appendChild(findingsDiv);
+                        }
+                        if (insight.supporting_quotes && insight.supporting_quotes.length) {
+                            const quotesDiv = document.createElement('div');
+                            quotesDiv.className = 'node-quotes';
+                            const ulQuotes = document.createElement('ul');
+                            insight.supporting_quotes.forEach(q => { const liq = document.createElement('li'); liq.textContent = q; ulQuotes.appendChild(liq); });
+                            quotesDiv.appendChild(document.createTextNode('💬 用户原声：'));
+                            quotesDiv.appendChild(ulQuotes);
+                            detailsDiv.appendChild(quotesDiv);
+                        }
+                        li.appendChild(detailsDiv);
+                    } else if (insight === undefined && !hasChildren) {
+                        const noDataDiv = document.createElement('div');
+                        noDataDiv.className = 'node-details';
+                        noDataDiv.style.color = '#94a3b8';
+                        noDataDiv.style.fontSize = '0.75rem';
+                        noDataDiv.textContent = '（该维度暂无AI返回的结论和引述）';
+                        li.appendChild(noDataDiv);
+                    }
+                }
+                if (hasChildren) {
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'children-container';
+                    const childUl = document.createElement('ul');
+                    childUl.style.listStyle = 'none';
+                    childUl.style.paddingLeft = '0';
+                    node.children.forEach(child => childUl.appendChild(buildNode(child, level + 1)));
+                    childrenContainer.appendChild(childUl);
+                    li.appendChild(childrenContainer);
+                    let isCollapsed = false;
+                    headerDiv.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        isCollapsed = !isCollapsed;
+                        if (isCollapsed) { childrenContainer.style.display = 'none'; toggleSpan.textContent = '▶'; }
+                        else { childrenContainer.style.display = 'block'; toggleSpan.textContent = '▼'; }
+                    });
+                }
+                return li;
+            }
+            treeData.forEach(root => ul.appendChild(buildNode(root)));
+            container.innerHTML = '';
+            container.appendChild(ul);
+        }
+
+        function buildInsightsMap(insightsArray) {
+            const map = new Map();
+            insightsArray.forEach(item => {
+                if (item.node_path) {
+                    map.set(item.node_path, { key_findings: item.key_findings || '', supporting_quotes: item.supporting_quotes || [] });
+                    const normalized = item.node_path.replace(/\s+/g, '').replace(/[>]/g, '>');
+                    map.set(normalized, { key_findings: item.key_findings || '', supporting_quotes: item.supporting_quotes || [] });
+                }
+            });
+            return map;
+        }
+
+        function getInsightForNode(fullPath, insightsMap) {
+            let insight = insightsMap.get(fullPath);
+            if (!insight) {
+                const normalizedFull = fullPath.replace(/\s+/g, '').replace(/[>]/g, '>');
+                insight = insightsMap.get(normalizedFull);
+            }
+            return insight;
+        }
+
+        function renderUserProfiles(profiles) {
+            const container = document.getElementById('vizContainer');
+            const section = document.createElement('div');
+            section.className = 'report-section';
+            const header = document.createElement('div');
+            header.className = 'report-section-header';
+            header.innerHTML = `<div class="report-section-title">👤 受访者画像小结</div><div class="report-section-subtitle">每人100字以内概括</div>`;
+            const body = document.createElement('div');
+            body.className = 'report-section-body';
+            const grid = document.createElement('div');
+            grid.className = 'profile-grid';
+            if (!profiles || profiles.length === 0) {
+                grid.innerHTML = '<div class="empty-placeholder" style="grid-column: 1/-1;">暂无用户画像数据</div>';
+            } else {
+                profiles.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+                    card.innerHTML = `<div class="profile-card-name">${escapeHtml(p.user_name || '未知用户')}</div><div class="profile-card-text">${escapeHtml(p.profile || '')}</div>`;
+                    grid.appendChild(card);
+                });
+            }
+            body.appendChild(grid);
+            section.appendChild(header);
+            section.appendChild(body);
+            if (container.firstChild) {
+                container.insertBefore(section, container.firstChild);
+            } else {
+                container.appendChild(section);
+            }
+        }
+
+        function renderInsightsTree(tree, insightsArray) {
+            const container = document.getElementById('vizContainer');
+            if (!tree || tree.length === 0) {
+                container.innerHTML = '<div>未识别到有效的提纲结构，请检查输入的提纲格式。</div>';
+                return;
+            }
+            const insightsMap = buildInsightsMap(insightsArray);
+            function customRenderTree(containerEl, treeData) {
+                if (!treeData || treeData.length === 0) { containerEl.innerHTML = '<div>无内容</div>'; return; }
+                const ul = document.createElement('ul'); ul.className = 'tree-root';
+                function buildNode(node) {
+                    const li = document.createElement('li'); li.className = 'tree-node';
+                    const headerDiv = document.createElement('div'); headerDiv.className = 'tree-node-header';
+                    const toggleSpan = document.createElement('span'); toggleSpan.className = 'toggle-icon';
+                    const hasChildren = node.children && node.children.length > 0;
+                    if (hasChildren) { toggleSpan.textContent = '▼'; toggleSpan.style.cursor = 'pointer'; }
+                    else { toggleSpan.textContent = '•'; toggleSpan.style.opacity = '0.5'; }
+                    const titleSpan = document.createElement('span'); titleSpan.className = 'node-title';
+                    titleSpan.textContent = node.numberedTitle || node.title;
+                    headerDiv.appendChild(toggleSpan); headerDiv.appendChild(titleSpan); li.appendChild(headerDiv);
+                    const insight = getInsightForNode(node.fullPath, insightsMap);
+                    if (insight && (insight.key_findings || (insight.supporting_quotes && insight.supporting_quotes.length))) {
+                        const detailsDiv = document.createElement('div'); detailsDiv.className = 'node-details';
+                        if (insight.key_findings) {
+                            const findingsDiv = document.createElement('div'); findingsDiv.className = 'node-findings';
+                            findingsDiv.innerHTML = `<strong>🔍 结论：</strong> ${escapeHtml(insight.key_findings)}`;
+                            detailsDiv.appendChild(findingsDiv);
+                        }
+                        if (insight.supporting_quotes && insight.supporting_quotes.length) {
+                            const quotesWrapper = document.createElement('div'); quotesWrapper.className = 'node-quotes';
+                            const toggleBtn = document.createElement('button'); toggleBtn.className = 'quote-toggle-btn';
+                            const quoteCount = insight.supporting_quotes.length;
+                            toggleBtn.innerHTML = `💬 用户原声 (${quoteCount}条) ▶`;
+                            const quotesListContainer = document.createElement('div'); quotesListContainer.className = 'quotes-list-container';
+                            quotesListContainer.style.display = 'none';
+                            const ulQuotes = document.createElement('ul');
+                            insight.supporting_quotes.forEach(q => { const liq = document.createElement('li'); liq.textContent = q; ulQuotes.appendChild(liq); });
+                            quotesListContainer.appendChild(ulQuotes);
+                            let isQuotesExpanded = false;
+                            toggleBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                isQuotesExpanded = !isQuotesExpanded;
+                                if (isQuotesExpanded) { quotesListContainer.style.display = 'block'; toggleBtn.innerHTML = `💬 用户原声 (${quoteCount}条) ▼`; }
+                                else { quotesListContainer.style.display = 'none'; toggleBtn.innerHTML = `💬 用户原声 (${quoteCount}条) ▶`; }
+                            });
+                            quotesWrapper.appendChild(toggleBtn); quotesWrapper.appendChild(quotesListContainer);
+                            detailsDiv.appendChild(quotesWrapper);
+                        }
+                        li.appendChild(detailsDiv);
+                    } else if (!hasChildren) {
+                        const noDataDiv = document.createElement('div'); noDataDiv.className = 'node-details';
+                        noDataDiv.style.color = '#94a3b8'; noDataDiv.style.fontSize = '0.75rem';
+                        noDataDiv.textContent = '（该维度暂无AI返回的结论和引述）';
+                        li.appendChild(noDataDiv);
+                    }
+                    if (hasChildren) {
+                        const childrenContainer = document.createElement('div'); childrenContainer.className = 'children-container';
+                        const childUl = document.createElement('ul'); childUl.style.listStyle = 'none'; childUl.style.paddingLeft = '0';
+                        node.children.forEach(child => childUl.appendChild(buildNode(child)));
+                        childrenContainer.appendChild(childUl); li.appendChild(childrenContainer);
+                        let isCollapsed = false;
+                        headerDiv.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            isCollapsed = !isCollapsed;
+                            if (isCollapsed) { childrenContainer.style.display = 'none'; toggleSpan.textContent = '▶'; }
+                            else { childrenContainer.style.display = 'block'; toggleSpan.textContent = '▼'; }
+                        });
+                    }
+                    return li;
+                }
+                treeData.forEach(root => ul.appendChild(buildNode(root)));
+                containerEl.innerHTML = ''; containerEl.appendChild(ul);
+            }
+
+            container.innerHTML = '';
+
+            if (currentUserProfiles && currentUserProfiles.length > 0) {
+                renderUserProfiles(currentUserProfiles);
+            }
+
+            const section1 = document.createElement('div'); section1.className = 'report-section';
+            const header1 = document.createElement('div'); header1.className = 'report-section-header';
+            header1.innerHTML = `<div class="report-section-title">📑 提纲维度洞察</div><div class="report-section-subtitle">点击节点可折叠/展开，原声默认折叠</div>`;
+            const body1 = document.createElement('div'); body1.className = 'report-section-body';
+            customRenderTree(body1, tree);
+            section1.appendChild(header1); section1.appendChild(body1);
+            container.appendChild(section1);
+
+            if (currentAdditionalFindings && currentAdditionalFindings.length > 0) {
+                const section2 = document.createElement('div'); section2.className = 'report-section';
+                const header2 = document.createElement('div'); header2.className = 'report-section-header';
+                header2.innerHTML = `<div class="report-section-title">提纲外额外发现</div><div class="report-section-subtitle">仅在允许并返回时展示</div>`;
+                const body2 = document.createElement('div'); body2.className = 'report-section-body';
+                const list = document.createElement('div'); list.className = 'extra-list';
+                currentAdditionalFindings.forEach(ext => {
+                    const item = document.createElement('div'); item.className = 'extra-item';
+                    const quotes = (ext.quotes || []).map(q => `<li>${escapeHtml(q)}</li>`).join('');
+                    item.innerHTML = `<div class="extra-item-title">💡 ${escapeHtml(ext.theme || '')}</div><div class="extra-item-desc">${escapeHtml(ext.description || '')}</div><div class="extra-item-quotes"><strong>原声：</strong><ul>${quotes}</ul></div>`;
+                    list.appendChild(item);
+                });
+                body2.appendChild(list);
+                section2.appendChild(header2); section2.appendChild(body2);
+                container.appendChild(section2);
+            }
+        }
+
+        function updateOutlinePreview() {
+            const outlineTextarea = document.getElementById('interviewOutline');
+            parsedOutlineTree = parseOutlineToTree(outlineTextarea.value);
+            const container = document.getElementById('outlineTreeContainer');
+            const previewDiv = document.getElementById('outlinePreview');
+            if (!parsedOutlineTree || parsedOutlineTree.length === 0) { previewDiv.style.display = 'none'; return; }
+            previewDiv.style.display = 'block';
+            renderTreeContainer(container, parsedOutlineTree, false, new Map());
+        }
+
+        // ---------- 多用户管理 ----------
+        function renderUsers() {
+            usersContainer.innerHTML = '';
+            users.forEach(user => {
+                const card = document.createElement('div'); card.className = 'user-card'; card.dataset.id = user.id;
+                card.innerHTML = `
+                    <div class="user-header">
+                        <input type="text" class="user-name-input" value="${escapeHtml(user.name)}" placeholder="受访者名称" data-id="${user.id}" data-field="name">
+                        <div class="user-actions">
+                            <button class="btn-icon upload-user-btn" data-id="${user.id}">📄 上传文件</button>
+                            <button class="btn-icon btn-danger delete-user-btn" data-id="${user.id}">删除</button>
+                        </div>
+                    </div>
+                    <textarea class="user-textarea" rows="5" placeholder="上传或粘贴该用户的访谈转录稿..." data-id="${user.id}" data-field="content">${escapeHtml(user.content)}</textarea>
+                    <input type="file" accept=".txt,.md" style="display:none;" data-id="${user.id}" class="user-file-input">
+                `;
+                usersContainer.appendChild(card);
+            });
+            document.querySelectorAll('.user-name-input').forEach(inp => inp.addEventListener('change', (e) => {
+                const uid = parseInt(inp.dataset.id);
+                const u = users.find(u => u.id === uid);
+                if (u) u.name = inp.value.trim() || `用户${uid}`;
+                updateAllButtonsState();
+            }));
+            document.querySelectorAll('.user-textarea').forEach(ta => ta.addEventListener('input', (e) => {
+                const uid = parseInt(ta.dataset.id);
+                const u = users.find(u => u.id === uid);
+                if (u) u.content = ta.value;
+                updateAllButtonsState();
+            }));
+            document.querySelectorAll('.upload-user-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                const uid = parseInt(btn.dataset.id);
+                const fileInput = document.querySelector(`.user-file-input[data-id="${uid}"]`);
+                fileInput && fileInput.click();
+            }));
+            document.querySelectorAll('.user-file-input').forEach(fi => fi.addEventListener('change', (e) => {
+                const uid = parseInt(fi.dataset.id);
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const content = ev.target.result;
+                    const u = users.find(u => u.id === uid);
+                    if (u) { u.content = content; const ta = document.querySelector(`.user-textarea[data-id="${uid}"]`); if (ta) ta.value = content; updateAllButtonsState(); showToast(`✅ 已加载 ${file.name}`); }
+                };
+                reader.readAsText(file, 'UTF-8');
+            }));
+            document.querySelectorAll('.delete-user-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                const uid = parseInt(btn.dataset.id);
+                users = users.filter(u => u.id !== uid);
+                renderUsers();
+                updateAllButtonsState();
+            }));
+            updateAllButtonsState();
+        }
+
+        function addUser() { users.push({ id: nextUserId++, name: `受访者${nextUserId - 1}`, content: '' }); renderUsers(); }
+        function clearAllUsers() { users = []; nextUserId = 1; renderUsers(); updateAllButtonsState(); showToast("🗑️ 清空所有用户"); }
+        function saveAllUsers() { showToast("✅ 所有用户已保存"); }
+        addUserBtn.addEventListener('click', addUser);
+        clearAllUsersBtn.addEventListener('click', clearAllUsers);
+        saveAllUsersBtn.addEventListener('click', saveAllUsers);
+        addUser();
+
+        function getAllUsersMergedText() {
+            return users.map(u => u.content.trim() ? `【用户：${u.name}】\n${u.content.trim()}\n【/用户：${u.name}】` : "").filter(t => t).join("\n\n");
+        }
+
+        // ---------- 构建 Prompt ----------
+        function buildPromptWithContext() {
+            const mergedText = getAllUsersMergedText();
+            if (!mergedText.trim()) { showToast("请至少为一个用户填写访谈文本内容！", true); return null; }
+            const topic = document.getElementById('researchTopic').value.trim();
+            const projectBg = document.getElementById('projectBackground').value.trim();
+            const researchGoal = document.getElementById('researchBackground').value.trim();
+            const outline = document.getElementById('interviewOutline').value.trim();
+            if (!outline) { showToast("请先填写访谈提纲维度！", true); return null; }
+            const focus = document.getElementById('focusContent').value.trim();
+            const custom = document.getElementById('customInstructions').value.trim();
+            const allowExtra = document.getElementById('allowExtraFindings').checked;
+            const userNames = users.map(u => u.name.trim()).filter(n => n);
+            let manualTagRule = userNames.length ? `手动受访者标签：${userNames.map(n => `“${n}”`).join('、')}。` : "";
+            const outlineTree = parseOutlineToTree(outline);
+            let outlineStructure = "";
+            if (outlineTree.length) {
+                const paths = [];
+                function collectPaths(node) { paths.push(node.fullPath); node.children.forEach(collectPaths); }
+                outlineTree.forEach(collectPaths);
+                outlineStructure = paths.map(p => `- ${p}`).join('\n');
+            } else { outlineStructure = outline.trim() || "未提供有效提纲"; }
+            const focusInstruction = focus ? `\n## 重点关注内容（必须着重提取）\n用户指定以下内容为本次分析的重点关注方向，请在各维度结论和引述中特别关注这些主题，并确保相关用户原声被优先提取和总结：\n${focus}\n` : "";
+            const extraInstruction = allowExtra ? `\n**额外要求**：请额外分析并输出一个 "additional_findings" 数组，包含超出上述提纲范围但非常重要的主题或洞察。每个元素包含 "theme", "description", "quotes" (至少2条用户原声，带【用户名】)。如果无则输出空数组。` : `\n**重要**：不要输出任何超出提纲范围的内容，仅严格按上述提纲节点进行分析。`;
+            const coreTaskDesc = `## 核心任务
+1. **忽略访谈者（调研员）的话语**：访谈者的问题仅作为理解上下文的参考，帮助您更好地聚类受访者回答的维度，但**最终的编码引述必须只包含受访者的话语**，并标注来源用户（格式：【用户名】引述内容）。
+2. **按提纲层级归类**：将受访者的回答内容归类到提纲的对应节点下（node_path 必须与给定的提纲层级路径完全匹配）。
+3. **提炼每个节点的核心结论（key_findings）**：
+   - **必须输出一个综合性的总体结论**，该结论应跨所有受访者进行归纳，反映该维度的整体发现、共性或主要分歧。
+   - **严禁**按不同受访者分别罗列观点（例如：“用户A认为…，用户B认为…”）。结论应是一段连贯的、总结性的文字。
+4. **提取典型原声**：每个节点至少提供2-5条带用户标签的原文引述（supporting_quotes），这些引述用于支撑上述总体结论，而非代替结论本身。`;
+
+            const profileTaskDesc = `5. **为每位受访者生成简短画像（user_profiles）**：
+   - 基于该用户在整个访谈中透露的关键信息（如行为特征、态度、痛点、使用场景、需求等），提炼一句高度概括的用户画像。
+   - **要求**：每条画像字数必须严格控制在 **100字以内**，语言精炼、突出该用户最显著的特征。
+   - 输出格式：数组中每个元素包含 "user_name" （与访谈文本中的用户名一致）和 "profile" （画像文本）。`;
+
+            const prompt = `你是一位具有互联网行业背景的资深用户研究专家。请采用提纲驱动的编码方式，严格基于以下访谈提纲维度对多用户访谈文本进行分析。
+
+${coreTaskDesc}
+${profileTaskDesc}
+${focusInstruction}
+## 研究定向
+主题: ${topic || "未提供"}
+背景: ${projectBg || "未提供"}
+目标: ${researchGoal || "未提供"}
+自定义指令: ${custom || "无"}
+
+## 访谈提纲层级结构（必须严格遵循，作为归码框架）
+${outlineStructure}
+
+## 角色识别与编码规则
+- ${manualTagRule}
+- 仅对受访者话语进行引述，标注来源如【张三】。
+- 访谈者标识（如“访谈员：”、“问：”、“Q：”等）不要出现在引述中，但可帮助您判断对话脉络。
+
+${extraInstruction}
+
+## 输出JSON格式要求
+请返回如下结构的JSON对象：
+{
+  "outline_insights": [
+    {
+      "node_path": "1. 使用习惯 > 1.1 使用频率",
+      "key_findings": "综合多个用户的总体结论...",
+      "supporting_quotes": ["【用户A】...", "【用户B】..."]
+    }
+  ],
+  "additional_findings": [],
+  "user_profiles": [
+    {
+      "user_name": "张三",
+      "profile": "极度依赖快捷操作的重度用户，对响应速度敏感，常使用碎片时间处理工作。"
+    }
+  ]
+}
+
+## 访谈文本（已标注用户）
+${mergedText}
+
+请严格输出合法JSON，不要额外解释。`;
+            return prompt;
+        }
+
+        // ---------- 通用解析函数 ----------
+        function processApiResult(result) {
+            if (!result.outline_insights && !result.additional_findings && !result.user_profiles) {
+                throw new Error("JSON中缺少必要字段 outline_insights 或 user_profiles");
+            }
+            currentOutlineInsights = result.outline_insights || [];
+            currentAdditionalFindings = result.additional_findings || [];
+            currentUserProfiles = result.user_profiles || [];
+
+            const outlineText = document.getElementById('interviewOutline').value;
+            if (outlineText.trim()) {
+                parsedOutlineTree = parseOutlineToTree(outlineText);
+            }
+            if (!parsedOutlineTree.length) {
+                showToast("未找到有效的提纲结构，请先保存提纲。", true);
+                return false;
+            }
+
+            renderInsightsTree(parsedOutlineTree, currentOutlineInsights);
+            document.getElementById('exportReportBtn').disabled = false;
+            return true;
+        }
+
+        // ---------- DeepSeek API 调用 ----------
+        async function callDeepSeekAPI(prompt, apiKey, model) {
+            const url = 'https://api.deepseek.com/v1/chat/completions';
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            };
+            const body = {
+                model: model,
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.3,
+                response_format: { type: "json_object" }
+            };
+            const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API 请求失败 (${response.status}): ${errorText}`);
+            }
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+            let jsonStr = content;
+            const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (jsonMatch) jsonStr = jsonMatch[1];
+            return JSON.parse(jsonStr);
+        }
+
+        async function handleCallDeepSeek() {
+            const apiKey = deepseekApiKeyInput.value.trim();
+            if (!apiKey) { showToast("请先输入 DeepSeek API Key", true); return; }
+            const model = modelSelect.value;
+            const prompt = buildPromptWithContext();
+            if (!prompt) return;
+            currentFullPrompt = prompt;
+            document.getElementById('promptPreview').innerText = prompt;
+            apiCallStatus.innerHTML = '⏳ 正在调用 DeepSeek API，请稍候...';
+            apiCallStatus.style.color = '#2563eb';
+            callDeepSeekBtn.disabled = true;
+            try {
+                const result = await callDeepSeekAPI(prompt, apiKey, model);
+                processApiResult(result);
+                apiCallStatus.innerHTML = '✅ AI 分析完成，结果已自动展示！';
+                apiCallStatus.style.color = '#059669';
+                showToast("分析成功，报告已生成");
+                if (rememberApiKeyCheck.checked) localStorage.setItem('deepseek_api_key', apiKey);
+                else localStorage.removeItem('deepseek_api_key');
+            } catch (err) {
+                console.error(err);
+                apiCallStatus.innerHTML = `❌ 调用失败: ${err.message}`;
+                apiCallStatus.style.color = '#b91c1c';
+                showToast(`错误: ${err.message}`, true);
+            } finally {
+                callDeepSeekBtn.disabled = false;
+            }
+        }
+
+        // ---------- 手动粘贴JSON解析 ----------
+        function handleManualJsonParse() {
+            const inputEl = document.getElementById('manualJsonInput');
+            const statusEl = document.getElementById('manualParseStatus');
+            const rawJson = inputEl.value.trim();
+            if (!rawJson) {
+                showToast("请粘贴JSON内容", true);
+                return;
+            }
+            try {
+                let jsonStr = rawJson;
+                const codeBlockMatch = rawJson.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+                if (codeBlockMatch) jsonStr = codeBlockMatch[1];
+                const result = JSON.parse(jsonStr);
+                processApiResult(result);
+                statusEl.innerHTML = '✅ JSON 解析成功，结果已展示！';
+                statusEl.style.color = '#059669';
+                showToast("手动粘贴的JSON已解析并生成报告");
+            } catch (e) {
+                console.error(e);
+                statusEl.innerHTML = `❌ JSON 解析失败: ${e.message}`;
+                statusEl.style.color = '#b91c1c';
+                showToast(`JSON 解析错误: ${e.message}`, true);
+            }
+        }
+
+        // ---------- 生成报告 ----------
+        function generateOutlineBasedReport() {
+            if ((!currentOutlineInsights || currentOutlineInsights.length === 0) && (!currentAdditionalFindings || currentAdditionalFindings.length === 0)) {
+                showToast("当前没有提纲洞察数据，请先调用AI分析或手动粘贴JSON。", true);
+                return null;
+            }
+            const topic = document.getElementById('researchTopic').value.trim() || "未提供";
+            const projectBg = document.getElementById('projectBackground').value.trim() || "未提供";
+            const researchGoal = document.getElementById('researchBackground').value.trim() || "未提供";
+            let md = `# 访谈分析报告\n\n**生成时间**：${new Date().toLocaleString()}\n\n## 研究元信息\n- **主题**：${topic}\n- **背景**：${projectBg}\n- **目标**：${researchGoal}\n\n## 受访者列表\n${users.map(u => `- ${u.name}`).join('\n')}\n`;
+
+            if (currentUserProfiles && currentUserProfiles.length > 0) {
+                md += `\n## 👤 受访者画像小结\n`;
+                currentUserProfiles.forEach(p => {
+                    md += `- **${p.user_name}**：${p.profile}\n`;
+                });
+                md += `\n`;
+            }
+
+            md += `## 提纲维度分析\n`;
+
+            function outputNode(node, level = 0) {
+                const insight = currentOutlineInsights.find(i => i.node_path === node.fullPath);
+                const heading = node.numberedTitle || node.title;
+                if (insight) {
+                    md += `\n${'#'.repeat(level + 2)} ${heading}\n\n**核心结论**：${insight.key_findings}\n\n**用户原声引用**：\n`;
+                    for (let q of (insight.supporting_quotes || [])) md += `- ${q}\n`;
+                } else {
+                    if (node.children.length === 0) md += `\n${'#'.repeat(level + 2)} ${heading}\n\n*（该维度无AI返回结论）*\n`;
+                    else md += `\n${'#'.repeat(level + 2)} ${heading}\n`;
+                }
+                node.children.forEach(child => outputNode(child, level + 1));
+            }
+            parsedOutlineTree.forEach(root => outputNode(root, 0));
+            if (currentAdditionalFindings && currentAdditionalFindings.length > 0) {
+                md += `\n## 提纲外额外发现\n`;
+                for (let ext of currentAdditionalFindings) {
+                    md += `\n### ${ext.theme}\n\n**描述**：${ext.description}\n\n**相关原声**：\n`;
+                    for (let q of (ext.quotes || [])) md += `- ${q}\n`;
+                }
+            }
+            md += `\n---\n*报告基于AI提纲编码生成，引述已标注用户来源。*`;
+            return md;
+        }
+
+        // ---------- API Key 记忆 ----------
+        function loadApiKeyFromStorage() {
+            const saved = localStorage.getItem('deepseek_api_key');
+            if (saved) {
+                deepseekApiKeyInput.value = saved;
+                rememberApiKeyCheck.checked = true;
+            }
+        }
+        clearApiKeyBtn.addEventListener('click', () => {
+            deepseekApiKeyInput.value = '';
+            localStorage.removeItem('deepseek_api_key');
+            rememberApiKeyCheck.checked = false;
+            showToast("API Key 已清除");
+        });
+
+        // ---------- 手动粘贴区域折叠切换 ----------
+        const toggleManualBtn = document.getElementById('toggleManualBtn');
+        const manualPasteSection = document.getElementById('manualPasteSection');
+        let isManualExpanded = false;
+        toggleManualBtn.addEventListener('click', () => {
+            isManualExpanded = !isManualExpanded;
+            if (isManualExpanded) {
+                manualPasteSection.style.display = 'block';
+                toggleManualBtn.innerHTML = '📋 手动粘贴AI返回的JSON结果（备选）▼';
+            } else {
+                manualPasteSection.style.display = 'none';
+                toggleManualBtn.innerHTML = '📋 手动粘贴AI返回的JSON结果（备选）▶';
+            }
+        });
+
+        // ---------- 事件绑定 ----------
+        document.getElementById('generatePromptBtn').addEventListener('click', async () => {
+            const p = buildPromptWithContext();
+            if (!p) return;
+            currentFullPrompt = p;
+            document.getElementById('promptPreview').innerText = p;
+
+            // 复制到剪贴板
+            try {
+                await navigator.clipboard.writeText(p);
+                showToast("✅ Prompt 已复制到剪贴板！");
+            } catch (err) {
+                showToast("⚠️ 复制失败，请手动复制", true);
+            }
+            showToast("✅ Prompt 已生成，并已尝试复制到剪贴板");
+        });
+
+        callDeepSeekBtn.addEventListener('click', handleCallDeepSeek);
+
+        document.getElementById('parseManualJsonBtn').addEventListener('click', handleManualJsonParse);
+        document.getElementById('clearManualJsonBtn').addEventListener('click', () => {
+            document.getElementById('manualJsonInput').value = '';
+            document.getElementById('manualParseStatus').innerHTML = '';
+        });
+
+        document.getElementById('exportReportBtn').addEventListener('click', () => {
+            const report = generateOutlineBasedReport();
+            if (!report) return;
+            const blob = new Blob([report], { type: "text/markdown" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `outline_report_${new Date().toISOString().slice(0, 19)}.md`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast("📑 报告已导出");
+        });
+        document.getElementById('clearResearchBtn').addEventListener('click', () => {
+            ['researchTopic', 'projectBackground', 'researchBackground', 'interviewOutline', 'focusContent', 'customInstructions'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('allowExtraFindings').checked = false;
+            updateOutlinePreview();
+            updateAllButtonsState();
+            showToast("🗑️ 已清空研究定向");
+        });
+        document.getElementById('saveResearchBtn').addEventListener('click', () => {
+            updateOutlinePreview();
+            showToast("✅ 研究定向已保存，提纲已解析");
+        });
+
+        function parseBatchText(text) {
+            const markers = { '【访谈主题】': 'researchTopic', '【背景信息】': 'projectBackground', '【研究目标】': 'researchBackground', '【提纲维度】': 'interviewOutline', '【重点关注】': 'focusContent', '【自定义指令】': 'customInstructions' };
+            const result = {};
+            let remaining = text;
+            for (const [marker, fieldId] of Object.entries(markers)) {
+                const regex = new RegExp(`${marker}\\s*([\\s\\S]*?)(?=${Object.keys(markers).map(m => m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}|$)`, 'i');
+                const match = remaining.match(regex);
+                if (match && match[1]) { result[fieldId] = match[1].trim(); remaining = remaining.replace(match[0], ''); }
+                else result[fieldId] = '';
+            }
+            return result;
+        }
+        function fillResearchForm(data) { for (const [fieldId, value] of Object.entries(data)) { const el = document.getElementById(fieldId); if (el) el.value = value; } updateOutlinePreview(); }
+        document.getElementById('parseBatchBtn').addEventListener('click', () => {
+            const batchText = document.getElementById('batchText').value;
+            if (!batchText.trim()) { showToast("请在文本框中粘贴内容", true); return; }
+            const parsed = parseBatchText(batchText);
+            if (!parsed.interviewOutline || parsed.interviewOutline.trim() === '') { showToast("❌ 解析失败：必须包含【提纲维度】且内容不能为空！", true); return; }
+            fillResearchForm(parsed);
+            showToast("✅ 已解析并填充表单，请检查内容后保存");
+            const singleTabBtn = document.querySelector('.tab-btn[data-tab="single"]');
+            if (singleTabBtn) singleTabBtn.click();
+            updateAllButtonsState();
+        });
+        document.getElementById('clearBatchBtn').addEventListener('click', () => { document.getElementById('batchText').value = ''; showToast("已清空批量输入框"); });
+        document.getElementById('batchFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => { document.getElementById('batchText').value = ev.target.result; showToast(`✅ 已加载文件: ${file.name}`); };
+            reader.readAsText(file, 'UTF-8');
+        });
+        function escapeHtml(str) { if (!str) return ""; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+        // 初始化
+        initTabs();
+        updateOutlinePreview();
+        loadApiKeyFromStorage();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>lazy-tools · 问卷数据质检平台</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./merged_questionnaire_tool.css">
+
+</head>
+
+<body>
+
+  <div class="max-w-[1700px] mx-auto p-8">
+
+    <header class="flex justify-between items-center mb-10">
+
+      <div>
+
+        <div class="flex items-center gap-3 mb-4">
+
+          <div class="w-12 h-12 rounded-2xl bg-[#EEF2F5] flex items-center justify-center text-xl">
+            🧹
+          </div>
+
+          <div class="badge">
+            Research Quality Platform
+          </div>
+
+        </div>
+
+        <h1 class="text-5xl font-bold tracking-tight">
+          问卷数据质检平台
+        </h1>
+
+        <div class="text-[#988F86] text-lg mt-3">
+          智能识别低质量样本、逻辑矛盾与异常行为
+        </div>
+
+      </div>
+
+      <div class="text-right">
+
+        <div class="text-sm text-[#A39B92]">
+          lazy-tools v2.0
+        </div>
+
+        <div class="mt-3 px-4 py-2 rounded-full bg-white border border-[#E8DFD5] inline-block text-sm">
+          快手主战分析部 · 柳柳 🌿
+        </div>
+
+      </div>
+
+    </header>
+
+    <div class="grid grid-cols-[440px_1fr] gap-8">
+
+      <!-- LEFT -->
+
+      <div class="space-y-6">
+
+        <!-- 上传 -->
+
+        <div class="card p-6">
+
+          <div class="font-semibold text-lg mb-5">
+            数据上传
+          </div>
+
+          <div id="uploadArea"
+            class="border-2 border-dashed border-[#DDD5CC] rounded-[26px] p-10 text-center cursor-pointer hover:bg-white/40 transition">
+
+            <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv" />
+
+            <div class="w-20 h-20 rounded-3xl bg-[#EEF2F5] flex items-center justify-center text-4xl mx-auto mb-5">
+              📊
+            </div>
+
+            <div class="font-semibold text-lg">
+              上传问卷数据
+            </div>
+
+            <div class="text-sm text-[#A29B92] mt-2">
+              支持拖拽上传 / 点击上传
+            </div>
+
+            <div id="fileName" class="text-sm text-[#7F776D] mt-4 hidden"></div>
+
+            <div id="fileStats" class="text-xs text-[#8F877C] mt-2 hidden"></div>
+
+          </div>
+
+          <div id="questionConfirmPanel" class="mt-4 p-4 rounded-2xl border border-[#ECE4DA] bg-[#FAF8F5] hidden">
+            <div class="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <div class="text-sm font-semibold text-[#6B6B6B]">步骤1：确认识别题项</div>
+                <div id="questionConfirmSummary" class="text-xs text-[#8F877C] mt-1"></div>
+              </div>
+              <button id="confirmQuestionsBtn" onclick="confirmQuestionItems()"
+                class="px-4 py-2 rounded-xl bg-[#8C9CAA] text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                ✅ 确认题项并继续
+              </button>
+            </div>
+            <div id="questionConfirmList" class="max-h-32 overflow-auto mb-3"></div>
+            <!-- 公共题识别结果将被渲染到这里 -->
+            <div id="coreBaseResult" class="empty:hidden"></div>
+          </div>
+
+        </div>
+
+        <!-- 规则 -->
+
+        <div class="card p-6">
+
+          <div class="text-lg font-semibold mb-5">
+            清洗规则配置
+          </div>
+
+          <!-- 时长 -->
+
+          <div class="rule-title">
+            ⏱️ 答题时长检测
+          </div>
+
+          <div class="rule-card">
+
+            <div class="space-y-4">
+
+              <!-- 固定阈值 -->
+
+              <div class="small-card">
+
+                <div class="flex justify-between items-center mb-4">
+
+                  <div>
+                    <div class="font-semibold text-sm">
+                      固定时长规则
+                    </div>
+
+                    <div class="text-xs text-[#A59D93] mt-1">
+                      低于最小值或高于最大值(分钟)
+                    </div>
+                  </div>
+
+                  <input type="checkbox" class="toggle" checked id="fixedDurationToggle">
+
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+
+                  <input class="input" id="minDuration" type="number" value="1" placeholder="最短分钟">
+
+                  <input class="input" id="maxDuration" type="number" value="30" placeholder="最长分钟">
+
+                </div>
+
+              </div>
+
+              <!-- IQR 规则 -->
+
+              <div class="small-card">
+
+                <div class="flex justify-between items-center mb-4">
+
+                  <div>
+                    <div class="font-semibold text-sm">
+                      工作量IQR规则 (智能校准)
+                    </div>
+
+                    <div class="text-xs text-[#A59D93] mt-1">
+                      根据个人工作量动态计算合理时限
+                    </div>
+                  </div>
+
+                  <input type="checkbox" class="toggle" checked id="iqrDurationToggle" onchange="toggleIqrRule()">
+
+                </div>
+
+                <div id="iqrConfirmPanel" class="mt-4 p-4 rounded-xl border border-[#ECE4DA] bg-white hidden">
+                  <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                      <div class="text-sm font-semibold text-[#6B6B6B]">IQR时长校准预览</div>
+                      <div id="iqrConfirmSummary" class="text-xs text-[#8F877C] mt-1"></div>
+                    </div>
+                    <button id="confirmIqrBtn" onclick="confirmIqrCalibration()"
+                      class="px-4 py-2 rounded-lg bg-[#8C9CAA] text-white text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                      ✅ 确认该校准
+                    </button>
+                  </div>
+                  <div id="iqrConfirmDetail" class="text-xs text-[#6B6B6B] space-y-2 mb-3"></div>
+                  <div class="flex items-center gap-3">
+                    <label class="text-xs text-[#A59D93] whitespace-nowrap">IQR倍数 k：</label>
+                    <input id="iqrKInput" type="number" step="0.1" value="1.5" min="0.5" max="5"
+                      class="input w-20 text-xs py-1 px-2" onchange="updateIqrPreview()">
+                    <span class="text-xs text-[#A59D93]">（默认1.5，值越大范围越宽、剔除越少）</span>
+                  </div>
+                </div>
+
+                <div id="iqrWaitingText" class="text-xs text-[#A59D93] mt-2">
+                  (请先在左侧上传数据并确认识别题项)
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- 锚定题 -->
+
+          <div class="rule-title">
+            🎯 锚定题/测谎题 <span class="badge badge-red">直接剔除</span>
+          </div>
+
+          <div class="rule-card">
+
+            <div id="anchorList" class="space-y-3">
+
+              <div class="small-card">
+
+                <div class="flex gap-2">
+
+                  <input class="input flex-1 anchor-question" placeholder="题号 (如: A3__3)">
+
+                  <input class="input flex-1 anchor-answer" placeholder="正确答案 (如: 1)">
+
+                  <button class="remove-btn" onclick="removeItem(this)">✕</button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <button class="add-btn mt-4" onclick="addAnchor()">
+              + 添加锚定题
+            </button>
+
+          </div>
+
+          <!-- 直线作答 -->
+
+          <div class="rule-title">
+            📏 直线作答检测 <span class="badge badge-yellow">标记复核</span>
+          </div>
+
+          <div class="rule-card">
+
+            <div class="space-y-3">
+
+              <div class="small-card">
+
+                <div class="grid grid-cols-2 gap-3">
+
+                  <div>
+                    <label class="text-xs text-[#A59D93] mb-1 block">独立题连续</label>
+                    <input class="input" id="straightNormalCount" type="number" value="10">
+                  </div>
+
+                  <div>
+                    <label class="text-xs text-[#A59D93] mb-1 block">矩阵题连续</label>
+                    <input class="input" id="straightMatrixCount" type="number" value="15">
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="small-card">
+
+                <div class="grid grid-cols-2 gap-3">
+
+                  <div>
+                    <label class="text-xs text-[#A59D93] mb-1 block">独立题比例 ≥</label>
+                    <input class="input" id="straightNormalPercent" type="number" value="80">
+                  </div>
+
+                  <div>
+                    <label class="text-xs text-[#A59D93] mb-1 block">矩阵题比例 ≥</label>
+                    <input class="input" id="straightMatrixPercent" type="number" value="90">
+                  </div>
+
+                </div>
+
+                <div class="flex items-center gap-2 mt-2">
+                  <span class="text-[#8F877C] text-sm">%</span>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- 逻辑矛盾 -->
+
+          <div class="rule-title">
+            ⚡ 逻辑矛盾检测 <span class="badge badge-red">直接剔除</span>
+          </div>
+
+          <div class="rule-card">
+
+            <div id="logicList" class="space-y-3">
+
+              <div class="small-card">
+
+                <div class="grid grid-cols-2 gap-3">
+
+                  <input class="input logic-q1" placeholder="题号A (如: A3__1)">
+
+                  <input class="input logic-a1" placeholder="答案A (如: 1)">
+
+                </div>
+
+                <div class="text-center text-xs text-[#B2A99F] my-2">
+                  与以下答案矛盾
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+
+                  <input class="input logic-q2" placeholder="题号B (如: A3__2)">
+
+                  <input class="input logic-a2" placeholder="答案B (如: 2)">
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <button class="add-btn mt-4" onclick="addLogic()">
+              + 添加逻辑矛盾规则
+            </button>
+
+          </div>
+
+          <!-- 规律作答 -->
+
+          <div class="rule-title">
+            🔄 规律作答检测 <span class="badge badge-red">直接剔除</span>
+          </div>
+
+          <div class="rule-card">
+
+            <div class="small-card">
+
+              <label class="text-xs text-[#A59D93] mb-1 block">最小周期(检测ABAB、ABCABC等)</label>
+
+              <input class="input" id="patternMinCycle" type="number" value="3">
+
+            </div>
+
+          </div>
+
+          <!-- 重复检测 -->
+
+          <div class="rule-title">
+            🔍 重复检测 <span class="badge badge-red">直接剔除</span>
+          </div>
+
+          <div class="rule-card">
+
+            <div class="space-y-3">
+
+              <label class="flex items-center gap-3 cursor-pointer">
+
+                <input type="checkbox" class="toggle" id="enableDuplicateIP" checked>
+
+                <span class="text-sm">IP重复 (≥2次)</span>
+
+              </label>
+
+              <label class="flex items-center gap-3 cursor-pointer">
+
+                <input type="checkbox" class="toggle" id="enableDuplicateDevice" checked>
+
+                <span class="text-sm">设备ID重复 (≥2次)</span>
+
+              </label>
+
+              <label class="flex items-center gap-3 cursor-pointer">
+
+                <input type="checkbox" class="toggle" id="enableDuplicateContact" checked>
+
+                <span class="text-sm">联系方式重复 (≥2次)</span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+          <!-- 操作 -->
+
+          <div class="flex gap-3 mt-7">
+
+            <button id="startCleanBtn" onclick="startCleaning()"
+              class="flex-1 py-4 rounded-2xl bg-[#8C9CAA] text-white font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled>
+              🚀 开始数据清洗
+            </button>
+
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 mt-4">
+
+            <button onclick="downloadCleanData()" class="py-3 rounded-2xl bg-[#EEF2F5] hover:bg-[#E4EBEF] text-sm">
+              ⬇️ 清洗数据
+            </button>
+
+            <button onclick="downloadRemovedData()" class="py-3 rounded-2xl bg-[#F6ECEC] hover:bg-[#F2E2E2] text-sm">
+              🗑️ 剔除明细
+            </button>
+
+            <button onclick="downloadReport()" class="py-3 rounded-2xl bg-[#F5F0E8] hover:bg-[#EDE6DB] text-sm">
+              📊 清洗报告
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+
+      <div class="card p-6">
+
+        <!-- tabs -->
+
+        <div class="flex gap-3 mb-8">
+
+          <button onclick="switchTab('overview',event)" class="tab-btn px-5 py-3 rounded-2xl bg-[#8C9EAF] text-white">
+            📊 概览
+          </button>
+
+          <button onclick="switchTab('log',event)" class="tab-btn px-5 py-3 rounded-2xl bg-[#F5F2EE]">
+            📝 日志
+          </button>
+
+          <button onclick="switchTab('removed',event)" class="tab-btn px-5 py-3 rounded-2xl bg-[#F5F2EE]">
+            ❌ 剔除明细
+          </button>
+
+          <button onclick="switchTab('marked',event)" class="tab-btn px-5 py-3 rounded-2xl bg-[#F5F2EE]">
+            ⚠️ 标记复核
+          </button>
+
+        </div>
+
+        <!-- stat -->
+
+        <div class="grid grid-cols-4 gap-4 mb-8">
+
+          <div class="stat bg-gradient-to-br from-[#8B9CAB] to-[#748594]">
+            <div id="totalCount" class="text-4xl font-bold">0</div>
+            <div class="text-sm opacity-80 mt-2">原始样本</div>
+          </div>
+
+          <div class="stat bg-gradient-to-br from-[#92A996] to-[#7E9683]">
+            <div id="validCount" class="text-4xl font-bold">0</div>
+            <div class="text-sm opacity-80 mt-2">有效样本</div>
+          </div>
+
+          <div class="stat bg-gradient-to-br from-[#C98B8B] to-[#B87373]">
+            <div id="removedCount" class="text-4xl font-bold">0</div>
+            <div class="text-sm opacity-80 mt-2">剔除样本</div>
+          </div>
+
+          <div class="stat bg-gradient-to-br from-[#D5BA91] to-[#C8A777]">
+            <div id="markedCount" class="text-4xl font-bold">0</div>
+            <div class="text-sm opacity-80 mt-2">标记复核</div>
+          </div>
+
+        </div>
+
+        <!-- overview -->
+
+        <div id="overviewTab">
+
+          <div class="bg-[#F8F5F1] rounded-[26px] p-6">
+
+            <div class="font-semibold mb-5">
+              规则统计分布
+            </div>
+
+            <div id="ruleStats" class="space-y-4">
+
+              <div class="bg-white border border-[#ECE4DA] rounded-2xl px-4 py-4 text-[#8F877C]">
+                等待上传数据...
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- log -->
+
+        <div id="logTab" class="hidden-tab">
+
+          <div class="bg-[#F8F5F1] rounded-[26px] p-6 h-[600px] overflow-auto">
+
+            <div id="logContent" class="space-y-3 text-sm">
+
+              <div class="text-[#8F877C]">
+                等待开始数据清洗...
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- removed -->
+
+        <div id="removedTab" class="hidden-tab">
+
+          <div class="bg-[#F8F5F1] rounded-[26px] p-6 h-[600px] overflow-auto">
+
+            <table class="w-full text-sm">
+
+              <thead>
+
+                <tr class="text-left text-[#8F877C]">
+
+                  <th class="pb-4 font-medium">序号</th>
+                  <th class="pb-4 font-medium">RID</th>
+                  <th class="pb-4 font-medium">剔除原因</th>
+                  <th class="pb-4 font-medium">规则</th>
+                  <th class="pb-4 font-medium">详情</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="removedTable">
+
+                <tr>
+
+                  <td colspan="5" class="py-10 text-center text-[#A49B91]">
+                    暂无剔除数据
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+        <!-- marked -->
+
+        <div id="markedTab" class="hidden-tab">
+
+          <div class="bg-[#F8F5F1] rounded-[26px] p-6 h-[600px] overflow-auto">
+
+            <table class="w-full text-sm">
+
+              <thead>
+
+                <tr class="text-left text-[#8F877C]">
+
+                  <th class="pb-4 font-medium">序号</th>
+                  <th class="pb-4 font-medium">RID</th>
+                  <th class="pb-4 font-medium">标记原因</th>
+                  <th class="pb-4 font-medium">规则</th>
+                  <th class="pb-4 font-medium">详情</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody id="markedTable">
+
+                <tr>
+
+                  <td colspan="5" class="py-10 text-center text-[#A49B91]">
+                    暂无标记数据
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="./merged_questionnaire_tool.js"></script>
+
+
+
+  <script type="text/javascript" src="/accessproxy_statics/h5_fp.js" defer></script>
+  <script type="text/javascript" src="/accessproxy_statics/wm.js" defer></script>
+</body>
+
+</html>

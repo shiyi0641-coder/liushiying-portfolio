@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 显著性标色小工具 · lazy-tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #F5F5F7;
+        }
+        .tool-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        }
+        .preview-table {
+            border-collapse: collapse;
+        }
+        .preview-table th,
+        .preview-table td {
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .preview-table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        .highlight-sig {
+            background-color: #fef3c7 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="tool-container">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 text-white flex items-center justify-center text-3xl">
+                    🎨
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-[#111]">显著性标色小工具</h1>
+                    <p class="text-gray-500">自动标亮 SPSS 输出表格中的显著性标记</p>
+                </div>
+            </div>
+            <a href="../index.html" class="text-gray-500 hover:text-[#111] transition">
+                ← 返回工具箱
+            </a>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card p-6 mb-6 border-l-4 border-amber-400">
+            <h3 class="font-semibold text-[#111] mb-3">📖 使用说明</h3>
+            <ol class="text-gray-600 space-y-2 text-sm">
+                <li>1. 在 SPSS 中复制输出表格（Ctrl+C）</li>
+                <li>2. 粘贴到下方的输入框中（Ctrl+V）</li>
+                <li>3. 点击「一键标色」按钮</li>
+                <li>4. 复制结果（Ctrl+C）粘贴回 Excel/Word</li>
+            </ol>
+        </div>
+
+        <!-- Input Section -->
+        <div class="card p-6 mb-6">
+            <h3 class="font-semibold text-[#111] mb-4">📝 输入 SPSS 表格</h3>
+            <textarea 
+                id="input" 
+                class="w-full min-h-[200px] p-4 border-2 border-gray-200 rounded-xl font-mono text-sm resize-y"
+                placeholder="请在此处粘贴 SPSS 输出的表格内容..."></textarea>
+            
+            <div class="flex items-center gap-6 mt-4 flex-wrap">
+                <label class="flex items-center gap-2">
+                    <span class="text-sm text-gray-600">显著性背景色：</span>
+                    <input type="color" id="sigColor" value="#fef3c7" class="w-10 h-8 rounded cursor-pointer">
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="checkbox" id="highlightP" checked class="w-4 h-4 rounded border-gray-300">
+                    <span class="text-sm text-gray-600">标注 p &lt; 0.05</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="checkbox" id="highlight001" checked class="w-4 h-4 rounded border-gray-300">
+                    <span class="text-sm text-gray-600">标注 p &lt; 0.01 (**)</span>
+                </label>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="highlightSignificance()" class="btn-primary text-white px-6 py-3 rounded-xl font-medium">
+                    🎨 一键标色
+                </button>
+                <button onclick="loadExample()" class="px-6 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                    📋 加载示例
+                </button>
+                <button onclick="clearAll()" class="px-6 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                    🗑️ 清空
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="resultCard" class="card p-6 hidden">
+            <h3 class="font-semibold text-[#111] mb-4">✨ 标色结果</h3>
+            <div id="output" class="overflow-x-auto mb-6"></div>
+            <div class="flex gap-3">
+                <button onclick="copyResult()" class="bg-[#111] text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-800 transition">
+                    📋 复制结果
+                </button>
+                <button onclick="exportHTML()" class="px-6 py-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+                    💾 导出 HTML
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const exampleData = `\tB\tSE\tWald\tdf\tSig.\tExp(B)\t95% C.I.for EXP(B)\n\t\t\t\t\t\t\tLower\tUpper
+步骤 1\t2.345\t0.567\t16.890\t1\t.000**\t10.432\t3.432\t31.678
+步骤 2\t1.234\t0.456\t7.320\t1\t.007**\t3.436\t1.405\t8.392
+步骤 3\t0.567\t0.234\t5.854\t1\t.016*\t1.763\t1.114\t2.789
+步骤 4\t0.123\t0.345\t0.127\t1\t.722\t1.131\t0.576\t2.221`;
+
+        function loadExample() {
+            document.getElementById('input').value = exampleData;
+        }
+
+        function clearAll() {
+            document.getElementById('input').value = '';
+            document.getElementById('resultCard').classList.add('hidden');
+        }
+
+        function highlightSignificance() {
+            const input = document.getElementById('input').value.trim();
+            if (!input) {
+                alert('请先粘贴表格内容！');
+                return;
+            }
+
+            const sigColor = document.getElementById('sigColor').value;
+            const highlightP = document.getElementById('highlightP').checked;
+            const highlight001 = document.getElementById('highlight001').checked;
+
+            const rows = input.split('\n');
+            let html = '<table class="preview-table w-full">';
+            
+            rows.forEach((row, index) => {
+                const cells = row.split('\t');
+                html += '<tr>';
+                
+                cells.forEach(cell => {
+                    const isHeader = index === 0 || index === 1;
+                    const tag = isHeader ? 'th' : 'td';
+                    
+                    let shouldHighlight = false;
+                    const cellText = cell.trim();
+                    
+                    if (!isHeader && cellText) {
+                        const numValue = parseFloat(cellText.replace(/[*,\s]/g, ''));
+                        
+                        if (!isNaN(numValue)) {
+                            if (highlight001 && numValue < 0.01) shouldHighlight = true;
+                            else if (highlightP && numValue < 0.05) shouldHighlight = true;
+                        }
+                        
+                        if (cellText.includes('**') && highlight001) shouldHighlight = true;
+                        else if (cellText.includes('*') && highlightP) shouldHighlight = true;
+                    }
+                    
+                    const style = shouldHighlight ? `style="background-color: ${sigColor};"` : '';
+                    html += `<${tag} ${style}>${cellText}</${tag}>`;
+                });
+                
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            
+            document.getElementById('output').innerHTML = html;
+            document.getElementById('resultCard').classList.remove('hidden');
+            document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyResult() {
+            const table = document.querySelector('#output table');
+            if (!table) return;
+            
+            const temp = document.createElement('div');
+            temp.innerHTML = table.outerHTML;
+            document.body.appendChild(temp);
+            
+            const range = document.createRange();
+            range.selectNode(temp);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                alert('已复制到剪贴板！可以粘贴到 Excel/Word 中。');
+            } catch (err) {
+                alert('复制失败，请手动复制。');
+            }
+            
+            window.getSelection().removeAllRanges();
+            document.body.removeChild(temp);
+        }
+
+        function exportHTML() {
+            const output = document.getElementById('output').innerHTML;
+            const fullHTML = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+table { border-collapse: collapse; width: 100%; }
+th, td { padding: 12px; border: 1px solid #ccc; text-align: center; }
+th { background: #f5f5f5; font-weight: bold; }
+</style>
+</head>
+<body>
+${output}
+</body>
+</html>`;
+            
+            const blob = new Blob([fullHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '显著性标色结果.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

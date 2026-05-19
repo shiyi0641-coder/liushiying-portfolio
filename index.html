@@ -73,6 +73,15 @@
         .timeline-item:hover::after { transform: scale(1.3); background: #7B8B9E; box-shadow: 0 0 0 4px rgba(123, 139, 158, 0.3), 0 0 20px rgba(123, 139, 158, 0.2); }
         .timeline-item:last-child::before { display: none; }
 
+        .card-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; opacity: 0; transform: translateY(-4px); transition: opacity 0.25s ease, transform 0.25s ease; z-index: 10; }
+        .internship-card:hover .card-actions, .project-card:hover .card-actions { opacity: 1; transform: translateY(0); }
+        .card-actions button { width: 32px; height: 32px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; transition: all 0.2s ease; background: white; color: #6b7280; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .card-actions button:hover { color: white; }
+        .card-actions .btn-edit:hover { background: #8B9A8E; }
+        .card-actions .btn-delete:hover { background: #ef4444; }
+        .card-actions .btn-move:hover { background: #7B8B9E; }
+        .internship-card, .project-card { position: relative; }
+
         .internship-card { overflow: hidden; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .internship-card .expand-content { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
         .internship-card.expanded .expand-content { max-height: 800px; opacity: 1; }
@@ -446,7 +455,7 @@
 
             <div class="grid md:grid-cols-2 gap-6 stagger-children">
                 <!-- Project 1 -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-gray-blue flex items-center justify-center mb-4"><i class="fas fa-brain text-white text-xl"></i></div>
@@ -462,7 +471,7 @@
                 </div>
 
                 <!-- Project 2: 心理健康教育服务新模式调研 (合并走心驿站) -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center mb-4"><i class="fas fa-hands-helping text-white text-xl"></i></div>
@@ -477,7 +486,7 @@
                 </div>
 
                 <!-- Project 3 -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-sage to-morandi-gray-green flex items-center justify-center mb-4"><i class="fas fa-users text-white text-xl"></i></div>
@@ -493,7 +502,7 @@
                 </div>
 
                 <!-- Project 4 -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-lavender to-morandi-gray-blue flex items-center justify-center mb-4"><i class="fas fa-chart-line text-white text-xl"></i></div>
@@ -508,7 +517,7 @@
                 </div>
 
                 <!-- Project 5: 懒蛋工具集成平台 -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-green to-morandi-sage flex items-center justify-center mb-4"><i class="fas fa-toolbox text-white text-xl"></i></div>
@@ -516,13 +525,14 @@
                         <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">懒蛋工具集成平台</h3>
                         <p class="text-gray-600 text-sm leading-relaxed mb-4">将词云工具、交叉表生成等高频工具集成至统一HTML界面，一站式沉淀团队通用能力，推动研究流程标准化。</p>
                         <div class="flex flex-wrap gap-2">
-                            <a href="./project-files/懒蛋_主页集成.zip" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载项目文件</a>
+                            <a href="./project-files/懒蛋工具/懒蛋_主页集成/index.html" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-external-link-alt"></i> 在线体验</a>
+                            <a href="./project-files/懒蛋_主页集成.zip" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-blue text-morandi-gray-blue hover:bg-morandi-gray-blue/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载源码</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Project 6: 数据清洗工具 -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-gray-blue to-morandi-lavender flex items-center justify-center mb-4"><i class="fas fa-broom text-white text-xl"></i></div>
@@ -530,13 +540,14 @@
                         <h3 class="text-lg font-semibold text-gray-800 mt-3 mb-2">数据清洗工具</h3>
                         <p class="text-gray-600 text-sm leading-relaxed mb-4">开发浏览器端数据清洗HTML工具，内置去重、格式标准化、异常值识别等规则，实现轻量高效的原始数据预处理。</p>
                         <div class="flex flex-wrap gap-2">
-                            <a href="./project-files/数据清洗.zip" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-blue text-morandi-gray-blue hover:bg-morandi-gray-blue/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载项目文件</a>
+                            <a href="./project-files/数据清洗/数据清洗/index.html" target="_blank" class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-blue text-morandi-gray-blue hover:bg-morandi-gray-blue/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-external-link-alt"></i> 在线体验</a>
+                            <a href="./project-files/数据清洗.zip" download class="px-4 py-3 rounded-xl text-sm font-medium border-2 border-morandi-gray-green text-morandi-gray-green hover:bg-morandi-gray-green/10 transition-all duration-300 flex items-center gap-2 cursor-pointer"><i class="fas fa-download"></i> 下载源码</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Project 7: 问卷模板智能生成工具 -->
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <div class="card-inner">
                         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-morandi-pink to-morandi-lavender flex items-center justify-center mb-4"><i class="fas fa-file-alt text-white text-xl"></i></div>
@@ -568,7 +579,7 @@
                 <div class="w-20 h-1 bg-gradient-to-r from-morandi-gray-green to-morandi-sage rounded-full mx-auto"></div>
             </div>
             <div class="grid md:grid-cols-3 gap-6 stagger-children">
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-star text-morandi-gray-green"></i> 核心技能</h3>
                     <div class="space-y-5">
@@ -594,14 +605,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-laptop text-morandi-gray-blue"></i> 办公技能</h3>
                     <div class="flex flex-wrap gap-2">
                         <span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Matlab</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">SPSS</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Excel</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Word</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">PPT</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Python</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">E-prime</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">SQL</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Coze</span><span class="tag-interactive px-3 py-2 rounded-full text-sm text-gray-600">Claude Code</span>
                     </div>
                 </div>
-                <div class="reveal bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
+                <div class="reveal project-card bg-white rounded-2xl p-6 shadow-lg card-3d cursor-default">
                     <div class="card-shine rounded-2xl"></div>
                     <h3 class="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-pencil-ruler text-morandi-pink"></i> 产品技能</h3>
                     <div class="flex flex-wrap gap-2">
@@ -872,6 +883,13 @@
                 </div>`;
 
             const list = document.getElementById('internshipList');
+            
+            // If editing, replace existing card
+            if (window._editingCard) {
+                window._editingCard.remove();
+                delete window._editingCard;
+            }
+            
             list.insertBefore(card, list.firstChild);
 
             // Re-observe for reveal, re-bind 3D tilt + cursor
@@ -881,7 +899,7 @@
             if (window.matchMedia('(pointer: fine)').matches) { card.addEventListener('mouseenter', () => cursorRing.classList.add('hovering')); card.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering')); }
 
             // Trigger reveal
-            setTimeout(() => card.classList.add('visible'), 50);
+            setTimeout(() => { card.classList.add('visible'); addCardActions(); }, 50);
 
             // Clear form
             ['add_company','add_position','add_start','add_end','add_preview','add_details'].forEach(id => document.getElementById(id).value = '');
@@ -922,6 +940,13 @@
                 </div>`;
 
             const grid = document.querySelector('#projects .grid');
+            
+            // If editing, replace existing card
+            if (window._editingProjectCard) {
+                window._editingProjectCard.remove();
+                delete window._editingProjectCard;
+            }
+            
             grid.appendChild(card);
 
             // Re-observe + 3D + cursor
@@ -929,11 +954,110 @@
             card.addEventListener('mousemove', function(e) { const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; card.style.transform = `perspective(1000px) rotateX(${((y - r.height/2) / (r.height/2)) * -5}deg) rotateY(${((x - r.width/2) / (r.width/2)) * 5}deg)`; const s = card.querySelector('.card-shine'); if (s) { s.style.setProperty('--mouse-x', (x/r.width*100)+'%'); s.style.setProperty('--mouse-y', (y/r.height*100)+'%'); } });
             card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)'; });
             if (window.matchMedia('(pointer: fine)').matches) { card.addEventListener('mouseenter', () => cursorRing.classList.add('hovering')); card.addEventListener('mouseleave', () => cursorRing.classList.remove('hovering')); }
-            setTimeout(() => card.classList.add('visible'), 50);
+            setTimeout(() => { card.classList.add('visible'); addCardActions(); }, 50);
 
             ['proj_name','proj_tag','proj_desc','proj_icon','proj_file','proj_file_label','proj_link','proj_link_label'].forEach(id => { if (id !== 'proj_tag' && id !== 'proj_icon' && id !== 'proj_file_label' && id !== 'proj_link_label') document.getElementById(id).value = ''; });
             closeAddProject();
         }
+
+        // ===== Card Actions: Edit & Delete =====
+        function addCardActions() {
+            // Internship cards
+            document.querySelectorAll('.internship-card').forEach(card => {
+                if (card.querySelector('.card-actions')) return;
+                const actions = document.createElement('div');
+                actions.className = 'card-actions';
+                actions.innerHTML = `
+                    <button class="btn-move" title="上移" onclick="event.stopPropagation(); moveCard(this.closest('.internship-card'), -1)"><i class="fas fa-arrow-up"></i></button>
+                    <button class="btn-move" title="下移" onclick="event.stopPropagation(); moveCard(this.closest('.internship-card'), 1)"><i class="fas fa-arrow-down"></i></button>
+                    <button class="btn-edit" title="编辑" onclick="event.stopPropagation(); editInternship(this.closest('.internship-card'))"><i class="fas fa-pen"></i></button>
+                    <button class="btn-delete" title="删除" onclick="event.stopPropagation(); deleteCard(this.closest('.internship-card'), 'internshipList')"><i class="fas fa-trash"></i></button>`;
+                card.querySelector('.card-inner').prepend(actions);
+            });
+
+            // Project cards
+            document.querySelectorAll('#projects .grid > .card-3d').forEach(card => {
+                if (card.querySelector('.card-actions')) return;
+                const actions = document.createElement('div');
+                actions.className = 'card-actions';
+                actions.innerHTML = `
+                    <button class="btn-edit" title="编辑" onclick="event.stopPropagation(); editProject(this.closest('.card-3d'))"><i class="fas fa-pen"></i></button>
+                    <button class="btn-delete" title="删除" onclick="event.stopPropagation(); deleteCard(this.closest('.card-3d'), 'projectGrid')"><i class="fas fa-trash"></i></button>`;
+                card.querySelector('.card-inner').prepend(actions);
+            });
+        }
+
+        function deleteCard(card, listId) {
+            if (!confirm('确定删除这一条吗？')) return;
+            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease, max-height 0.3s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => card.remove(), 300);
+        }
+
+        function moveCard(card, direction) {
+            const parent = card.parentElement;
+            const cards = Array.from(parent.querySelectorAll('.internship-card'));
+            const idx = cards.indexOf(card);
+            const newIdx = idx + direction;
+            if (newIdx < 0 || newIdx >= cards.length) return;
+            if (direction === -1) parent.insertBefore(card, cards[newIdx]);
+            else parent.insertBefore(cards[newIdx], card);
+        }
+
+        function editInternship(card) {
+            // Extract data from card
+            const inner = card.querySelector('.card-inner');
+            const h3 = inner.querySelector('h3');
+            const pos = inner.querySelector('h3 + p, .text-sm[class*="text-morandi"]');
+            const date = inner.querySelector('[class*="rounded-full"][class*="bg-morandi"]');
+            const preview = inner.querySelector('.space-y-3:not(.expand-content .space-y-3)');
+            const details = inner.querySelector('.expand-content');
+            
+            // Fill form
+            document.getElementById('add_company').value = h3 ? h3.textContent.trim() : '';
+            document.getElementById('add_position').value = pos ? pos.textContent.trim() : '';
+            const dateText = date ? date.textContent.trim() : '';
+            const parts = dateText.split(' - ');
+            document.getElementById('add_start').value = parts[0] ? parts[0].trim() : '';
+            document.getElementById('add_end').value = parts[1] ? parts[1].trim() : '';
+            document.getElementById('add_preview').value = preview ? preview.textContent.trim().replace(/\s+/g, ' ').substring(0, 200) : '';
+            
+            // Store reference for saving
+            card.dataset.editing = 'true';
+            window._editingCard = card;
+            
+            openAddInternship();
+        }
+
+        function editProject(card) {
+            const inner = card.querySelector('.card-inner');
+            const h3 = inner.querySelector('h3');
+            const tag = inner.querySelector('[class*="rounded-full"][class*="bg-morandi"]');
+            const desc = inner.querySelector('p.text-gray-600');
+            const links = inner.querySelectorAll('a[href]');
+            
+            document.getElementById('proj_name').value = h3 ? h3.textContent.trim() : '';
+            document.getElementById('proj_tag').value = tag ? tag.textContent.trim() : '';
+            document.getElementById('proj_desc').value = desc ? desc.textContent.trim() : '';
+            
+            if (links.length > 0) {
+                const firstLink = links[0];
+                if (firstLink.hasAttribute('download')) {
+                    document.getElementById('proj_file').value = firstLink.getAttribute('href');
+                } else {
+                    document.getElementById('proj_link').value = firstLink.getAttribute('href');
+                }
+            }
+            
+            card.dataset.editing = 'true';
+            window._editingProjectCard = card;
+            
+            openAddProject();
+        }
+
+        // Run after DOM ready
+        addCardActions();
 
         // ===== Keyboard =====
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeChat(); closeLightbox(); closeAddInternship(); closeAddProject(); } });
